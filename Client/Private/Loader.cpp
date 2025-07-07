@@ -85,6 +85,11 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
 		return E_FAIL;
 
+	// Black Background Image for Main Logo Screen.
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Black"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Background/black.png"), 1))))
+		return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 

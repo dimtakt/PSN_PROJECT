@@ -15,7 +15,7 @@ namespace Engine
 	#define			NS_END						}
 	
 	#define			USING(NAMESPACE)	using namespace NAMESPACE;
-	
+
 	#ifdef	ENGINE_EXPORTS
 	#define ENGINE_DLL		_declspec(dllexport)
 	#else
@@ -77,5 +77,21 @@ namespace Engine
 				}													\
 			}
 }
+
+
+// ==============================
+// ||	Custom Macros
+// START=========================
+
+	#define			TO_RAD(DEGREE)									XMConvertToRadians(DEGREE)
+	#define			TO_DEG(RADIAN)									XMConvertToDegrees(RADIAN)
+
+	#define			IS_BETWEEN(condition, minValue, maxValue)		(((minValue) <= (condition)) && ((condition) < (maxValue)))	// 이상 and 미만
+
+	#define			FAILED_CHECK_NOMSG(_hr)							if( ((HRESULT)(_hr)) < 0 )	\
+																		{ return E_FAIL;}
+
+
+// END===========================
 
 #endif // Engine_Macro_h__

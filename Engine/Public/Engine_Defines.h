@@ -29,6 +29,9 @@ using namespace std;
 #include "Engine_Function.h"
 
 
+#include "DirectXTK/SpriteFont.h"
+#include "DirectXTK/SpriteBatch.h"
+
 
 #ifdef _DEBUG
 

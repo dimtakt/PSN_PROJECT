@@ -6,6 +6,7 @@
 #include "Prototype_Manager.h"
 #include "Renderer.h"
 #include "Timer_Manager.h"
+#include "Font_Manager.h"
 //#include "Picking.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -14,6 +15,8 @@ CGameInstance::CGameInstance()
 {
 
 }
+
+// ==============================
 
 #pragma region ENGINE
 
@@ -47,6 +50,12 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pTimer_Manager = CTimer_Manager::Create();
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
+
+	m_pFont_Manager = CFont_Manager::Create();
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
@@ -121,6 +130,8 @@ _float CGameInstance::Rand(_float fMin, _float fMax)
 
 #pragma endregion
 
+// ==============================
+
 #pragma region LEVEL_MANAGER
 
 HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
@@ -132,6 +143,8 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 }
 
 #pragma endregion
+
+// ==============================
 
 #pragma region PROTOTYPE_MANAGER
 
@@ -153,6 +166,8 @@ CBase* CGameInstance::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLeve
 
 #pragma endregion
 
+// ==============================
+
 #pragma region OBJECT_MANAGER
 
 CComponent* CGameInstance::Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex)
@@ -170,6 +185,8 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wst
 
 #pragma endregion
 
+// ==============================
+
 #pragma region RENDERER
 
 
@@ -181,6 +198,8 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 
 
 #pragma endregion
+
+// ==============================
 
 #pragma region TIMER_MANAGER
 
@@ -200,6 +219,42 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 }
 
 #pragma endregion
+
+// ==============================
+
+#pragma region FONT_MANAGER
+
+HRESULT	CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontPath)
+{
+	return m_pFont_Manager->Add_Font(strFontTag, pFontPath);
+}
+
+HRESULT CGameInstance::Render_Font(
+	const _wstring& strFontTag,
+	const _tchar* pText,
+	const _float2& vPosition,
+	_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f),
+	_float fRotation = 0.f,
+	const _float2& vOrigin = _float2(0.f, 0.f),
+	_float fScale = 0.f)
+{
+	return m_pFont_Manager->Render_Font(
+		strFontTag,
+		pText,
+		vPosition,
+		vColor,
+		fRotation,
+		vOrigin,
+		fScale
+	);
+}
+
+#pragma endregion
+
+// ==============================
+
+#pragma region DX9 Legacy
+
 //
 //void CGameInstance::Transform_Picking_ToLocalSpace(CTransform* pTransformCom)
 //{
@@ -211,12 +266,18 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 //	return m_pPicking->isPicked_InLocalSpace(vPointA, vPointB, vPointC, pOut);
 //}
 
+#pragma endregion
+
+// ==============================
+
+
 
 
 void CGameInstance::Release_Engine()
 {
 	Release();
 
+	Safe_Release(m_pFont_Manager);
 	//Safe_Release(m_pPicking);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
