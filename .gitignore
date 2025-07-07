@@ -27,7 +27,7 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+# [Bb]in/           # need to commit binary resources
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -399,3 +399,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+Client/Bin/Client.exe
+Client/Bin/Engine.dll
