@@ -27,6 +27,7 @@ private:
 
 private:
 	HRESULT Ready_Prototype_ForStatic();
+	HRESULT Ready_Font();
 	HRESULT Start_Level(LEVEL eStartLevelID);
 
 public:

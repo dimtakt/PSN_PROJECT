@@ -29,6 +29,9 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Font()))
+		return E_FAIL;
+
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;	
 
@@ -67,6 +70,27 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
 	//	CTransform::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Font()
+{
+	// 경로 잘못됨 등의 이유로 로드 실패 시..
+	// CFont::Initialize_Font 단계에서 런타임 에러가 발생함.
+
+	// 영어 기본폰트 로드
+	if (FAILED(m_pGameInstance->Add_Font(
+			L"Font_DOS",
+			L"../Bin/Resources/_SUPERHOT/Fonts/PerfectDOSVGA437Win.spritefont"
+	)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Font(
+		L"Font_Default",
+		L"../Bin/Resources/Fonts/140.spritefont"
+	)))
+		return E_FAIL;
 
 	return S_OK;
 }

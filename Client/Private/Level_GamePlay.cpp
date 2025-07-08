@@ -1,6 +1,7 @@
 #include "Level_GamePlay.h"
 
 #include "GameInstance.h"
+#include "Camera_Free.h"
 
 
 
@@ -56,10 +57,22 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
-	
+	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 
+	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fNear = 0.1f;
+	CameraDesc.fFar = 500.f;
+	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraDesc.fMouseSensor = 1.f;
 
-	return S_OK; 
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
+		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _wstring& strLayerTag)

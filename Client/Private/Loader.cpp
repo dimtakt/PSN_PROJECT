@@ -5,7 +5,7 @@
 #include "BackGround.h"
 #include "Terrain.h"
 //#include "Monster.h"
-//#include "Camera.h"
+#include "Camera_Free.h"
 //#include "Player.h"
 //#include "Effect.h"
 //#include "Sky.h"
@@ -159,10 +159,10 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	///* Prototype_GameObject_Camera*/
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Camera"),
-	//	CCamera::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	/* Prototype_GameObject_Camera_Free */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"),
+		CCamera_Free::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	///* Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Player"),

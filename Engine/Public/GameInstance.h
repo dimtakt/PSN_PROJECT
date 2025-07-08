@@ -73,7 +73,9 @@ public:
 
 #pragma region FONT_MANAGER
 public:
+	// (1:key값, 2:value값) 폰트를 추가합니다.
 	HRESULT	Add_Font(const _wstring& strFontTag, const _tchar* pFontPath);
+	// (1:key값, 2:출력텍스트, 3:출력위치; 4:출력색상, 5:회전, 6:크기및회전기준, 7:크기) 폰트를 출력합니다.
 	HRESULT Render_Font(
 		const _wstring& strFontTag,							// map에 넣은 key값
 		const _tchar* pText,								// 출력할 텍스트
@@ -81,11 +83,23 @@ public:
 		_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f),	// 출력할 색상
 		_float fRotation = 0.f,								// 회전 조정
 		const _float2& vOrigin = _float2(0.f, 0.f),			// 회전 및 크기조정 기준
-		_float fScale = 0.f									// 크기 조정
+		_float fScale = 1.f									// 크기 조정
 	);
 
 #pragma endregion
 
+	// ==============================
+
+#pragma region PIPELINE
+public:
+	_matrix Get_Transform_Matrix(D3DTS eTransformState) const;
+	const _float4x4* Get_Transform_Float4x4(D3DTS eTransformState) const;
+	_matrix Get_Transform_Matrix_Inverse(D3DTS eTransformState) const;
+	const _float4x4* Get_Transform_Float4x4_Inverse(D3DTS eTransformState) const;
+	const _float4* Get_CamPosition() const;
+	void Set_Transform(D3DTS eTransformState, _fmatrix Matrix);
+	void Set_Transform(D3DTS eTransformState, const _float4x4& Matrix);
+#pragma endregion
 
 	// ==============================
 
@@ -112,6 +126,7 @@ private:
 	class CRenderer*			m_pRenderer = { nullptr };
 	class CTimer_Manager*		m_pTimer_Manager = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
+	class CPipeLine*			m_pPipeLine = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
 
 public:

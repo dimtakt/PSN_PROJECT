@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "Timer_Manager.h"
 #include "Font_Manager.h"
+#include "PipeLine.h"
 //#include "Picking.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -16,6 +17,8 @@ CGameInstance::CGameInstance()
 
 }
 
+// ==============================
+// || ENGINE
 // ==============================
 
 #pragma region ENGINE
@@ -51,7 +54,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
 
-	m_pFont_Manager = CFont_Manager::Create();
+	m_pPipeLine = CPipeLine::Create();
+	if (nullptr == m_pPipeLine)
+		return E_FAIL;
+
+	m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
 
@@ -131,6 +138,8 @@ _float CGameInstance::Rand(_float fMin, _float fMax)
 #pragma endregion
 
 // ==============================
+// || LEVEL_MANAGER
+// ==============================
 
 #pragma region LEVEL_MANAGER
 
@@ -144,6 +153,8 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 
 #pragma endregion
 
+// ==============================
+// || PROTOTYPE_MANAGER
 // ==============================
 
 #pragma region PROTOTYPE_MANAGER
@@ -167,6 +178,8 @@ CBase* CGameInstance::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLeve
 #pragma endregion
 
 // ==============================
+// || OBJECT_MANAGER
+// ==============================
 
 #pragma region OBJECT_MANAGER
 
@@ -186,6 +199,8 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wst
 #pragma endregion
 
 // ==============================
+// || RENDERER
+// ==============================
 
 #pragma region RENDERER
 
@@ -199,6 +214,8 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 
 #pragma endregion
 
+// ==============================
+// || TIMER_MANAGER
 // ==============================
 
 #pragma region TIMER_MANAGER
@@ -221,6 +238,8 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 #pragma endregion
 
 // ==============================
+// || FONT_MANAGER
+// ==============================
 
 #pragma region FONT_MANAGER
 
@@ -233,10 +252,10 @@ HRESULT CGameInstance::Render_Font(
 	const _wstring& strFontTag,
 	const _tchar* pText,
 	const _float2& vPosition,
-	_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f),
-	_float fRotation = 0.f,
-	const _float2& vOrigin = _float2(0.f, 0.f),
-	_float fScale = 0.f)
+	_fvector vColor,
+	_float fRotation,
+	const _float2& vOrigin,
+	_float fScale)
 {
 	return m_pFont_Manager->Render_Font(
 		strFontTag,
@@ -249,8 +268,56 @@ HRESULT CGameInstance::Render_Font(
 	);
 }
 
+
 #pragma endregion
 
+// ==============================
+// || PIPELINE
+// ==============================
+
+#pragma region PIPELINE
+
+
+_matrix CGameInstance::Get_Transform_Matrix(D3DTS eTransformState) const
+{
+	return m_pPipeLine->Get_Transform_Matrix(eTransformState);
+}
+
+const _float4x4* CGameInstance::Get_Transform_Float4x4(D3DTS eTransformState) const
+{
+	return m_pPipeLine->Get_Transform_Float4x4(eTransformState);
+}
+
+_matrix CGameInstance::Get_Transform_Matrix_Inverse(D3DTS eTransformState) const
+{
+	return m_pPipeLine->Get_Transform_Matrix_Inverse(eTransformState);
+}
+
+const _float4x4* CGameInstance::Get_Transform_Float4x4_Inverse(D3DTS eTransformState) const
+{
+	return m_pPipeLine->Get_Transform_Float4x4_Inverse(eTransformState);
+}
+
+const _float4* CGameInstance::Get_CamPosition() const
+{
+	return m_pPipeLine->Get_CamPosition();
+}
+
+void CGameInstance::Set_Transform(D3DTS eTransformState, _fmatrix Matrix)
+{
+	m_pPipeLine->Set_Transform(eTransformState, Matrix);
+}
+
+void CGameInstance::Set_Transform(D3DTS eTransformState, const _float4x4& Matrix)
+{
+	m_pPipeLine->Set_Transform(eTransformState, Matrix);
+}
+
+
+#pragma endregion
+
+// ==============================
+// || PICKING
 // ==============================
 
 #pragma region DX9 Legacy
@@ -278,6 +345,7 @@ void CGameInstance::Release_Engine()
 	Release();
 
 	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pPipeLine);
 	//Safe_Release(m_pPicking);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
