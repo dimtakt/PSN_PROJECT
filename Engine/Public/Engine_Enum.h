@@ -3,6 +3,7 @@
 
 namespace Engine
 {
+	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
