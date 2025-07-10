@@ -88,6 +88,12 @@
     <Filter Include="00.System\01.Device\Input">
       <UniqueIdentifier>{f6753e49-3c8c-48f9-a436-0c7f91a3c297}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\96.Lights">
+      <UniqueIdentifier>{b210fe54-1170-4fb1-a67d-6440126551c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\96.Lights\Manager">
+      <UniqueIdentifier>{0c69622a-4ea5-4309-92c2-ef79440408bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -164,6 +170,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Input_Device.cpp">
       <Filter>00.System\01.Device\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Light_Manager.cpp">
+      <Filter>01.Utility\96.Lights\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Light.cpp">
+      <Filter>01.Utility\96.Lights</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +271,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Input_Device.h">
       <Filter>00.System\01.Device\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Light_Manager.h">
+      <Filter>01.Utility\96.Lights\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Light.h">
+      <Filter>01.Utility\96.Lights</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

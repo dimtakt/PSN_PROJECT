@@ -1,4 +1,5 @@
 #include "Camera_Free.h"
+#include "GameInstance.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCamera{ pDevice, pContext }
@@ -29,22 +30,38 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-    if (GetKeyState('W') & 0x8000)
+    // * 키보드 WASD 에 의한 카메라 이동
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
     {
         m_pTransformCom->Go_Straight(fTimeDelta);
     }
-    if (GetKeyState('S') & 0x8000)
+    if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
     {
         m_pTransformCom->Go_Backward(fTimeDelta);
     }
-    if (GetKeyState('A') & 0x8000)
+    if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
     {
         m_pTransformCom->Go_Left(fTimeDelta);
     }
-    if (GetKeyState('D') & 0x8000)
+    if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
     {
         m_pTransformCom->Go_Right(fTimeDelta);
     }
+
+
+    // * 마우스 움직임에 의한 카메라 회전
+
+    _int    iMouseMove = {};
+
+    // 항시 글로벌 Y축에 따라 회전해야 하므로 Y축을 고정적인 회전 기준점으로 둠
+    if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+
+    // Y축 회전값에 따라 변하는, 로컬 X축에 따라 회전해야 하므로
+    // Get_State로 RIGHT 값을 받아와 사용
+    if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
+        m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * iMouseMove * m_fMouseSensor);
 
 
     __super::Update_PipeLines();

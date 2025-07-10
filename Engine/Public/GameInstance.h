@@ -103,6 +103,25 @@ public:
 
 	// ==============================
 
+#pragma region INPUT_DEVICE
+public:
+	_byte	Get_DIKeyState(_ubyte byKeyID);				// ┌ 0 = 안눌림, 
+	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);		// └ 0x80 = 눌림.
+	// 인자(X, Y, WHEEL)에 해당하는 마우스 움직임 크기를 반환. 휠은 올릴 시 양수반환
+	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);	
+#pragma endregion
+
+	// ==============================
+
+#pragma region LIGHT_MANAGER
+public:
+	const LIGHT_DESC* Get_LightDesc(_uint iIndex) const;
+	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+
+#pragma endregion
+
+
+
 #pragma region DX9 Legacy
 
 	//
@@ -120,6 +139,7 @@ public:
 
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
+	class CInput_Device*		m_pInput_Device = { nullptr };
 	class CLevel_Manager*		m_pLevel_Manager = { nullptr };
 	class CObject_Manager*		m_pObject_Manager = { nullptr };
 	class CPrototype_Manager*	m_pPrototype_Manager = { nullptr };
@@ -128,6 +148,7 @@ private:
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
 	class CPipeLine*			m_pPipeLine = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
+	class CLight_Manager*		m_pLight_Manager = { nullptr };
 
 public:
 	void Release_Engine();

@@ -8,7 +8,6 @@ Engine::CInput_Device::CInput_Device(void)
 
 HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 {
-
 	// DInput 컴객체를 생성하는 함수
 	if (FAILED(DirectInput8Create(hInst,
 		DIRECTINPUT_VERSION,
@@ -16,6 +15,14 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 		(void**)&m_pInputSDK,
 		NULL)))
 		return E_FAIL;
+
+
+
+
+	// ==============================
+	// || Keyboard Initialize
+	// ==============================
+	
 	// 키보드 객체 생성
 	if (FAILED(m_pInputSDK->CreateDevice(GUID_SysKeyboard, &m_pKeyBoard, nullptr)))
 		return E_FAIL;
@@ -30,6 +37,11 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 	m_pKeyBoard->Acquire();
 
 
+
+	// ==============================
+	// || Mouse Initialize
+	// ==============================
+	
 	// 마우스 객체 생성
 	if (FAILED(m_pInputSDK->CreateDevice(GUID_SysMouse, &m_pMouse, nullptr)))
 		return E_FAIL;

@@ -44,7 +44,7 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 
 	for (size_t i = 0; i < m_iNumPasses; i++)
 	{
-		ID3DX11EffectPass* pPass = pTechnique->GetPassByIndex(i);
+		ID3DX11EffectPass* pPass = pTechnique->GetPassByIndex(static_cast<uint32_t>(i));
 		if (nullptr == pPass)
 			return E_FAIL;		
 
