@@ -56,10 +56,11 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//(LightDesc.Diffuse * MtrlDesc.Diffuse) * (fShade(0 ~ 1) + (LightDesc.Ambient * MtrlDesc.Ambient))
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 0.0f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	/*LightDesc.vSpecular = ;*/
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);	// Light 방향
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);		// Light 색상 및 밝기의 세기
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);	// Light 환경광으로 가정. 최소 밝기 보장에 관여.
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);		// Light 반사광.
+
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
