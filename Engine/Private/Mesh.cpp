@@ -12,13 +12,16 @@ CMesh::CMesh(const CMesh& Prototype)
 
 HRESULT CMesh::Initialize_Prototype(const aiMesh* pAIMesh)
 {
-	m_iNumVertices = pAIMesh->mNumVertices;
-	m_iVertexStride = sizeof(VTXMESH);
-	m_iNumIndices = pAIMesh->mNumFaces * 3;
-	m_iIndexStride = 4;
-	m_iNumVertexBuffers = 1;
-	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
-	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	// m_pVB 에 버텍스 버퍼 할당
+
+	m_iNumVertices = pAIMesh->mNumVertices;					// 정점의 총 개수
+	m_iVertexStride = sizeof(VTXMESH);						// 정점의 용량
+	m_iNumIndices = pAIMesh->mNumFaces * 3;					// 정점 인덱스의 개수
+	m_iIndexStride = 4;										// 정점 인덱스의 용량
+	m_iNumVertexBuffers = 1;								// 정점 버퍼 개수
+	m_eIndexFormat = DXGI_FORMAT_R32_UINT;					// * 정점 인덱스의 용량이 32비트임
+	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;	// * 면이 삼각형임
 
 	D3D11_BUFFER_DESC		VBDesc{};
 	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
@@ -46,6 +49,10 @@ HRESULT CMesh::Initialize_Prototype(const aiMesh* pAIMesh)
 		return E_FAIL;
 
 	Safe_Delete_Array(pVertices);
+
+
+
+	// m_pIB 에 인덱스 버퍼 할당
 
 	D3D11_BUFFER_DESC		IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;

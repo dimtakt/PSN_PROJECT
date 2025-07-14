@@ -37,6 +37,10 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
+	_int			m_iHp			=	{};
+	_int			m_iMaxHp		=	{};
+	
+	
 protected:
 	/*원형컴포넌트를 찾아서 복제한다. */
 	/*map컨테이너에 보관한다.  */
