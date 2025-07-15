@@ -14,8 +14,8 @@ public:
 	HRESULT Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial);
 
 private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device*								m_pDevice = { nullptr };
+	ID3D11DeviceContext*						m_pContext = { nullptr };
 	vector<ID3D11ShaderResourceView*>			m_SRVs[AI_TEXTURE_TYPE_MAX];
 
 public:
