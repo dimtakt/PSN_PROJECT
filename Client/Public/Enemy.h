@@ -3,6 +3,14 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
+
+NS_BEGIN(Engine)
+
+class CShader;
+class CModel;
+
+NS_END
+
 NS_BEGIN(Client)
 
 class CEnemy final : public CGameObject
@@ -32,11 +40,14 @@ public:
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
+	HRESULT		Bind_ShaderResources();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	GAMEOBJ_TYPE	m_eGameObjType	=	GAMEOBJ_TYPE::ENEMY;
 
+	CShader*		m_pShaderCom	= { nullptr };	
+	CModel*			m_pModelCom		= { nullptr };
 
 
 public:

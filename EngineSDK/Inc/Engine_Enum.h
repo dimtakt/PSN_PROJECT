@@ -3,12 +3,13 @@
 
 namespace Engine
 {
+	enum class MODELTYPE { NONANIM, ANIM };
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
-	enum class WINMODE { FULL, WIN, END };
 	
+	enum class WINMODE { FULL, WIN, END };
 	enum class MOUSEKEYSTATE { LB, RB, MB, END	};
 	enum class MOUSEMOVESTATE {	X, Y, Z, END	};
 }

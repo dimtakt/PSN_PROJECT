@@ -26,7 +26,6 @@ namespace Engine
 		XMFLOAT4	vDirection;
 		XMFLOAT4	vPosition;
 		float		fRange;
-
 	}LIGHT_DESC;
 
 	typedef struct tagVertexPositionTexcoord

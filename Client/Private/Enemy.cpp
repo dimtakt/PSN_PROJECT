@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Gameinstance.h"
 
 CEnemy::CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject( pDevice, pContext )
@@ -47,11 +48,19 @@ void CEnemy::Update(_float fTimeDelta)
 void CEnemy::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
+
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+		return;
 }
 
 HRESULT CEnemy::Render()
 {
 	// ·»´õ
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Begin(0);
+	m_pModelCom->Render();
 
 	return S_OK;
 }
@@ -59,9 +68,46 @@ HRESULT CEnemy::Render()
 HRESULT CEnemy::Ready_Components(void* pArg)
 {
 	// ÄÄÆ÷³ÍÆ® ÁØºñ
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+		return E_FAIL;
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
+		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+		return E_FAIL;
 
 	return S_OK;
 }
+
+HRESULT CEnemy::Bind_ShaderResources()
+{
+	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	if (nullptr == pLightDesc)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 
 CEnemy* CEnemy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -92,4 +138,7 @@ CEnemy* CEnemy::Clone(void* pArg)
 void CEnemy::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

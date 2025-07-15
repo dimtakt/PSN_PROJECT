@@ -2,7 +2,11 @@
 #include "MainApp.h"
 #include "GameInstance.h"
 
+// Levels
 #include "Level_Loading.h"
+
+// Static Models
+#include "Enemy.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
@@ -66,6 +70,23 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"),
+		CEnemy::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	// 모델의 방향을 올바르게 로드하기 위해 사전에 변환용 벡터 정의
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+	/* Prototype_Component_Model_Enemy */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
+		return E_FAIL;
+
+
+
 
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
 	//	CTransform::Create(m_pDevice, m_pContext))))

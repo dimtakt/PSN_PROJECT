@@ -5,6 +5,7 @@
 #include "BackGround.h"
 #include "Terrain.h"
 //#include "Monster.h"
+#include "Enemy.h"
 #include "Camera_Free.h"
 //#include "Player.h"
 //#include "Effect.h"
@@ -133,11 +134,19 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::CUBE, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 	//	return E_FAIL;
 
+
+	// ==============================
+	// || Load Models
+	// ==============================
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
+
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
 		return E_FAIL;
+
+	// 기존 모델 로드부분은, Enemy 가 모든 레벨에서 쓰일 예정이므로 Static (MainApp)으로 옮김.
 
 	///* Prototype_Component_VIBuffer_Cube */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Cube"),
@@ -149,6 +158,11 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	/* Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+		return E_FAIL;
+
+	/* Prototype_Component_Shader_VtxMesh */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxMesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
 	
