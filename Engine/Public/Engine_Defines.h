@@ -5,6 +5,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
+#include <DirectXCollision.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

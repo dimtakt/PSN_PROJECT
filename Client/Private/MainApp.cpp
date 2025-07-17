@@ -55,6 +55,9 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Draw();
 
+	// ksta : 임시 폰트 출력
+	m_pGameInstance->Render_Font(TEXT("Font_DOS"), L"Test", _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+
 	m_pGameInstance->Render_End();
 
 	return S_OK;

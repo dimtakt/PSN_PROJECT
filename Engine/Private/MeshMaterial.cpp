@@ -17,33 +17,21 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 
 		for (size_t j = 0; j < iNumTextures; j++)
 		{
-			//ID3D11ShaderResourceView* pSRV = { nullptr };
-			/* pModelFilePath : D:\Burger\153\Framework\Client\Bin\Resources\Models\Fiona\Fiona.fbx */
-
-			/* 뽑아서 저장해뒀던 경로 + 파일이름 + 확장자 */
+			// 1. 텍스쳐 경로 저장. (지저분한 데이터라 파일명, 확장자만 뽑는 정제 필요)
 			aiString	strTexturePath;
-
 			if (FAILED(pAIMaterial->GetTexture(static_cast<aiTextureType>(i), j, &strTexturePath)))
 				break;
 
-			/*strTexturePath.data*/
+			// 2. 정제용 분할 경로 문자열 선언.
+			_char			szDrive[MAX_PATH]			= {};
+			_char			szDir[MAX_PATH]				= {};
+			_char			szFilename[MAX_PATH]		= {};
+			_char			szExt[MAX_PATH]				= {};
+			_char			szTextureFilePath[MAX_PATH] = {};	// 최종 경로 변수
 
-			/*_splitpath_s();*/
-
-
-			// 분할할 경로
-			_char			szDrive[MAX_PATH] = {};
-			_char			szDir[MAX_PATH] = {};
-
-			_char			szFilename[MAX_PATH] = {};
-			_char			szExt[MAX_PATH] = {};
-
-			// 텍스쳐 경로가 담길 변수
-			_char			szTextureFilePath[MAX_PATH] = {};
-
-			// 3D 모델 파일의 경로로부터 경로만을 szDrive, szDir 에 분할
+			// 3.	3D 모델 파일(인자)로부터는, 저장 경로만을 szDrive, szDir 에 분할
+			//		텍스쳐 파일의 경로로부터는, 파일명과 확장자만을 szFilename, szExt 에 분할
 			_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
-			// 텍스쳐 파일의 경로로부터 파일명과 확장자만을 szFilename, szExt 에 분할
 			_splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szFilename, MAX_PATH, szExt, MAX_PATH);
 
 			// szTextureFilePath 에 4개 문자열 병합
@@ -76,12 +64,21 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 			}
 
 			m_SRVs[i].push_back(pSRV);
+
 		}
 	}
 
 
 
 	return S_OK;
+}
+
+HRESULT CMeshMaterial::Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iIndex)
+{
+	if (iIndex >= m_SRVs[eTextureType].size())
+		return E_FAIL;
+
+	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iIndex]);
 }
 
 CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial)

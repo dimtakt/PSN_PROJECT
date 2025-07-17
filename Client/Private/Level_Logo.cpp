@@ -47,6 +47,7 @@ HRESULT CLevel_Logo::Render()
 
 HRESULT CLevel_Logo::Ready_Layer_BackGround(const _wstring& strLayerTag)
 {
+	// CBackGround 프로토타입으로부터 Create 함
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOGO), strLayerTag,
 		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"))))
 		return E_FAIL;
