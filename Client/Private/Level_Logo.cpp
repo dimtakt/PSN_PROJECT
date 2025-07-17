@@ -22,6 +22,7 @@ HRESULT CLevel_Logo::Initialize()
 
 void CLevel_Logo::Update(_float fTimeDelta)
 {
+	// 엔터 시 GAMEPLAY 레벨로 
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
@@ -30,17 +31,17 @@ void CLevel_Logo::Update(_float fTimeDelta)
 		return;
 	}
 
-	// ksta : 폰트 그리기 테스트.
-	// Open_Level 이후 호출 시 문제 생김.
-	//m_pGameInstance->Render_Font(L"Font_DOS", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
-	//m_pGameInstance->Render_Font(L"Font_Default", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
-
 	return;
 }
 
 HRESULT CLevel_Logo::Render()
 {
 	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+
+	// ksta : 폰트 그리기 테스트.
+	// Open_Level 이후 호출 시 문제 생김.
+	//m_pGameInstance->Render_Font(L"Font_DOS", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
+	//m_pGameInstance->Render_Font(L"Font_Default", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
 
 	return S_OK;
 }

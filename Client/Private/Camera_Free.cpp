@@ -32,23 +32,27 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
     // * 키보드 WASD 에 의한 카메라 이동
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
-    {
-        m_pTransformCom->Go_Straight(fTimeDelta);
-    }
-    if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
-    {
-        m_pTransformCom->Go_Backward(fTimeDelta);
-    }
-    if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
-    {
-        m_pTransformCom->Go_Left(fTimeDelta);
-    }
-    if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
-    {
-        m_pTransformCom->Go_Right(fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
+    //    m_pTransformCom->Go_Straight(fTimeDelta);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
+    //    m_pTransformCom->Go_Backward(fTimeDelta);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
+    //    m_pTransformCom->Go_Left(fTimeDelta);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
+    //    m_pTransformCom->Go_Right(fTimeDelta);
 
+    if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
+        m_pTransformCom->Go_Straight(fTimeDelta);
+    if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
+        m_pTransformCom->Go_Backward(fTimeDelta);
+    if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
+        m_pTransformCom->Go_Left(fTimeDelta);
+    if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
+        m_pTransformCom->Go_Right(fTimeDelta);
+
+    if (m_pGameInstance->Get_IsKeyUp(DIK_P) ||
+        m_pGameInstance->Get_IsKeyDown(DIK_P))
+        m_pTransformCom->Go_Straight(fTimeDelta * 20);
 
     // * 마우스 움직임에 의한 카메라 회전
 

@@ -109,6 +109,17 @@ public:
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);		// └ 0x80 = 눌림.
 	// 인자(X, Y, WHEEL)에 해당하는 마우스 움직임 크기를 반환. 휠은 올릴 시 양수반환
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);	
+
+	// Key_Manager와 유사하게..
+public:
+	_bool	Get_IsKeyDown(_ubyte byKeyID);
+	_bool	Get_IsKeyDown(MOUSEKEYSTATE eMouse);
+
+	_bool	Get_IsKeyUp(_ubyte byKeyID);
+	_bool	Get_IsKeyUp(MOUSEKEYSTATE eMouse);
+
+	_bool	Get_IsKeyPressing(_ubyte byKeyID);
+	_bool	Get_IsKeyPressing(MOUSEKEYSTATE eMouse);
 #pragma endregion
 
 	// ==============================

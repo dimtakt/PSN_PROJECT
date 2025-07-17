@@ -62,7 +62,25 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 void Engine::CInput_Device::Update(void)
 {
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
-	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);
+	m_pMouse->GetDeviceState(sizeof(m_tCurMouseState), &m_tCurMouseState);
+
+	for (size_t i = 0; i < 256; i++)
+    {
+        bool isPressing = (Get_DIKeyState(i) & 0x80);
+
+        m_mPreState[i] = m_mCurState[i];
+        m_mCurState[i] = isPressing;
+    }
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		bool isPressing = (Get_DIKeyState(i) & 0x80);
+
+		m_mPreMouseState[i] = m_mCurMouseState[i];
+		m_mCurMouseState[i] = isPressing;
+	}
+
+	m_tPreMouseState = m_tCurMouseState;
 }
 
 CInput_Device* CInput_Device::Create(HINSTANCE hInstance, HWND hWnd)
