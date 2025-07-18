@@ -1,6 +1,7 @@
 #include "Model.h"
 
 #include "Mesh.h"
+#include "Bone.h"
 #include "MeshMaterial.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -16,7 +17,9 @@ CModel::CModel(const CModel& Prototype)
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
+    , m_Bones{ Prototype.m_Bones }
 {
+
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
 
@@ -49,6 +52,9 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
     if (FAILED(Ready_Materials(pModelFilePath)))
         return E_FAIL;
 
+    if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -70,6 +76,19 @@ HRESULT CModel::Bind_Materials(class CShader* pShader, const _char* pConstantNam
     return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iIndex);
 }
 
+void CModel::Play_Animation(_float fTimeDelta)
+{
+    /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+
+
+    /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+    for (auto& pBone : m_Bones)
+    {
+        pBone->Update_CombinedTransformationMatrix(m_Bones);
+    }
+
+}
+
 HRESULT CModel::Render(_uint iMeshIndex)
 {
     if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources()))
@@ -87,7 +106,7 @@ HRESULT CModel::Ready_Meshes()
 
     for (size_t i = 0; i < m_iNumMeshes; i++)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_pAIScene->mMeshes[i], XMLoadFloat4x4(&m_PreTransformMatrix));
+        CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], XMLoadFloat4x4(&m_PreTransformMatrix));
         if (nullptr == pMesh)
             return E_FAIL;
 
@@ -96,6 +115,7 @@ HRESULT CModel::Ready_Meshes()
 
     return S_OK;
 }
+
 
 HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
@@ -111,6 +131,24 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
         m_Materials.push_back(pMeshMaterial);
     }
 
+
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
+{
+    CBone* pBone = CBone::Create(pAINode, iParentIndex);
+    if (nullptr == pBone)
+        return E_FAIL;
+
+    m_Bones.push_back(pBone);
+
+    _int   iIndex = m_Bones.size() - 1;
+
+    for (size_t i = 0; i < pAINode->mNumChildren; i++)
+    {
+        Ready_Bones(pAINode->mChildren[i], iIndex);
+    }
 
     return S_OK;
 }

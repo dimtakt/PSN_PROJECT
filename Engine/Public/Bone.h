@@ -5,7 +5,8 @@
 /*
 aiNodeAnim
 aiNode : 뼈들의 관계를 표현하기위한 데이터. 부모연결 말하는듯
-aiBone
+aiBone : 이 뼈는 몇개의 정점에게 영향을 주며
+		그중 어떤 정점들에게 영향을 준다!! + 얼마나 영향을 준다. 
 */
 
 /*
@@ -22,16 +23,18 @@ private:
 	virtual ~CBone() = default;
 
 public:
-	HRESULT Initialize(const aiNode* pAINode);
+	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);
+	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones);
 
 private:
 	_char				m_szName[MAX_PATH] = {};
 	_float4x4			m_TransformationMatrix = {};
 	_float4x4			m_CombinedTransformationMatrix = {};
 
+	_int				m_iParentBoneIndex = { -1 };
 
 public:
-	static CBone* Create(const aiNode* pAINode);
+	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
 	virtual void Free() override;
 };
 

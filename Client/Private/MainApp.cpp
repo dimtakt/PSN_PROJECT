@@ -84,6 +84,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	/* Prototype_Component_Model_Enemy */
+	// ksta : 임시로 NOANIM으로 둠
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
 		return E_FAIL;
