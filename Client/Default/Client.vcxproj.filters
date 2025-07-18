@@ -58,6 +58,9 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{a99b3610-4e82-4f02-9a89-1281f5579e61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\UI">
+      <UniqueIdentifier>{09206269-9715-4f1e-b298-0edd0d866fa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Bullet.h">
       <Filter>02.GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Crosshair.h">
+      <Filter>02.GameObject\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +164,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Bullet.cpp">
       <Filter>02.GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Crosshair.cpp">
+      <Filter>02.GameObject\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

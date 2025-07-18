@@ -163,6 +163,7 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\public\Player.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\public\UI_Crosshair.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\private\UI_Crosshair.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

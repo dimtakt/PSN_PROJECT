@@ -35,7 +35,7 @@ public:
 
 private:
 	/* 파일로부터 읽은 모든 정보를 다 저장해주는 구조체. */
-	const aiScene* m_pAIScene = { nullptr };
+	const aiScene*			m_pAIScene = { nullptr };
 	Assimp::Importer		m_Importer = {};
 	MODELTYPE				m_eModelType = {};
 	_float4x4				m_PreTransformMatrix = {};
