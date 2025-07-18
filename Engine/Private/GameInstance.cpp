@@ -280,6 +280,34 @@ HRESULT CGameInstance::Render_Font(
 	);
 }
 
+HRESULT CGameInstance::Render_Font_Immediately(
+	const _wstring& strFontTag,
+	const _tchar* pText,
+	const _float2& vPosition,
+	_fvector vColor,
+	_float fRotation,
+	const _float2& vOrigin,
+	_float fScale)
+{
+	return m_pFont_Manager->Render_Font_Immediately(
+		strFontTag,
+		pText,
+		vPosition,
+		vColor,
+		fRotation,
+		vOrigin,
+		fScale
+	);
+}
+
+HRESULT CGameInstance::Render_Font_Begin(const _wstring& strFontTag)
+{
+	return m_pFont_Manager->Render_Begin(strFontTag);
+}
+HRESULT CGameInstance::Render_Font_End(const _wstring& strFontTag)
+{
+	return m_pFont_Manager->Render_End(strFontTag);
+}
 
 #pragma endregion
 

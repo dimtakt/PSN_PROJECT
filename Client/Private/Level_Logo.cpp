@@ -39,8 +39,13 @@ HRESULT CLevel_Logo::Render()
 	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
 
 	// ksta : 폰트 그리기 테스트.
-	// Open_Level 이후 호출 시 문제 생김.
-	//m_pGameInstance->Render_Font(L"Font_DOS", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
+
+	_wstring strFontTag = L"Font_DOS";
+	m_pGameInstance->Render_Font_Begin(strFontTag);
+	m_pGameInstance->Render_Font(strFontTag, L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+	m_pGameInstance->Render_Font_End(strFontTag);
+	
+	
 	//m_pGameInstance->Render_Font(L"Font_Default", L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));
 
 	return S_OK;

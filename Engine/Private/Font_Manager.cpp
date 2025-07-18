@@ -24,6 +24,22 @@ HRESULT CFont_Manager::Add_Font(const _wstring& strFontTag, const _tchar* pFontP
     return S_OK;
 }
 
+HRESULT CFont_Manager::Render_Font_Immediately(
+    const _wstring& strFontTag,
+    const _tchar* pText,
+    const _float2& vPosition,
+    _fvector vColor,
+    _float fRotation,
+    const _float2& vOrigin,
+    _float fScale)
+{
+    CFont* pFont = Find_Font(strFontTag);
+    if (nullptr == pFont)
+        return E_FAIL;
+
+    return pFont->Render_Font_Immediately(pText, vPosition, vColor, fRotation, vOrigin, fScale);
+}
+
 HRESULT CFont_Manager::Render_Font(
     const _wstring& strFontTag,
     const _tchar* pText,
@@ -38,6 +54,24 @@ HRESULT CFont_Manager::Render_Font(
         return E_FAIL;
 
     return pFont->Render_Font(pText, vPosition, vColor, fRotation, vOrigin, fScale);
+}
+
+HRESULT CFont_Manager::Render_Begin(const _wstring& strFontTag)
+{
+    CFont* pFont = Find_Font(strFontTag);
+    if (nullptr == pFont)
+        return E_FAIL;
+
+    return pFont->Render_Begin();
+}
+
+HRESULT CFont_Manager::Render_End(const _wstring& strFontTag)
+{
+    CFont* pFont = Find_Font(strFontTag);
+    if (nullptr == pFont)
+        return E_FAIL;
+
+    return pFont->Render_End();
 }
 
 CFont* CFont_Manager::Find_Font(const wstring& strFontTag)

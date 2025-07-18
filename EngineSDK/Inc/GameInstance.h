@@ -73,9 +73,21 @@ public:
 
 #pragma region FONT_MANAGER
 public:
-	// (1:key값, 2:value값) 폰트를 추가합니다.
+	// 폰트를 추가합니다. (1:key값, 2:경로 값) 
 	HRESULT	Add_Font(const _wstring& strFontTag, const _tchar* pFontPath);
-	// (1:key값, 2:출력텍스트, 3:출력위치; 4:출력색상, 5:회전, 6:크기및회전기준, 7:크기) 폰트를 출력합니다.
+	// 폰트를 출력합니다. (1:key값, 2:출력텍스트, 3:출력위치; 4:출력색상, 5:회전, 6:크기및회전기준, 7:크기)
+	// 함수 내에 Render_Start / End 포함
+	HRESULT Render_Font_Immediately(
+		const _wstring& strFontTag,							// map에 넣은 key값
+		const _tchar* pText,								// 출력할 텍스트
+		const _float2& vPosition,							// 출력할 위치
+		_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f),	// 출력할 색상
+		_float fRotation = 0.f,								// 회전 조정
+		const _float2& vOrigin = _float2(0.f, 0.f),			// 회전 및 크기조정 기준
+		_float fScale = 1.f									// 크기 조정
+	);
+	// 폰트를 출력합니다. (1:key값, 2:출력텍스트, 3:출력위치; 4:출력색상, 5:회전, 6:크기및회전기준, 7:크기)
+	// 함수 내에 Render_Begin / End 미포함. 호출 필요
 	HRESULT Render_Font(
 		const _wstring& strFontTag,							// map에 넣은 key값
 		const _tchar* pText,								// 출력할 텍스트
@@ -85,6 +97,8 @@ public:
 		const _float2& vOrigin = _float2(0.f, 0.f),			// 회전 및 크기조정 기준
 		_float fScale = 1.f									// 크기 조정
 	);
+	HRESULT Render_Font_Begin(const _wstring& strFontTag);
+	HRESULT Render_Font_End(const _wstring& strFontTag);
 
 #pragma endregion
 

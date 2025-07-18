@@ -15,6 +15,15 @@ public:
         const _wstring& strFontTag, 
         const _tchar* pFontPath);
 
+    HRESULT Render_Font_Immediately(
+        const _wstring& strFontTag,
+        const _tchar* pText,
+        const _float2& vPosition,
+        _fvector vColor,
+        _float fRotation,
+        const _float2& vOrigin,
+        _float fScale);
+
     HRESULT Render_Font(
         const _wstring& strFontTag,
         const _tchar* pText,
@@ -23,6 +32,9 @@ public:
         _float fRotation,
         const _float2& vOrigin,
         _float fScale);
+
+    HRESULT Render_Begin(const _wstring& strFontTag);
+    HRESULT Render_End(const _wstring& strFontTag);
 
 private:
     class CFont* Find_Font(const wstring& strFontTag);
