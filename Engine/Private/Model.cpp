@@ -19,6 +19,8 @@ CModel::CModel(const CModel& Prototype)
     , m_Materials{ Prototype.m_Materials }
     , m_Bones{ Prototype.m_Bones }
 {
+    for (auto& pBone : m_Bones)
+        Safe_AddRef(pBone);
 
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
@@ -46,13 +48,13 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
     if (nullptr == m_pAIScene)
         return E_FAIL;
 
+    if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+        return E_FAIL;
+
     if (FAILED(Ready_Meshes()))
         return E_FAIL;
 
     if (FAILED(Ready_Materials(pModelFilePath)))
-        return E_FAIL;
-
-    if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
         return E_FAIL;
 
     return S_OK;
@@ -76,6 +78,14 @@ HRESULT CModel::Bind_Materials(class CShader* pShader, const _char* pConstantNam
     return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iIndex);
 }
 
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
+}
+
 void CModel::Play_Animation(_float fTimeDelta)
 {
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
@@ -84,9 +94,8 @@ void CModel::Play_Animation(_float fTimeDelta)
     /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
     for (auto& pBone : m_Bones)
     {
-        pBone->Update_CombinedTransformationMatrix(m_Bones);
+        pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
     }
-
 }
 
 HRESULT CModel::Render(_uint iMeshIndex)
@@ -106,7 +115,7 @@ HRESULT CModel::Ready_Meshes()
 
     for (size_t i = 0; i < m_iNumMeshes; i++)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], XMLoadFloat4x4(&m_PreTransformMatrix));
+        CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
         if (nullptr == pMesh)
             return E_FAIL;
 
@@ -183,14 +192,16 @@ void CModel::Free()
 {
     __super::Free();
 
+    for (auto& pBone : m_Bones)
+        Safe_Release(pBone);
+    m_Bones.clear();
+
     for (auto& pMesh : m_Meshes)
         Safe_Release(pMesh);
-
     m_Meshes.clear();
 
     for (auto& pMaterial : m_Materials)
         Safe_Release(pMaterial);
-
     m_Materials.clear();
 
 

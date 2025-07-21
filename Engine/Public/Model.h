@@ -31,6 +31,7 @@ public:
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
+	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	void Play_Animation(_float fTimeDelta);
 
 private:

@@ -22,11 +22,11 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	return S_OK;
 }
 
-void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones)
+void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones)
 {
 	if (-1 == m_iParentBoneIndex)
 	{
-		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&m_TransformationMatrix));
+		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&PreTransformMatrix) * XMLoadFloat4x4(&m_TransformationMatrix));
 		return;
 	}
 

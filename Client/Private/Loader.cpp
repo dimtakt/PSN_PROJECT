@@ -153,8 +153,8 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	//	CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 
-	//
-	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
+	// ksta : 나중에 이런 셰이더들도 Static으로 옮기는걸 고려해봐야 할 듯
+	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));
 	/* Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -165,7 +165,11 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	
+	/* Prototype_Component_Shader_VtxAnimMesh */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
+
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
 
 	/* Prototype_GameObject_Terrain*/

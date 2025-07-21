@@ -1,4 +1,6 @@
 #include "Mesh.h"
+#include "Bone.h"
+#include "Shader.h"
 
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer { pDevice, pContext }
@@ -10,9 +12,8 @@ CMesh::CMesh(const CMesh& Prototype)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype(MODELTYPE eType, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype(MODELTYPE eType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
-
 	// m_pVB 에 버텍스 버퍼 할당
 
 	m_iMaterialIndex = pAIMesh->mMaterialIndex;
@@ -26,7 +27,7 @@ HRESULT CMesh::Initialize_Prototype(MODELTYPE eType, const aiMesh* pAIMesh, _fma
 
 	HRESULT			hr = MODELTYPE::NONANIM == eType ?
 		Ready_Vertices_For_NonAnim(pAIMesh, PreTransformMatrix) :
-		Ready_Vertices_For_Anim(pAIMesh);
+		Ready_Vertices_For_Anim(pAIMesh, Bones);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -71,18 +72,17 @@ HRESULT CMesh::Initialize(void* pArg)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eType, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<class CBone*>& Bones)
 {
-	CMesh* pInstance = new CMesh(pDevice, pContext);
-
-	if (FAILED(pInstance->Initialize_Prototype(eType, pAIMesh, PreTransformMatrix)))
+	for (size_t i = 0; i < m_iNumBones; i++)
 	{
-		MSG_BOX(TEXT("Failed to Created : CMesh"));
-		Safe_Release(pInstance);
+		XMStoreFloat4x4(&m_BoneMatrices[i],
+			XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
 	}
 
-	return pInstance;
+	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
 }
+
 
 HRESULT CMesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
@@ -123,7 +123,7 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTra
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh)
+HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone*>& Bones)
 {
 	m_iVertexStride = sizeof(VTXANIMMESH);
 
@@ -136,6 +136,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh)
 	VBDesc.StructureByteStride = m_iVertexStride;
 
 	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
@@ -153,6 +154,28 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh)
 	{
 		/* i번째 뼈가 영향을 주는 정점의 갯수 */
 		aiBone* pAIBone = pAIMesh->mBones[i];
+
+		_float4x4	OffsetMatrix;
+
+		memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+
+		_uint	iBoneIndex = { 0 };
+
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+			{
+				if (true == pBone->Compare_Name(pAIBone->mName.data))
+					return true;
+
+				iBoneIndex++;
+
+				return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
 
 		for (size_t j = 0; j < pAIBone->mNumWeights; j++)
 		{
@@ -184,6 +207,30 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh)
 		}
 	}
 
+	if (0 == m_iNumBones)
+	{
+		m_iNumBones = 1;
+
+		_uint	iBoneIndex = { 0 };
+
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+			{
+				if (true == pBone->Compare_Name(m_szName))
+					return true;
+
+				iBoneIndex++;
+
+				return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
+
+		_float4x4		OffsetMatrix;
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+	}
+
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;
 
@@ -193,6 +240,20 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh)
 	Safe_Delete_Array(pVertices);
 
 	return S_OK;
+}
+
+
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+{
+	CMesh* pInstance = new CMesh(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(eType, pAIMesh, Bones, PreTransformMatrix)))
+	{
+		MSG_BOX(TEXT("Failed to Created : CMesh"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
 }
 
 CComponent* CMesh::Clone(void* pArg)

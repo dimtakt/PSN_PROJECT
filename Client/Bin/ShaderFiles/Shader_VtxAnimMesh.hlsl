@@ -53,15 +53,16 @@ VS_OUT VS_MAIN(VS_IN In)
     
     /* 정점의 로컬위치 * 월드 * 뷰 * 투영 */ 
     
-    // 하나의 버텍스에 대해 웨이트 영향을 주는 본의 행렬 및 해당하는 웨이트 정보를 행렬에 담음
-    // 즉, 이게 최종적으로 버텍스를 변환시킬 Translation 행렬. +임에 주목
+    float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    
     matrix BoneMatrix =
         g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
         g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
         g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
-        g_BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+        g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
     
     vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
+    vector vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
         
     float4x4 matWV, matWVP;
     
@@ -69,9 +70,9 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(vPosition, matWVP);
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = mul(vNormal, g_WorldMatrix);
     Out.vTexcoord = In.vTexcoord;
-    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vWorldPos = mul(vPosition, g_WorldMatrix);
     
     return Out;
 }

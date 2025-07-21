@@ -34,7 +34,6 @@ void CEnemy::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
-
 }
 
 void CEnemy::Update(_float fTimeDelta)
@@ -42,7 +41,7 @@ void CEnemy::Update(_float fTimeDelta)
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 
-
+	m_pModelCom->Play_Animation(fTimeDelta);
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)
@@ -69,6 +68,9 @@ HRESULT CEnemy::Render()
 		/*if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;        */
 
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
 		m_pShaderCom->Begin(0);
 
 		m_pModelCom->Render(i);
@@ -82,7 +84,7 @@ HRESULT CEnemy::Render()
 HRESULT CEnemy::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxMesh"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
 		return E_FAIL;
 
