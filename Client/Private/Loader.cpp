@@ -67,6 +67,9 @@ HRESULT CLoader::Loading()
 	case LEVEL::GAMEPLAY:
 		hr = Loading_For_GamePlay_Level();
 		break;
+	case LEVEL::EDITOR:
+		hr = Loading_For_Editor_Level();
+		break;
 	}
 
 	if (FAILED(hr))
@@ -209,6 +212,31 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	return S_OK;
 }
+
+
+HRESULT CLoader::Loading_For_Editor_Level()
+{
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
+	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
+
+	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));
+
+	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
+	// Camera
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Free"),
+		CCamera_Free::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
+
+	m_isFinished = true;
+
+
+
+	return S_OK;
+}
+
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);

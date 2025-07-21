@@ -12,10 +12,11 @@ namespace Client
 	enum class LEVEL { 
 		STATIC,
 		LOADING, 
-		LOGO, 
+		LOGO,
 		GAMEPLAY,	// 임시
 
 		MENU,		// 메뉴
+		EDITOR,		// 에디터
 		DIALOG,		// 대화창
 
 		// 이하 스테이지 열거체

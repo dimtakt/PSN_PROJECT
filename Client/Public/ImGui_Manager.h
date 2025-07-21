@@ -22,12 +22,12 @@
 
 NS_BEGIN(Client)
 
-class CImgui_Manager
+class CImGui_Manager
 {
 private:
-	CImgui_Manager();
+	CImGui_Manager();
 public:
-	~CImgui_Manager();
+	~CImGui_Manager();
 
 public:
 	void GUI_Render_Begin();
@@ -35,7 +35,7 @@ public:
 	void GUI_Render_End();
 public:
 	HRESULT Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	static CImgui_Manager* Create(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CImGui_Manager* Create(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
 

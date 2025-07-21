@@ -1,6 +1,6 @@
 #include "ImGui_Manager.h"
 
-CImgui_Manager::CImgui_Manager()
+CImGui_Manager::CImGui_Manager()
 {
 	// Initialize ImGui context
 	IMGUI_CHECKVERSION();
@@ -10,7 +10,7 @@ CImgui_Manager::CImgui_Manager()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 }
 
-CImgui_Manager::~CImgui_Manager()
+CImGui_Manager::~CImGui_Manager()
 {
 	if (ImGui::GetCurrentContext()) {
 		ImGui_ImplDX11_Shutdown();
@@ -19,7 +19,7 @@ CImgui_Manager::~CImgui_Manager()
 	}
 }
 
-void CImgui_Manager::GUI_Render_Begin() // like as Update.
+void CImGui_Manager::GUI_Render_Begin() // like as Update.
 {
 	// Start the Dear ImGui frame
 	ImGui_ImplDX11_NewFrame();
@@ -27,7 +27,7 @@ void CImgui_Manager::GUI_Render_Begin() // like as Update.
 	ImGui::NewFrame();
 }
 
-void CImgui_Manager::GUI_Render()
+void CImGui_Manager::GUI_Render()
 {
 	GUI_Render_Begin();
 
@@ -67,14 +67,14 @@ void CImgui_Manager::GUI_Render()
 	GUI_Render_End();
 }
 
-void CImgui_Manager::GUI_Render_End()
+void CImGui_Manager::GUI_Render_End()
 {
 	ImGui::EndFrame();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-HRESULT CImgui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+HRESULT CImGui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	if (!ImGui_ImplWin32_Init(hWnd))
 	{
@@ -93,12 +93,12 @@ HRESULT CImgui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11Devic
 	return S_OK;
 }
 
-CImgui_Manager* CImgui_Manager::Create(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CImGui_Manager* CImGui_Manager::Create(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CImgui_Manager* pInstance = new CImgui_Manager();
+	CImGui_Manager* pInstance = new CImGui_Manager();
 	if (FAILED(pInstance->Initialize(hWnd, pDevice, pContext)))
 	{
-		MSG_BOX(TEXT("Failed to Created : CImgui_Manager"));
+		MSG_BOX(TEXT("Failed to Created : CImGui_Manager"));
 		return nullptr;
 	}
 	return pInstance;

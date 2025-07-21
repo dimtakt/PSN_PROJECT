@@ -23,11 +23,17 @@ HRESULT CLevel_Logo::Initialize()
 void CLevel_Logo::Update(_float fTimeDelta)
 {
 	// 엔터 시 GAMEPLAY 레벨로 
-	if (GetKeyState(VK_RETURN) & 0x8000)
+	
+	if (m_pGameInstance->Get_IsKeyDown(DIK_RETURN))
 	{
 		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
 			return;
-
+		return;
+	}
+	else if (m_pGameInstance->Get_IsKeyDown(DIK_E))
+	{
+		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::EDITOR))))
+			return;
 		return;
 	}
 
