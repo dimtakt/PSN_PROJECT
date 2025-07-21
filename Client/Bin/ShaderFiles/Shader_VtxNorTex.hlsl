@@ -23,6 +23,7 @@ vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
 
+float g_fTiling = 50.f;
 
 
 
@@ -114,7 +115,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord * 50.f);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord * g_fTiling); // ksta : 터레인 타일링
     
     // 빛의 반대 벡터와, 표면의 법선 벡터가 얼마나 일치하는지를 내적 계산을 통해 담음.
     // 비슷할 수록 큰 값이 담김으로써 빛의 세기가 더 커지도록 반영.
@@ -130,7 +131,7 @@ PS_OUT PS_MAIN(PS_IN In)
     // 계산 구조는 위의 fShade 와 동일
     // 셰이더 값은 0~1이므로 거듭제곱을 하여도 0~1 사이로 최소 최댓값은 동일함
     // 이를 이용하여 거듭제곱을 이용 셰이더의 민감도를 조정하는 식으로 활용.
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.f);
     
     Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
                     (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;   // 반사 추가로 이 줄 추가

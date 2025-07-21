@@ -17,6 +17,9 @@ CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 HRESULT CLevel_Editor::Initialize()
 {
+	if (FAILED(Ready_Lights()))
+		return E_FAIL;
+
 	if (FAILED(Ready_ImGui(g_hWnd, m_pDevice, m_pContext)))
 		return E_FAIL;
 
@@ -47,6 +50,25 @@ HRESULT CLevel_Editor::Render()
 	SetWindowText(g_hWnd, TEXT("에디터 레벨 입니다"));
 	//m_pImgui_Manage->Render();
 	this->ImGui_Render();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Editor::Ready_Lights()
+{
+	LIGHT_DESC			LightDesc{};
+
+	//(LightDesc.Diffuse * MtrlDesc.Diffuse) * (fShade(0 ~ 1) + (LightDesc.Ambient * MtrlDesc.Ambient))
+
+	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);	// Light 방향
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);		// Light 색상 및 밝기의 세기
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);	// Light 환경광으로 가정. 최소 밝기 보장에 관여.
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);		// Light 반사광.
+
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -91,45 +113,17 @@ HRESULT CLevel_Editor::Ready_Layer_Camera(const _wstring& strLayerTag)
 void CLevel_Editor::ImGui_Render()
 {
 	m_pImGui_Manager->GUI_Render_Begin();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	// 그리기 시작
 
-	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	if (show_demo_window)
-		ImGui::ShowDemoWindow(&show_demo_window);
+	ImGui_MainMenu();				// 최상단 메뉴
 
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-	{
-		static float f = 0.0f;
-		static int counter = 0;
+	if (isOn_GUITerrainEditor)
+		ImGui_TerrainEditor();		// 터레인 에디터
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+	if (isOn_ModelDeployer)
+		ImGui_ModelDeployer();		// 메쉬 배치기
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
-
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-		ImGui::End();
-	}
-
-	// 3. Show another simple window.
-	if (show_another_window)
-	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close Me"))
-			show_another_window = false;
-		ImGui::End();
-	}
-
+	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
 }
 
@@ -169,4 +163,140 @@ void CLevel_Editor::Free()
 	}
 
 	__super::Free();
+}
+
+
+// ==============================
+// || Custom GUI Windows..
+// ==============================
+
+void CLevel_Editor::ImGui_MainMenu()
+{
+	// 메인 창
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			//if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+			//if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+			//if (ImGui::MenuItem("Close", "Ctrl+W")) { isOn_GUITerrain = false; }
+			ImGui::EndMenu();
+		}
+		else if (ImGui::BeginMenu("Window"))
+		{
+			if (ImGui::MenuItem("Terrain Editor", nullptr))
+				isOn_GUITerrainEditor = !isOn_GUITerrainEditor;
+			if (ImGui::MenuItem("Model Deplayer", nullptr))
+				isOn_ModelDeployer = !isOn_ModelDeployer;
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+}
+
+void CLevel_Editor::ImGui_TerrainEditor()
+{
+	// 터레인 에디터
+	ImGui::Begin("Terrain Editor", &isOn_GUITerrainEditor);
+
+	static _float	fPosX = 0;
+	static _float	fPosY = 0;
+	static _float	fPosZ = 0;
+	
+	static _int		iSize = 1024;
+	_float			fTerrainDefaultSize = 1024.f;
+
+	_float			fMultiplier = iSize / fTerrainDefaultSize;
+
+
+
+	if (ImGui::BeginMenu("Edit"))
+	{
+		if (ImGui::MenuItem("Reset Position"))	{ fPosX = 0.f; fPosY = 0.f; fPosZ = 0.f; }
+		if (ImGui::MenuItem("Reset Size"))		{ iSize = 1024; }
+
+		ImGui::EndMenu();
+	}
+
+	ImGui::Text("Create Menu");
+	ImGui::Separator();
+	
+
+	// Position
+	ImGui::BeginGroup();
+
+	ImGui::PushItemWidth(60);
+	ImGui::Text("Position");
+
+	ImGui::DragFloat("X##pos", &fPosX, 0.1f);
+	ImGui::SameLine();
+	ImGui::DragFloat("Y##pos", &fPosY, 0.1f);
+	ImGui::SameLine();
+	ImGui::DragFloat("Z##pos", &fPosZ, 0.1f);
+	ImGui::PopItemWidth();
+
+	ImGui::EndGroup();
+	ImGui::Separator();
+
+
+	// Size
+	ImGui::BeginGroup();
+
+	ImGui::PushItemWidth(90);
+	ImGui::Text("Size");
+
+	ImGui::DragInt("X##Size", &iSize, 1.0f, 0, 10000);
+	ImGui::SameLine();
+	ImGui::DragInt("Z##Size", &iSize, 1.0f, 0, 10000);
+	ImGui::PopItemWidth();
+
+	ImGui::EndGroup();
+	ImGui::Separator();
+	
+
+	// Create
+	static _int iIndex = 0;
+
+	if (ImGui::Button("Create Terrain"))
+	{
+		// 생성 코드..
+		_wstring strLayerTag = L"Layer_Background";
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
+			ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Terrain"))))
+			return;
+
+		_float fTiling = 50.f * (iSize / fTerrainDefaultSize);
+		CShader* pShaderCom = static_cast<CShader*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Shader", iIndex));
+		if (FAILED(pShaderCom->Bind_RawValue("g_fTiling", &fTiling, sizeof(_float))))
+			return;
+		
+		CTransform* pTransform = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Transform", iIndex));
+		pTransform->Scaling(_float3(fMultiplier, fMultiplier, fMultiplier));
+		pTransform->Set_State(STATE::POSITION, XMVectorSet(fPosX, fPosY, fPosZ, 1));
+		
+		iIndex++;
+	}
+	
+	// 오브젝트 수정 기능은 나중에 만들어도 됨
+	//ImGui::Separator();
+
+	//if (iIndex >= 1)
+	//{
+
+	//}
+
+
+	ImGui::End();
+}
+
+void CLevel_Editor::ImGui_ModelDeployer()
+{
+	// 모델 배치기
+	ImGui::Begin("Model Deployer", &isOn_ModelDeployer);
+
+	//다렉x콜리젼 헤더파일..?
+	//dx9때처럼 레이와 삼각형 간의 충돌 함수가 존재하니 그거 쓰면 됨
+
+	ImGui::End();
 }

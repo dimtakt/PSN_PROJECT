@@ -23,6 +23,8 @@ public:
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
+	_uint Get_CurLevel() { return m_iCurrentLevelID; }
+
 private:
 	class CLevel*				m_pCurrentLevel = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };

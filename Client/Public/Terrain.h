@@ -31,6 +31,8 @@ private:
 	CTexture*				m_pTextureCom = { nullptr };
 	CVIBuffer_Terrain*		m_pVIBufferCom = { nullptr };
 
+	CTransform*				m_pTransform = { nullptr };
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();

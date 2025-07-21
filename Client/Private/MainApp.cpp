@@ -122,7 +122,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Transform"),
 	//	CTransform::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 

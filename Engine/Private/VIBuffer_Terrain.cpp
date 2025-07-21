@@ -45,6 +45,9 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 	
 	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
 
+	// ksta : 이 부분이 실질적인 터레인 크기를 조절하게 됨.
+	// x, z 값이 i, j라면. 즉 ++로 증가하는 값이라면 해당 크기를 따름
+	// y축은 Height Map 으로 얻은 높이를 기준.
 	for (size_t i = 0; i < m_iNumVerticesZ; i++)
 	{
 		for (size_t j = 0; j < m_iNumVerticesX; j++)
@@ -53,6 +56,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 
 			pVertices[iIndex].vPosition = _float3((_float)j, (pPixels[iIndex] & 0x000000ff) / 15.0f, (_float)i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			// 텍스쳐 타일링이 1, 1인 상태
 			pVertices[iIndex].vTexcoord = _float2((_float)j / (m_iNumVerticesX - 1.f), (_float)(i / (m_iNumVerticesZ - 1.f)));
 		}
 	}

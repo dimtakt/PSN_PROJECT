@@ -27,7 +27,7 @@ public:
 public:
 	_float Rand_Normal();
 	_float Rand(_float fMin, _float fMax);
-
+	
 #pragma endregion
 
 	// ==============================
@@ -35,6 +35,7 @@ public:
 #pragma region LEVEL_MANAGER
 public:
 	HRESULT Open_Level(_uint iLevelID, class CLevel* pNewLevel);
+	_uint Get_CurLevel();
 #pragma endregion
 
 	// ==============================

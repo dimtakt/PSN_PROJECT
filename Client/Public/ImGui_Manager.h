@@ -31,7 +31,7 @@ public:
 
 public:
 	void GUI_Render_Begin();
-	void GUI_Render();
+	//void GUI_Render();
 	void GUI_Render_End();
 public:
 	HRESULT Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

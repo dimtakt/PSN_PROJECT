@@ -27,45 +27,50 @@ void CImGui_Manager::GUI_Render_Begin() // like as Update.
 	ImGui::NewFrame();
 }
 
-void CImGui_Manager::GUI_Render()
-{
-	GUI_Render_Begin();
+#pragma region Render Sample
 
-	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
-	// 창 제목, X버튼 상태 받는 bool(nullptr이면 X버튼 없음), ImGuiWindowFlags_를 이용해 옵션 삽입 가능
-	ImGui::Begin("Test Window", nullptr, ImGuiWindowFlags_MenuBar);
+//void CImGui_Manager::GUI_Render()
+//{
+//	GUI_Render_Begin();
+//
+//	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+//	// 창 제목, X버튼 상태 받는 bool(nullptr이면 X버튼 없음), ImGuiWindowFlags_를 이용해 옵션 삽입 가능
+//	ImGui::Begin("Test Window", nullptr, ImGuiWindowFlags_MenuBar);
+//
+//	// Menu Bar
+//	if (ImGui::BeginMenuBar())
+//	{
+//		if (ImGui::BeginMenu("File"))
+//		{
+//			ImGui::MenuItem("open");
+//			ImGui::MenuItem("save");
+//			ImGui::EndMenu();
+//		}
+//		ImGui::EndMenuBar();
+//	}
+//
+//	// Slider
+//	static float sliderValue = 0.0f;
+//
+//	ImGui::SliderFloat("Slider", &sliderValue, 0.0f, 1.0f);
+//
+//	// Button
+//	if (ImGui::Button("Test Me")) {
+//		// 버튼이 클릭되었을 때 실행될 코드
+//		MessageBoxA(nullptr, "Button clicked!", "Info", MB_OK);
+//
+//	}
+//	// text
+//	ImGuiIO& io = ImGui::GetIO();
+//	ImGui::Text("FPS: %.1f", io.Framerate);
+//	ImGui::Text("Delta_Time: %.5f", ImGui::GetIO().DeltaTime);
+//	ImGui::End();
+//
+//	GUI_Render_End();
+//}
 
-	// Menu Bar
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			ImGui::MenuItem("open");
-			ImGui::MenuItem("save");
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
+#pragma endregion
 
-	// Slider
-	static float sliderValue = 0.0f;
-
-	ImGui::SliderFloat("Slider", &sliderValue, 0.0f, 1.0f);
-
-	// Button
-	if (ImGui::Button("Test Me")) {
-		// 버튼이 클릭되었을 때 실행될 코드
-		MessageBoxA(nullptr, "Button clicked!", "Info", MB_OK);
-
-	}
-	// text
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Text("FPS: %.1f", io.Framerate);
-	ImGui::Text("Delta_Time: %.5f", ImGui::GetIO().DeltaTime);
-	ImGui::End();
-
-	GUI_Render_End();
-}
 
 void CImGui_Manager::GUI_Render_End()
 {
@@ -83,7 +88,7 @@ HRESULT CImGui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11Devic
 	}
 	if (!ImGui_ImplDX11_Init(pDevice, pContext))
 	{
-		MessageBoxA(nullptr, "ImGui DX9 Init Failed", "Error", MB_OK);
+		MessageBoxA(nullptr, "ImGui DX11 Init Failed", "Error", MB_OK);
 		return E_FAIL;
 	}
 

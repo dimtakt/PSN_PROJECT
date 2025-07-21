@@ -163,6 +163,11 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 	return m_pLevel_Manager->Open_Level(iLevelID, pNewLevel);
 }
 
+_uint CGameInstance::Get_CurLevel()
+{
+	return m_pLevel_Manager->Get_CurLevel();
+}
+
 #pragma endregion
 
 // ==============================
