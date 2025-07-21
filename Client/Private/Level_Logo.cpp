@@ -42,7 +42,10 @@ HRESULT CLevel_Logo::Render()
 
 	_wstring strFontTag = L"Font_DOS";
 	m_pGameInstance->Render_Font_Begin(strFontTag);
-	m_pGameInstance->Render_Font(strFontTag, L"Hello World!", _float2(100.f, 100.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+	m_pGameInstance->Render_Font(strFontTag, L"Test", _float2(100.f, 100.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+	m_pGameInstance->Render_Font(strFontTag, L"==============================", _float2(100.f, 125.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+	m_pGameInstance->Render_Font(strFontTag, L"Enter : GamePlay", _float2(100.f, 150.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+	m_pGameInstance->Render_Font(strFontTag, L"E : Editor", _float2(100.f, 175.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
 	m_pGameInstance->Render_Font_End(strFontTag);
 	
 	

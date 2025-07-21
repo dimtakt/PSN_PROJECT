@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../public/;../../Engine/Public/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/;../../Engine/Public/;../ThirdPartyCode/imGui/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,7 +155,9 @@
     <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\public\Level_Editor.h" />
     <ClInclude Include="..\public\Enemy.h" />
+    <ClInclude Include="..\Public\ImGui_Manager.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -164,6 +166,14 @@
     <ClInclude Include="..\public\Player.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_win32.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_internal.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_rectpack.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_textedit.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_truetype.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -173,7 +183,9 @@
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
+    <ClCompile Include="..\private\Level_Editor.cpp" />
     <ClCompile Include="..\private\Enemy.cpp" />
+    <ClCompile Include="..\Private\ImGui_Manager.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -182,6 +194,13 @@
     <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_tables.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_widgets.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

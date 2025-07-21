@@ -61,6 +61,21 @@
     <Filter Include="02.GameObject\UI">
       <UniqueIdentifier>{09206269-9715-4f1e-b298-0edd0d866fa8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96.ExternalTool">
+      <UniqueIdentifier>{9b202d2a-4cfb-4054-a979-c76a00f9531f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.ExternalTool\imgui">
+      <UniqueIdentifier>{999f0e88-299a-46cb-9d3c-e4daff124cf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.ExternalTool\sources">
+      <UniqueIdentifier>{264932e8-0c23-45bc-be9a-0bc7ce35d08d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.ExternalTool\_Manager">
+      <UniqueIdentifier>{8a1b2f69-3b01-4e5e-93de-d0fd89dc9553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Editor">
+      <UniqueIdentifier>{af9130bc-0446-46f8-98b4-2fd46755179c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -113,6 +128,36 @@
     </ClInclude>
     <ClInclude Include="..\public\UI_Crosshair.h">
       <Filter>02.GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImGui_Manager.h">
+      <Filter>96.ExternalTool\_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_internal.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_rectpack.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_textedit.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_truetype.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h">
+      <Filter>96.ExternalTool\sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_win32.h">
+      <Filter>96.ExternalTool\sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Editor.h">
+      <Filter>01.Levels\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +212,33 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_Crosshair.cpp">
       <Filter>02.GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <Filter>96.ExternalTool\_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_tables.cpp">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_widgets.cpp">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp">
+      <Filter>96.ExternalTool\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.cpp">
+      <Filter>96.ExternalTool\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_win32.cpp">
+      <Filter>96.ExternalTool\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Editor.cpp">
+      <Filter>01.Levels\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
