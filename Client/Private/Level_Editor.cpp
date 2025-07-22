@@ -121,6 +121,17 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
+
+	ImGui::Begin("Mouse Debug");
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("MousePos: (%.1f, %.1f)", io.MousePos.x, io.MousePos.y);
+
+	POINT pt;
+	GetCursorPos(&pt);
+	ScreenToClient(g_hWnd, &pt);
+	ImGui::Text("Win32 Cursor: (%d, %d)", pt.x, pt.y);
+	ImGui::End();
+
 	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
 }
@@ -180,11 +191,11 @@ void CLevel_Editor::ImGui_MainMenu()
 			//if (ImGui::MenuItem("Close", "Ctrl+W")) { isOn_GUITerrain = false; }
 			ImGui::EndMenu();
 		}
-		else if (ImGui::BeginMenu("Window"))
+		if (ImGui::BeginMenu("Window"))
 		{
 			if (ImGui::MenuItem("Terrain Editor", nullptr))
 				isOn_GUITerrainEditor = !isOn_GUITerrainEditor;
-			if (ImGui::MenuItem("ModelDeployer", nullptr))
+			if (ImGui::MenuItem("Model Deployer", nullptr))
 				isOn_ModelDeployer = !isOn_ModelDeployer;
 
 			ImGui::EndMenu();
@@ -216,6 +227,7 @@ void CLevel_Editor::ImGui_TerrainEditor()
 
 		ImGui::EndMenu();
 	}
+	ImGui::Separator();
 
 	ImGui::Text("Create Menu");
 	ImGui::Separator();
@@ -293,8 +305,17 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	// 모델 배치기
 	ImGui::Begin("Model Deployer", &isOn_ModelDeployer);
 
+	ImGui::Text("Create Menu");
+	ImGui::Separator();
+
+	ImGui::BeginGroup();
+	const char* szItems[] = { "Enemy" };
+	static int iCurrentItem = 0;
+	ImGui::Combo("Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
+
+	ImGui::EndGroup();
+
 	//다렉x콜리젼 헤더파일..?
 	//dx9때처럼 레이와 삼각형 간의 충돌 함수가 존재하니 그거 쓰면 됨
-
 	ImGui::End();
 }
