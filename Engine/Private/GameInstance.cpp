@@ -10,7 +10,7 @@
 #include "Font_Manager.h"
 #include "PipeLine.h"
 #include "Light_Manager.h"
-//#include "Picking.h"
+#include "Picking.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -35,9 +35,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pInput_Device)
 		return E_FAIL;
 
-	//m_pPicking = CPicking::Create(*ppOut, EngineDesc.hWnd);
-	//if (nullptr == m_pPicking)
-	//	return E_FAIL;
+	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pPicking)
+		return E_FAIL;
 
 
 	m_pLevel_Manager = CLevel_Manager::Create();
@@ -84,7 +84,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
-	/*m_pPicking->Update();*/
+	m_pPicking->Update();
+	m_pPipeLine->Update();
 
 	m_pObject_Manager->Update(fTimeDelta);
 	m_pObject_Manager->Late_Update(fTimeDelta);
@@ -211,6 +212,11 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wst
 		return E_FAIL;
 
 	return m_pObject_Manager->Add_GameObject_ToLayer(iLayerLevelIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
+}
+
+CGameObject* CGameInstance::Get_LastGameObject(_uint iLayerLevelIndex, const _wstring& strLayerTag)
+{
+	return m_pObject_Manager->Get_LastGameObject(iLayerLevelIndex, strLayerTag);
 }
 
 #pragma endregion
@@ -438,16 +444,19 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 
 #pragma region DX9 Legacy
 
-//
-//void CGameInstance::Transform_Picking_ToLocalSpace(CTransform* pTransformCom)
-//{
-//	m_pPicking->Transform_ToLocalSpace(pTransformCom);
-//}
-//
-//_bool CGameInstance::isPicked_InLocalSpace(const _float3& vPointA, const _float3& vPointB, const _float3& vPointC, _float3* pOut)
-//{
-//	return m_pPicking->isPicked_InLocalSpace(vPointA, vPointB, vPointC, pOut);
-//}
+
+void CGameInstance::Transform_Picking_ToLocalSpace(CTransform* pTransformCom)
+{
+	m_pPicking->Transform_ToLocalSpace(pTransformCom);
+}
+_bool CGameInstance::Picking_InWorld(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC)
+{
+	return m_pPicking->Picking_InWorld(vPickedPos, vPointA, vPointB, vPointC);
+}
+_bool CGameInstance::Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC)
+{
+	return m_pPicking->Picking_InLocal(vPickedPos, vPointA, vPointB, vPointC);
+}
 
 #pragma endregion
 
@@ -464,7 +473,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pInput_Device);
-	//Safe_Release(m_pPicking);
+	Safe_Release(m_pPicking);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pObject_Manager);

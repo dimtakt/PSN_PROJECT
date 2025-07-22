@@ -16,13 +16,16 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
+	virtual _bool isPicked(class CTransform* pTransform, _float3* pOut);
+
+public:
 	/* 준비된 자원을 이용하여 어떠한 기능(렌더링)을 수행하기위하여 자원을 장치에 바인딩한다. */
 	HRESULT Bind_Resources();
 	HRESULT Render();
 
 protected:
-	ID3D11Buffer*	m_pVB = { nullptr };
-	ID3D11Buffer*	m_pIB = { nullptr };
+	ID3D11Buffer*			m_pVB = { nullptr };
+	ID3D11Buffer*			m_pIB = { nullptr };
 
 	_uint					m_iNumVertices = {};
 	_uint					m_iVertexStride = {};
@@ -32,6 +35,8 @@ protected:
 	DXGI_FORMAT				m_eIndexFormat = {};
 	D3D_PRIMITIVE_TOPOLOGY	m_ePrimitiveType = {};
 
+	_float3*				m_pVertexPositions = {};
+	_uint*					m_pIndices = {};
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

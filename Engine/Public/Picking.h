@@ -3,6 +3,7 @@
 #include "Base.h"
 
 NS_BEGIN(Engine)
+class CTransform;
 
 class CPicking final : public CBase
 {
@@ -25,7 +26,7 @@ public:
 	//_bool Get_IntersectAtY(_float targetY, _float3& vIntersectPos);
 	//_bool Get_IntersectAtZ(_float targetY, _float3& vIntersectPos);
 
-	void Transform_ToLocalSpace(const _float4x4& WorldMatrixInverse);
+	void Transform_ToLocalSpace(CTransform* pTransformCom);
 
 
 

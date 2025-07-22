@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "VIBuffer_Terrain.h" // 
 
 NS_BEGIN(Engine)
 class CShader;
@@ -26,12 +27,21 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	_bool isPicked(CTransform* pTransform, _float3* pOut)
+	{
+		return m_pVIBufferCom->isPicked(pTransform, pOut);
+	}
+	_bool isPicked(_float3* pOut)
+	{
+		return m_pVIBufferCom->isPicked(m_pTransformCom, pOut);
+	}
+
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 	CVIBuffer_Terrain*		m_pVIBufferCom = { nullptr };
 
-	CTransform*				m_pTransform = { nullptr };
 
 private:
 	HRESULT Ready_Components();

@@ -25,6 +25,10 @@ public:
 	void Late_Update(_float fTimeDelta);
 	void Clear(_uint iLevelIndex);
 
+public:
+	class CGameObject* Get_LastGameObject(_uint iLayerLevelIndex, const _wstring& strLayerTag);
+
+
 private:
 	class CGameInstance*					m_pGameInstance = { nullptr };
 	_uint									m_iNumLevels = {};

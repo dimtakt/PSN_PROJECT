@@ -130,6 +130,12 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
 		return E_FAIL;
 
+	// ===== m_pVertexPositions Á¤º¸ »ðÀÔ
+ 	m_pVertexPositions = new _float3[m_iNumVertices];
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		m_pVertexPositions[i] = pVertices[i].vPosition;
+	// ==============================
+
 	Safe_Delete_Array(pVertices);
 
 	D3D11_BUFFER_DESC		IBDesc{};
@@ -148,6 +154,11 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 
 	Safe_Delete_Array(pPixels);
 	
+	// ===== m_pIndices Á¤º¸ »ðÀÔ
+	m_pIndices = new _uint[m_iNumIndices];
+	memcpy(m_pIndices, pIndices, sizeof(_uint)* m_iNumIndices);
+	// ============================== 
+
 	Safe_Delete_Array(pIndices);
 
 	return S_OK;
@@ -157,6 +168,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void* pArg)
 {
 	return S_OK;
 }
+
 
 CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pHeightMapFilePath)
 {
@@ -189,4 +201,9 @@ void CVIBuffer_Terrain::Free()
 	__super::Free();
 
 
+	if (false == m_isCloned)
+	{
+		Safe_Delete_Array(m_pIndices);
+		Safe_Delete_Array(m_pVertexPositions);
+	}
 }

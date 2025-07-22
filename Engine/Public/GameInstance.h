@@ -3,6 +3,7 @@
 #include "Prototype_Manager.h"
 
 NS_BEGIN(Engine)
+class CTransform;
 
 class ENGINE_DLL CGameInstance final : public CBase
 {
@@ -52,6 +53,7 @@ public:
 public:
 	class CComponent* Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	class CGameObject* Get_LastGameObject(_uint iLayerLevelIndex, const _wstring& strLayerTag);
 #pragma endregion
 
 	// ==============================
@@ -150,11 +152,12 @@ public:
 
 #pragma region DX9 Legacy
 
-	//
-	//#pragma region PICKING 
-	//	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
-	//	_bool isPicked_InLocalSpace(const _float3& vPointA, const _float3& vPointB, const _float3& vPointC, _float3* pOut);
-	//#pragma endregion
+	
+	#pragma region PICKING 
+		void Transform_Picking_ToLocalSpace(CTransform* pTransformCom);
+		_bool Picking_InWorld(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
+		_bool Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
+	#pragma endregion
 
 
 #pragma endregion

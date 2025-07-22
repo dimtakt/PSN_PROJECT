@@ -44,6 +44,16 @@ void CLayer::Late_Update(_float fTimeDelta)
 	}
 }
 
+CGameObject* CLayer::Get_LastGameObject()
+{
+	if (!m_GameObjects.empty())
+	{
+		return m_GameObjects.back();
+	}
+
+	return nullptr;
+}
+
 CLayer* CLayer::Create()
 {
 	return new CLayer();

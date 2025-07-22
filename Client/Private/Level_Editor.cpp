@@ -7,6 +7,7 @@
 #include "GameInstance.h"
 #include "Layer.h"
 #include "GameObject.h"
+#include "Terrain.h"
 //#include "Client_Struct.h"
 //#include "Camera_Free.h"
 #include "Camera_Editor.h"
@@ -36,7 +37,6 @@ HRESULT CLevel_Editor::Initialize()
 	//if (FAILED(Ready_Interaction_Texture_Info()))
 	//	return E_FAIL;
 
-
 	return S_OK;
 }
 
@@ -44,11 +44,15 @@ void CLevel_Editor::Update(_float fTimeDelta)
 {
 	if (!ImGui::GetIO().WantCaptureMouse)		//UI창 위에 마우스 올라가 있으면 피킹체크X
 		Picking_Check();
+
+	//if (isOn_DeployMode)
+		//Deploy_Object();
+
 }
 
 HRESULT CLevel_Editor::Render()
 {
-	SetWindowText(g_hWnd, TEXT("에디터 레벨 입니다"));
+	SetWindowText(g_hWnd, TEXT("Level : Editor"));
 	//m_pImgui_Manage->Render();
 	this->ImGui_Render();
 
@@ -121,26 +125,15 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
-
-	ImGui::Begin("Mouse Debug");
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Text("MousePos: (%.1f, %.1f)", io.MousePos.x, io.MousePos.y);
-
-	POINT pt;
-	GetCursorPos(&pt);
-	ScreenToClient(g_hWnd, &pt);
-	ImGui::Text("Win32 Cursor: (%d, %d)", pt.x, pt.y);
-	ImGui::End();
-
 	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
 }
 
 void CLevel_Editor::ImGui_MenuBar_Render()
 {
-	if (ImGui::BeginMenuBar())
-	{
-	}
+	//if (ImGui::BeginMenuBar())
+	//{
+	//}
 }
 
 void CLevel_Editor::Picking_Check()
@@ -271,10 +264,13 @@ void CLevel_Editor::ImGui_TerrainEditor()
 	if (ImGui::Button("Create Terrain"))
 	{
 		// 생성 코드..
-		_wstring strLayerTag = L"Layer_Background";
+		_wstring strLayerTag = L"Layer_Object_Editor";
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
 			ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Terrain"))))
 			return;
+
+		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), strLayerTag);
+		m_pTerrainObject.push_back(pGameObject);
 
 		_float fTiling = 50.f * (iSize / fTerrainDefaultSize);
 		CShader* pShaderCom = static_cast<CShader*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Shader", iIndex));
@@ -311,11 +307,64 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::BeginGroup();
 	const char* szItems[] = { "Enemy" };
 	static int iCurrentItem = 0;
-	ImGui::Combo("Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
+	ImGui::Text("Selected Model");
+	ImGui::Combo("##Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
+	ImGui::Separator();
+
+	if (!isOn_DeployMode) {
+		if (ImGui::Button("Active Deploy Mode"))
+			isOn_DeployMode = true;
+	}
+	else {
+		if (ImGui::Button("Deactive Deploy Mode"))
+			isOn_DeployMode = false;
+	}
+
+
+	static _float3 vDebugPos = {}; //
+
+	// 클릭하면 모델 설치
+	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+	{
+		switch (iCurrentItem)
+		{
+		case 0:
+		{
+			HRESULT hr = m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Object_Enemy",
+				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
+
+			if (hr == E_FAIL) MessageBoxW(g_hWnd, L"Failed", L"System Error", MB_OK);
+		}
+
+			break;
+		default:
+			break;
+		}
+
+		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Object_Enemy");
+		if (!m_pTerrainObject.empty())
+		{
+			CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
+
+			_float3 vPos = {};
+			pTerrain->isPicked(&vPos);
+			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+			pObjectTransformCom->Scale(_float3{ 20, 20, 20 }); // 임시로 크기 키움
+			pObjectTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
+
+			vDebugPos = vPos; //
+		}
+		m_pObject.push_back(pGameObject);
+
+
+	}
+
+	ImGui::Text("Pos Debug");
+	ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vDebugPos), 0.01f);
+
 
 	ImGui::EndGroup();
 
-	//다렉x콜리젼 헤더파일..?
-	//dx9때처럼 레이와 삼각형 간의 충돌 함수가 존재하니 그거 쓰면 됨
 	ImGui::End();
 }
+

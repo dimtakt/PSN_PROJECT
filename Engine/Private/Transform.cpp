@@ -33,14 +33,14 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
 }
 
-void CTransform::Scale(_float3 vScale)
+void CTransform::Scale(_float3 vScale)		// 절대적
 {
 	Set_State(STATE::RIGHT, XMVector3Normalize(Get_State(STATE::RIGHT)) * vScale.x);
 	Set_State(STATE::UP, XMVector3Normalize(Get_State(STATE::UP)) * vScale.y);
 	Set_State(STATE::LOOK, XMVector3Normalize(Get_State(STATE::LOOK)) * vScale.z);
 }
 
-void CTransform::Scaling(_float3 vScale)
+void CTransform::Scaling(_float3 vScale)	// 상대적
 {
 	Set_State(STATE::RIGHT, Get_State(STATE::RIGHT) * vScale.x);
 	Set_State(STATE::UP, Get_State(STATE::UP) * vScale.y);

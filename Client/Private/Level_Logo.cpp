@@ -42,7 +42,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 
 HRESULT CLevel_Logo::Render()
 {
-	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+	SetWindowText(g_hWnd, TEXT("Level : Logo"));
 
 	// ksta : 폰트 그리기 테스트.
 

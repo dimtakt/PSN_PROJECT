@@ -89,7 +89,7 @@ _bool CPicking::Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, con
     _vector vC = XMLoadFloat3(&vPointC);
 
     _vector rayOrigin = XMLoadFloat3(&m_vLocalMousePos);
-    _vector rayDir = XMLoadFloat3(&m_vLocalMouseRay);
+    _vector rayDir = XMVector3Normalize(XMLoadFloat3(&m_vLocalMouseRay));
 
     float fDist = 0.f;  
     bool isPicked = TriangleTests::Intersects(rayOrigin, rayDir, vA, vB, vC, fDist);
@@ -103,15 +103,15 @@ _bool CPicking::Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, con
     return isPicked;
 }
 
-void CPicking::Transform_ToLocalSpace(const _float4x4& WorldMatrixInverse)
+void CPicking::Transform_ToLocalSpace(CTransform* pTransformCom)
 {
-    _matrix matWorldInv = XMLoadFloat4x4(&WorldMatrixInverse);
+    _matrix matWorldInv = pTransformCom->Get_WorldMatrix_Inverse();
 
     _vector vLocalPos = XMVector3TransformCoord(XMLoadFloat3(&m_vMousePos), matWorldInv);
-    _vector vLocalRay = XMVector3TransformNormal(XMLoadFloat3(&m_vMouseRay), matWorldInv);
+    _vector vLocalRay = XMVector3Normalize(XMVector3TransformNormal(XMLoadFloat3(&m_vMouseRay), matWorldInv));
 
     XMStoreFloat3(&m_vLocalMousePos, vLocalPos);
-    XMStoreFloat3(&m_vLocalMouseRay, vLocalRay);
+    XMStoreFloat3(&m_vLocalMouseRay, vLocalRay); 
 }
 
 
