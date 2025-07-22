@@ -30,6 +30,9 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
+	void Set_Animation(_uint iIndex);
+
+public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	void Play_Animation(_float fTimeDelta);
@@ -56,9 +59,15 @@ private:
 	vector<class CBone*>			m_Bones;
 
 private:
+	_uint							m_iCurrentAnimIndex = { 0 };
+	_uint							m_iNumAnimations = { 0 };
+	vector<class CAnimation*>		m_Animations;
+
+private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones(const aiNode* pAINode, _int iParentIndex);
+	HRESULT Ready_Animations();
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);

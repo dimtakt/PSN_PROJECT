@@ -40,6 +40,15 @@ namespace Engine
 		};
 	}VTXPOSTEX;
 
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+
+		float		fTrackPosition;
+	}KEYFRAME;
+
 	typedef struct tagVertexNormalTexcoord
 	{
 		XMFLOAT3		vPosition;

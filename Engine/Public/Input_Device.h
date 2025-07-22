@@ -72,8 +72,8 @@ public:
 	}
 	_bool	Get_IsKeyPressing(MOUSEKEYSTATE eMouse)
 	{
-		auto itCur = m_mCurState.find(ENUM_CLASS(eMouse));
-		return itCur != m_mCurState.end() && itCur->second;
+		auto itCur = m_mCurMouseState.find(ENUM_CLASS(eMouse));
+		return itCur != m_mCurMouseState.end() && itCur->second;
 	}
 
 

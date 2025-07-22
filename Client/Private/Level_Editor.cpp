@@ -8,7 +8,8 @@
 #include "Layer.h"
 #include "GameObject.h"
 //#include "Client_Struct.h"
-#include "Camera_Free.h"
+//#include "Camera_Free.h"
+#include "Camera_Editor.h"
 
 CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -89,7 +90,7 @@ HRESULT CLevel_Editor::Ready_ImGui(HWND hWnd, ID3D11Device* pDevice, ID3D11Devic
 HRESULT CLevel_Editor::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
 	// ksta : 마우스 카메라가 있어야 제대로 될 듯. 아래는 임시용
-	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
+	CCamera_Editor::CAMERA_EDITOR_DESC		CameraDesc{};
 
 	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
@@ -101,11 +102,8 @@ HRESULT CLevel_Editor::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fMouseSensor = .2f;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
-		ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+		ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Editor"), &CameraDesc)))
 		return E_FAIL;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
-	//	ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Mouse"))))
-	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -186,7 +184,7 @@ void CLevel_Editor::ImGui_MainMenu()
 		{
 			if (ImGui::MenuItem("Terrain Editor", nullptr))
 				isOn_GUITerrainEditor = !isOn_GUITerrainEditor;
-			if (ImGui::MenuItem("Model Deplayer", nullptr))
+			if (ImGui::MenuItem("ModelDeployer", nullptr))
 				isOn_ModelDeployer = !isOn_ModelDeployer;
 
 			ImGui::EndMenu();

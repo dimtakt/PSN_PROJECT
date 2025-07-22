@@ -76,6 +76,9 @@
     <Filter Include="01.Levels\Editor">
       <UniqueIdentifier>{af9130bc-0446-46f8-98b4-2fd46755179c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Camera\Editor">
+      <UniqueIdentifier>{e4b13863-a76d-4f8e-ab0a-792317848329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -159,6 +162,9 @@
     <ClInclude Include="..\public\Level_Editor.h">
       <Filter>01.Levels\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Editor.h">
+      <Filter>02.GameObject\Camera\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -239,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Level_Editor.cpp">
       <Filter>01.Levels\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Editor.cpp">
+      <Filter>02.GameObject\Camera\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 //#include "Monster.h"
 #include "Enemy.h"
 #include "Camera_Free.h"
+#include "Camera_Editor.h"
 //#include "Player.h"
 //#include "Effect.h"
 //#include "Sky.h"
@@ -121,6 +122,10 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 2))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Terrain_Probuilder"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/GridBox_Default.dds"), 1))))
+		return E_FAIL;
+
 	///* Prototype_Component_Texture_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Player"),
 	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Player/Player0.png"), 1))))
@@ -185,6 +190,9 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
+
+
 	///* Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Player"),
 	//	CPlayer::Create(m_pDevice, m_pContext))))
@@ -222,6 +230,10 @@ HRESULT CLoader::Loading_For_Editor_Level()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 2))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Texture_Terrain_Probuilder"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/GridBox_Default.dds"), 1))))
+		return E_FAIL;
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_VIBuffer_Terrain"),
@@ -246,8 +258,13 @@ HRESULT CLoader::Loading_For_Editor_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
 	// Camera
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Free"),
-		CCamera_Free::Create(m_pDevice, m_pContext))))
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Free"),
+	//	CCamera_Free::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+	/* Prototype_GameObject_Camera_Editor */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Editor"),
+		CCamera_Editor::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Terrain"),

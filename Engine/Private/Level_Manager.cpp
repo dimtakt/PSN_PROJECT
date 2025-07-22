@@ -20,7 +20,8 @@ HRESULT CLevel_Manager::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 
 	m_pCurrentLevel = pNewLevel;		
 
-	m_iCurrentLevelID = iLevelID;	
+	m_iCurrentLevelID = iLevelID;
+	//m_iDestLevelID = iDestLevelID;
 
 	return S_OK;
 }

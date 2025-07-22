@@ -59,7 +59,15 @@ HRESULT CTerrain::Render()
 
 HRESULT CTerrain::Ready_Components()
 {
-    LEVEL eLevel = static_cast<LEVEL>(m_pGameInstance->Get_CurLevel());
+    LEVEL eLevel;
+    
+    // ksta : 임시조치. 에디터에선 에디터로, 아니면 게임플레이로. 추후 수정 필요.
+    if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::EDITOR))
+        eLevel = LEVEL::EDITOR;
+    else
+        eLevel = LEVEL::GAMEPLAY;
+
+    //eLevel = static_cast<LEVEL>(m_pGameInstance->Get_CurLevel()); // 현재 레벨이 아니니까.. 로딩 레벨이 리턴되는게 문제.
 
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Shader_VtxNorTex"),
@@ -70,7 +78,11 @@ HRESULT CTerrain::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Texture_Terrain"),
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Texture_Terrain"),
+    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+    //    return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Texture_Terrain_Probuilder"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 

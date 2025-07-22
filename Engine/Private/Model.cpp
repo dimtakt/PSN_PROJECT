@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "Bone.h"
 #include "MeshMaterial.h"
+#include "Animation.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent{ pDevice ,pContext }
@@ -57,6 +58,9 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
     if (FAILED(Ready_Materials(pModelFilePath)))
         return E_FAIL;
 
+    //if (FAILED(Ready_Animations()))
+    //    return E_FAIL;
+
     return S_OK;
 }
 
@@ -89,7 +93,7 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
 void CModel::Play_Animation(_float fTimeDelta)
 {
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
-
+    //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta);
 
     /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
     for (auto& pBone : m_Bones)
@@ -107,6 +111,14 @@ HRESULT CModel::Render(_uint iMeshIndex)
         return E_FAIL;
 
     return S_OK;
+}
+
+void CModel::Set_Animation(_uint iIndex)
+{
+    if (iIndex >= m_iNumAnimations)
+        return;
+
+    m_iCurrentAnimIndex = iIndex;
 }
 
 HRESULT CModel::Ready_Meshes()
@@ -157,6 +169,25 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
     for (size_t i = 0; i < pAINode->mNumChildren; i++)
     {
         Ready_Bones(pAINode->mChildren[i], iIndex);
+    }
+
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Animations()
+{
+    /* 시간에 따라 내 뼈들이 어떻게 움직여야하는가? 에 대한 정보가 필요하다.  */
+    /* 대기동작을 위해서는 뼈들이 어떤 시간대에 어떤 상태를 취하는가? */
+    /* 공격동작을 위해서는 뼈들이 어떤 시간대에 어떤 상태를 취하는가? */
+    m_iNumAnimations = m_pAIScene->mNumAnimations;
+
+    for (size_t i = 0; i < m_iNumAnimations; i++)
+    {
+        //CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i]);
+        //if (nullptr == pAnimation)
+            //return E_FAIL;
+
+        //m_Animations.push_back(pAnimation);
     }
 
     return S_OK;

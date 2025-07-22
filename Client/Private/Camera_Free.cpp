@@ -50,9 +50,9 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
     if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
         m_pTransformCom->Go_Right(fTimeDelta);
 
-    if (m_pGameInstance->Get_IsKeyUp(DIK_P) ||
-        m_pGameInstance->Get_IsKeyDown(DIK_P))
-        m_pTransformCom->Go_Straight(fTimeDelta * 20);
+    //if (m_pGameInstance->Get_IsKeyUp(DIK_P) ||
+    //    m_pGameInstance->Get_IsKeyDown(DIK_P))
+    //    m_pTransformCom->Go_Straight(fTimeDelta * 20);
 
     // * 마우스 움직임에 의한 카메라 회전
 

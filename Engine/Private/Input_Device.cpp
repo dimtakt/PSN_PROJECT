@@ -74,7 +74,7 @@ void Engine::CInput_Device::Update(void)
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		bool isPressing = (Get_DIKeyState(i) & 0x80);
+		bool isPressing = (Get_DIMouseState(static_cast<MOUSEKEYSTATE>(i)) & 0x80);
 
 		m_mPreMouseState[i] = m_mCurMouseState[i];
 		m_mCurMouseState[i] = isPressing;

@@ -3,10 +3,10 @@
 #include "Base.h"
 
 /*
-aiNodeAnim
-aiNode : 뼈들의 관계를 표현하기위한 데이터. 부모연결 말하는듯
-aiBone : 이 뼈는 몇개의 정점에게 영향을 주며
-		그중 어떤 정점들에게 영향을 준다!! + 얼마나 영향을 준다. 
+aiNodeAnim	: 애니메이션을 위한 뼈의 상태행렬을 보관한다. 
+aiNode		: 뼈들의 관계를 표현하기위한 데이터. 부모연결 말하는듯
+aiBone		: 이 뼈는 몇개의 정점에게 영향을 주며
+			그중 어떤 정점들에게 영향을 준다!! + 얼마나 영향을 준다. 
 */
 
 /*
@@ -25,6 +25,9 @@ private:
 public:
 	_matrix Get_CombinedTransformationMatrix() const {
 		return XMLoadFloat4x4(&m_CombinedTransformationMatrix);
+	}
+	void Set_TransformationMatrix(_fmatrix Matrix) {
+		XMStoreFloat4x4(&m_TransformationMatrix, Matrix);
 	}
 
 public:

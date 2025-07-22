@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\public\Bullet.h" />
+    <ClInclude Include="..\public\Camera_Editor.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\public\Level_Editor.h" />
@@ -182,6 +183,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
+    <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Level_Editor.cpp" />
     <ClCompile Include="..\private\Enemy.cpp" />
