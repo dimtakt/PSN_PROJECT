@@ -42,13 +42,16 @@ void CEnemy::Update(_float fTimeDelta)
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 
 	m_pModelCom->Play_Animation(fTimeDelta);
+
+	if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::GAMEPLAY))
+		m_pTransformCom->Go_Straight(fTimeDelta * 1.f);
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 }
 
@@ -65,8 +68,6 @@ HRESULT CEnemy::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
-		/*if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_DIFFUSE, 0)))
-			return E_FAIL;        */
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
@@ -75,8 +76,6 @@ HRESULT CEnemy::Render()
 
 		m_pModelCom->Render(i);
 	}
-
-
 
 	return S_OK;
 }

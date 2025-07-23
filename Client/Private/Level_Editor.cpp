@@ -12,6 +12,8 @@
 //#include "Camera_Free.h"
 #include "Camera_Editor.h"
 
+#include "Level_Loading.h"
+
 CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -42,7 +44,7 @@ HRESULT CLevel_Editor::Initialize()
 
 void CLevel_Editor::Update(_float fTimeDelta)
 {
-	if (!ImGui::GetIO().WantCaptureMouse)		//UI창 위에 마우스 올라가 있으면 피킹체크X
+	if (!ImGui::GetIO().WantCaptureMouse)
 		Picking_Check();
 
 	//if (isOn_DeployMode)
@@ -101,7 +103,7 @@ HRESULT CLevel_Editor::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 500.f;
-	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraDesc.fMouseSensor = .2f;
 
@@ -117,6 +119,7 @@ void CLevel_Editor::ImGui_Render()
 	m_pImGui_Manager->GUI_Render_Begin();
 	// 그리기 시작
 
+
 	ImGui_MainMenu();				// 최상단 메뉴
 
 	if (isOn_GUITerrainEditor)
@@ -124,6 +127,7 @@ void CLevel_Editor::ImGui_Render()
 
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
+
 
 	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
@@ -138,10 +142,10 @@ void CLevel_Editor::ImGui_MenuBar_Render()
 
 void CLevel_Editor::Picking_Check()
 {
-	//if (m_pGameInstance->Get_IsKeyDown(DIMOUSE_BUTTON0))
-	//	m_bPicking = true;
-	//else
-	//	m_bPicking = false;
+	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+		m_isPicking = true;
+	else
+		m_isPicking = false;
 }
 
 CLevel_Editor* CLevel_Editor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -179,8 +183,8 @@ void CLevel_Editor::ImGui_MainMenu()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			//if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-			//if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+			if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+			if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
 			//if (ImGui::MenuItem("Close", "Ctrl+W")) { isOn_GUITerrain = false; }
 			ImGui::EndMenu();
 		}
@@ -264,7 +268,7 @@ void CLevel_Editor::ImGui_TerrainEditor()
 	if (ImGui::Button("Create Terrain"))
 	{
 		// 생성 코드..
-		_wstring strLayerTag = L"Layer_Object_Editor";
+		_wstring strLayerTag = L"Layer_Editor_Terrain";
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
 			ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Terrain"))))
 			return;
@@ -274,8 +278,8 @@ void CLevel_Editor::ImGui_TerrainEditor()
 
 		_float fTiling = 50.f * (iSize / fTerrainDefaultSize);
 		CShader* pShaderCom = static_cast<CShader*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Shader", iIndex));
-		if (FAILED(pShaderCom->Bind_RawValue("g_fTiling", &fTiling, sizeof(_float))))
-			return;
+		//if (FAILED(pShaderCom->Bind_RawValue("g_fTiling", &fTiling, sizeof(_float))))
+		//	return;
 		
 		CTransform* pTransform = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Transform", iIndex));
 		pTransform->Scaling(_float3(fMultiplier, fMultiplier, fMultiplier));
@@ -284,6 +288,26 @@ void CLevel_Editor::ImGui_TerrainEditor()
 		iIndex++;
 	}
 	
+
+	//ImGui::Separator();
+	//if (ImGui::Button("Undo"))
+	//	if (!m_pTerrainObject.empty())
+	//	{
+	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Terrain");
+	//		m_pTerrainObject.pop_back();
+	//	}
+	//if (ImGui::CollapsingHeader("Danger Section"))
+	//{
+	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	//	if (ImGui::Button("All Reset"))
+	//	{
+	//		for (size_t i = 0; i < m_pTerrainObject.size(); i++)
+	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Terrain");
+	//		m_pTerrainObject.clear();
+	//	}
+	//	ImGui::PopStyleColor();
+	//}
+
 	// 오브젝트 수정 기능은 나중에 만들어도 됨
 	//ImGui::Separator();
 
@@ -305,7 +329,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::Separator();
 
 	ImGui::BeginGroup();
-	const char* szItems[] = { "Enemy" };
+	const char* szItems[] = { "Enemy", "Props_Pot", "Ptops_Fotel"};
 	static int iCurrentItem = 0;
 	ImGui::Text("Selected Model");
 	ImGui::Combo("##Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
@@ -324,24 +348,33 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	static _float3 vDebugPos = {}; //
 
 	// 클릭하면 모델 설치
-	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isPicking)
 	{
 		switch (iCurrentItem)
 		{
 		case 0:
 		{
-			HRESULT hr = m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Object_Enemy",
+			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-
-			if (hr == E_FAIL) MessageBoxW(g_hWnd, L"Failed", L"System Error", MB_OK);
-		}
-
 			break;
+		}
+		case 1:
+		{
+			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
+			break;
+		}
+		case 2:
+		{
+			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+			break;
+		}
 		default:
 			break;
 		}
 
-		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Object_Enemy");
+		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 		if (!m_pTerrainObject.empty())
 		{
 			CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
@@ -349,7 +382,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			_float3 vPos = {};
 			pTerrain->isPicked(&vPos);
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
-			pObjectTransformCom->Scale(_float3{ 20, 20, 20 }); // 임시로 크기 키움
+			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
 			pObjectTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
 			vDebugPos = vPos; //
@@ -361,6 +394,26 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 	ImGui::Text("Pos Debug");
 	ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vDebugPos), 0.01f);
+
+	//ImGui::Separator();
+	//if (ImGui::Button("Undo"))
+	//	if (!m_pObject.empty())
+	//	{
+	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+	//		m_pObject.pop_back();
+	//	}
+	//if (ImGui::CollapsingHeader("Danger Section"))
+	//{
+	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	//	if (ImGui::Button("All Reset"))
+	//	{
+	//		for (size_t i = 0; i < m_pObject.size(); i++)
+	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+	//		m_pObject.clear();
+	//	}
+	//	ImGui::PopStyleColor();
+	//}
+
 
 
 	ImGui::EndGroup();

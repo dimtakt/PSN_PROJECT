@@ -60,6 +60,10 @@ private:
 	std::vector<CGameObject*> m_pObject = {};
 	std::vector<CGameObject*> m_pTerrainObject = {};
 
+
+
+	_bool m_isPicking = false;
+
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

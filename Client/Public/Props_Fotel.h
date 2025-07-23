@@ -3,7 +3,6 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
-
 NS_BEGIN(Engine)
 
 class CShader;
@@ -13,17 +12,12 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CEnemy final : public CGameObject
+class CProps_Fotel final : public CGameObject
 {
-public:
-	typedef struct tagEnemyDesc : public GAMEOBJECT_DESC
-	{
-
-	}ENEMY_DESC;
 private:
-	CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CEnemy(const CGameObject& Prototype);
-	virtual ~CEnemy() = default;
+	CProps_Fotel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CProps_Fotel(const CGameObject& Prototype);
+	virtual ~CProps_Fotel() = default;
 
 public:
 	HRESULT		Initialize_Prototype()				override;
@@ -33,28 +27,21 @@ public:
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
 
-public:
-	// 퍼블릭 함수들 (Get/Set 등..)
-	// ..
-
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
-
-
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	GAMEOBJ_TYPE	m_eGameObjType	=	GAMEOBJ_TYPE::ENEMY;
+	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
 
 	CShader*		m_pShaderCom	= { nullptr };	
 	CModel*			m_pModelCom		= { nullptr };
 
-
 public:
-	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CEnemy*			Clone(void* pArg)					override;
-	void			Free()								override;
+	static CProps_Fotel*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CProps_Fotel*			Clone(void* pArg)		override;
+	void					Free()					override;
 
 
 };

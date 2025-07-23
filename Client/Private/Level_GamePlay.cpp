@@ -114,8 +114,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Monster"))))
 	//	return E_FAIL;
 	
+	CGameObject::GAMEOBJECT_DESC GameObjDesc{};
+
+	GameObjDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	GameObjDesc.fSpeedPerSec	= 1.f;
+
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"))))
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
 		return E_FAIL;
 
 	return S_OK;

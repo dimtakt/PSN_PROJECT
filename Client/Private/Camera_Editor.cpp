@@ -32,15 +32,16 @@ HRESULT CCamera_Editor::Initialize(void* pArg)
 void CCamera_Editor::Priority_Update(_float fTimeDelta)
 {
     // * 키보드 WASD 에 의한 카메라 이동
+    _float fSpeed = 10.f;
 
     if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
-        m_pTransformCom->Go_Straight(fTimeDelta);
+        m_pTransformCom->Go_Straight(fTimeDelta * fSpeed);
     if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
-        m_pTransformCom->Go_Backward(fTimeDelta);
+        m_pTransformCom->Go_Backward(fTimeDelta * fSpeed);
     if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
-        m_pTransformCom->Go_Left(fTimeDelta);
+        m_pTransformCom->Go_Left(fTimeDelta * fSpeed);
     if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
-        m_pTransformCom->Go_Right(fTimeDelta);
+        m_pTransformCom->Go_Right(fTimeDelta * fSpeed);
 
 
 
@@ -62,9 +63,9 @@ void CCamera_Editor::Priority_Update(_float fTimeDelta)
     else if (m_pGameInstance->Get_IsKeyPressing(MOUSEKEYSTATE::MB))   // 휠클릭 중일 때만 드래그 이동
     {
         if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-            m_pTransformCom->Go_Right(-fTimeDelta * iMouseMove * m_fMouseSensor);
+            m_pTransformCom->Go_Right(-fTimeDelta * iMouseMove * m_fMouseSensor * fSpeed);
         if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
-            m_pTransformCom->Go_Above(fTimeDelta * iMouseMove * m_fMouseSensor);
+            m_pTransformCom->Go_Above(fTimeDelta * iMouseMove * m_fMouseSensor * fSpeed);
     }
 
 

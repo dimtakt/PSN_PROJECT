@@ -156,6 +156,8 @@
     <ClInclude Include="..\public\Camera_Editor.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Props_Fotel.h" />
+    <ClInclude Include="..\Public\Props_Pot.h" />
     <ClInclude Include="..\public\Level_Editor.h" />
     <ClInclude Include="..\public\Enemy.h" />
     <ClInclude Include="..\Public\ImGui_Manager.h" />
@@ -185,6 +187,8 @@
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Props_Fotel.cpp" />
+    <ClCompile Include="..\Private\Props_Pot.cpp" />
     <ClCompile Include="..\private\Level_Editor.cpp" />
     <ClCompile Include="..\private\Enemy.cpp" />
     <ClCompile Include="..\Private\ImGui_Manager.cpp" />

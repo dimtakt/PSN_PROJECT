@@ -40,15 +40,6 @@
     <Filter Include="02.GameObject\Camera\Free">
       <UniqueIdentifier>{88cff4c9-6a8e-4694-8905-0fed30859257}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\AnimObject">
-      <UniqueIdentifier>{f8c1c8b8-c559-4ebb-8b56-203ca701a4dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\AnimObject\Player">
-      <UniqueIdentifier>{822b9ef2-e358-438b-8464-d8749a70c692}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\AnimObject\Enemy">
-      <UniqueIdentifier>{86fc2d53-70cf-4f59-9c8a-dc7fed8fa042}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\Bullet">
       <UniqueIdentifier>{9eac51e1-e6de-443c-a7a5-fbe9bb6c2c92}</UniqueIdentifier>
     </Filter>
@@ -78,6 +69,24 @@
     </Filter>
     <Filter Include="02.GameObject\Camera\Editor">
       <UniqueIdentifier>{e4b13863-a76d-4f8e-ab0a-792317848329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject">
+      <UniqueIdentifier>{f8c1c8b8-c559-4ebb-8b56-203ca701a4dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Player">
+      <UniqueIdentifier>{822b9ef2-e358-438b-8464-d8749a70c692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy">
+      <UniqueIdentifier>{86fc2d53-70cf-4f59-9c8a-dc7fed8fa042}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_NonAnimObject">
+      <UniqueIdentifier>{13a3552f-0cc9-45a5-811b-fd185a7ec3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_NonAnimObject\Pot">
+      <UniqueIdentifier>{15cecc25-36de-4e83-9e38-4b040f051001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_NonAnimObject\Fotel">
+      <UniqueIdentifier>{1308e205-c261-45d1-8074-84a816818a9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -121,10 +130,10 @@
       <Filter>02.GameObject\Camera\Free</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Enemy.h">
-      <Filter>02.GameObject\AnimObject\Enemy</Filter>
+      <Filter>02.GameObject\_AnimObject\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Player.h">
-      <Filter>02.GameObject\AnimObject\Player</Filter>
+      <Filter>02.GameObject\_AnimObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Bullet.h">
       <Filter>02.GameObject\Bullet</Filter>
@@ -164,6 +173,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Camera_Editor.h">
       <Filter>02.GameObject\Camera\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Props_Fotel.h">
+      <Filter>02.GameObject\_NonAnimObject\Fotel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Props_Pot.h">
+      <Filter>02.GameObject\_NonAnimObject\Pot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -208,10 +223,10 @@
       <Filter>02.GameObject\Camera\Free</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Enemy.cpp">
-      <Filter>02.GameObject\AnimObject\Enemy</Filter>
+      <Filter>02.GameObject\_AnimObject\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Player.cpp">
-      <Filter>02.GameObject\AnimObject\Player</Filter>
+      <Filter>02.GameObject\_AnimObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Bullet.cpp">
       <Filter>02.GameObject\Bullet</Filter>
@@ -248,6 +263,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Editor.cpp">
       <Filter>02.GameObject\Camera\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Props_Fotel.cpp">
+      <Filter>02.GameObject\_NonAnimObject\Fotel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Props_Pot.cpp">
+      <Filter>02.GameObject\_NonAnimObject\Pot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,8 @@
 
 // Static Models
 #include "Enemy.h"
+#include "Props_Pot.h"
+#include "Props_Fotel.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
@@ -77,6 +79,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"),
 		CEnemy::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),
+		CProps_Pot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"),
+		CProps_Fotel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	// 모델의 방향을 올바르게 로드하기 위해 사전에 변환용 벡터 정의
@@ -84,9 +92,15 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	/* Prototype_Component_Model_Enemy */
-	// ksta : 임시로 NOANIM으로 둠
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Pot"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/pot/pot.fbx", PreTransformMatrix))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Fotel"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/fotel/fotel.fbx", PreTransformMatrix))))
 		return E_FAIL;
 
 
