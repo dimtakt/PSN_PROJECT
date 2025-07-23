@@ -285,7 +285,7 @@ void CLevel_Editor::ImGui_TerrainEditor()
 		pTransform->Scaling(_float3(fMultiplier, fMultiplier, fMultiplier));
 		pTransform->Set_State(STATE::POSITION, XMVectorSet(fPosX, fPosY, fPosZ, 1));
 		
-		iIndex++;
+		iIndex++; // 이거 안내려서 문제생긴듯
 	}
 	
 
@@ -346,6 +346,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 
 	static _float3 vDebugPos = {}; //
+	static _int iObjIndex = 0;
 
 	// 클릭하면 모델 설치
 	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isPicking)
@@ -386,6 +387,8 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			break;
 		}
 
+	
+
 		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 		if (!m_pTerrainObject.empty())
 		{
@@ -393,15 +396,16 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 			_float3 vPos = {};
 			pTerrain->isPicked(&vPos);
-			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+			CTransform* pObjectTransformCom = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", L"Com_Transform", iObjIndex));
+			//CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
-			pObjectTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
+			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPos.x, vPos.y, vPos.z, 1)); // ksta : 이게 문제였음 이게!!
 
 			vDebugPos = vPos; //
 		}
 		m_pObject.push_back(pGameObject);
 
-
+		iObjIndex++; // 이거 안내려서 문제생긴듯
 	}
 
 	ImGui::Text("Pos Debug");
