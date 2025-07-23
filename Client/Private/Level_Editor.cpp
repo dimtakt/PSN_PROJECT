@@ -329,7 +329,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::Separator();
 
 	ImGui::BeginGroup();
-	const char* szItems[] = { "Enemy", "Props_Pot", "Ptops_Fotel"};
+	const char* szItems[] = { "Enemy", "Props_Pot", "Props_Fotel", "Props_ServerRack1", "Props_ServerRack2" };
 	static int iCurrentItem = 0;
 	ImGui::Text("Selected Model");
 	ImGui::Combo("##Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
@@ -368,6 +368,18 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		{
 			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+			break;
+		}
+		case 3:
+		{
+			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
+			break;
+		}
+		case 4:
+		{
+			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
 			break;
 		}
 		default:

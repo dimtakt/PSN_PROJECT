@@ -88,6 +88,9 @@
     <Filter Include="02.GameObject\_NonAnimObject\Fotel">
       <UniqueIdentifier>{1308e205-c261-45d1-8074-84a816818a9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\_NonAnimObject\ServerRack">
+      <UniqueIdentifier>{f2a27300-1377-431d-b7b1-3aa42c9eb9ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -180,6 +183,12 @@
     <ClInclude Include="..\Public\Props_Pot.h">
       <Filter>02.GameObject\_NonAnimObject\Pot</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Props_ServerRack1.h">
+      <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Props_ServerRack2.h">
+      <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -269,6 +278,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Props_Pot.cpp">
       <Filter>02.GameObject\_NonAnimObject\Pot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Props_ServerRack1.cpp">
+      <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Props_ServerRack2.cpp">
+      <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

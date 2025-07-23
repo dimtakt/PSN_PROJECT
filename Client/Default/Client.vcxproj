@@ -167,6 +167,8 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\public\Player.h" />
+    <ClInclude Include="..\public\Props_ServerRack1.h" />
+    <ClInclude Include="..\Public\Props_ServerRack2.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h" />
@@ -198,6 +200,8 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
+    <ClCompile Include="..\private\Props_ServerRack1.cpp" />
+    <ClCompile Include="..\Private\Props_ServerRack2.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp" />
