@@ -62,6 +62,11 @@ HRESULT CMesh::Initialize_Prototype(MODELTYPE eType, const aiMesh* pAIMesh, cons
 	if (FAILED(m_pDevice->CreateBuffer(&IBDesc, &IBInitialData, &m_pIB)))
 		return E_FAIL;
 
+	// ===== m_pIndices 정보 삽입
+	m_pIndices = new _uint[m_iNumIndices];
+	memcpy(m_pIndices, pIndices, sizeof(_uint) * m_iNumIndices);
+	// ============================== 
+
 	Safe_Delete_Array(pIndices);
 
 	return S_OK;
@@ -118,6 +123,12 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTra
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
 		return E_FAIL;
 
+	// ===== m_pVertexPositions 정보 삽입
+	m_pVertexPositions = new _float3[m_iNumVertices];
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		m_pVertexPositions[i] = pVertices[i].vPosition;
+	// ==============================
+
 	Safe_Delete_Array(pVertices);
 
 	return S_OK;
@@ -150,7 +161,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone
 	m_iNumBones = pAIMesh->mNumBones;
 
 	/*이 메시에 영향을 주는 뼈들을 하나씩 순회한다. */
-	for (size_t i = 0; i < m_iNumBones; i++)
+	for (_uint i = 0; i < m_iNumBones; i++)
 	{
 		/* i번째 뼈가 영향을 주는 정점의 갯수 */
 		aiBone* pAIBone = pAIMesh->mBones[i];
@@ -177,7 +188,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone
 
 		m_BoneIndices.push_back(iBoneIndex);
 
-		for (size_t j = 0; j < pAIBone->mNumWeights; j++)
+		for (_uint j = 0; j < pAIBone->mNumWeights; j++)
 		{
 			aiVertexWeight	AIVertexWeight = pAIBone->mWeights[j];
 
@@ -236,6 +247,12 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone
 
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
 		return E_FAIL;
+
+	// ===== m_pVertexPositions 정보 삽입
+	m_pVertexPositions = new _float3[m_iNumVertices];
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		m_pVertexPositions[i] = pVertices[i].vPosition;
+	// ==============================
 
 	Safe_Delete_Array(pVertices);
 

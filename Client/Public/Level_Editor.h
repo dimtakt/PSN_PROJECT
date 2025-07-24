@@ -40,7 +40,8 @@ private:
 private:	// Default Window & Var Ctrl
 	void ImGui_Render();
 	void ImGui_MenuBar_Render();
-	void Picking_Check();
+	void Check_NotUsingUI();
+	_bool Check_ObjectPicking();
 
 private:	// Custom Window
 	void ImGui_MainMenu();
@@ -65,7 +66,7 @@ private:
 	// ===== Inspector Window
 	// Opens when "isObject_Selected" is True,
 	// Visibles when "pSelectedObject" has specific component.
-	_bool isOn_ComViewer_Transform = true;			// 현재 선택한 오브젝트의 Transform 제어창.
+	_bool isOn_ComViewer_Transform = false;			// 현재 선택한 오브젝트의 Transform 제어창.
 
 
 
@@ -79,7 +80,7 @@ private:
 
 	_bool isObject_Selected = false;				// 선택된 오브젝트가 존재할 때 True.
 	CGameObject* pSelectedObject = {};				// 선택된 오브젝트를 담을 임시 포인터 변수
-	_bool m_isPicking = false;						// UI창이 사용중이 아닐 때 True.
+	_bool m_isNotUsingUI = false;						// UI창이 사용중이 아닐 때 True.
 
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

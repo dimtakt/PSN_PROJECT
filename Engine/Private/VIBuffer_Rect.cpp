@@ -48,6 +48,12 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
 		return E_FAIL;
 
+	// ===== m_pVertexPositions Á¤º¸ »ðÀÔ
+	m_pVertexPositions = new _float3[m_iNumVertices];
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		m_pVertexPositions[i] = pVertices[i].vPosition;
+	// ==============================
+
 	Safe_Delete_Array(pVertices);
 
 	D3D11_BUFFER_DESC		IBDesc{};
@@ -73,6 +79,11 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 
 	if (FAILED(m_pDevice->CreateBuffer(&IBDesc, &IBInitialData, &m_pIB)))
 		return E_FAIL;
+
+	// ===== m_pIndices Á¤º¸ »ðÀÔ
+	m_pIndices = new _uint[m_iNumIndices];
+	memcpy(m_pIndices, pIndices, sizeof(_uint) * m_iNumIndices);
+	// ============================== 
 
 	Safe_Delete_Array(pIndices);
 

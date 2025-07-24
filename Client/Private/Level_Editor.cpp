@@ -44,8 +44,13 @@ HRESULT CLevel_Editor::Initialize()
 
 void CLevel_Editor::Update(_float fTimeDelta)
 {
-	if (!ImGui::GetIO().WantCaptureMouse)
-		Picking_Check();
+	if (!ImGui::GetIO().WantCaptureMouse)	// m_isNotUsingUI 제어
+		Check_NotUsingUI();
+
+	if (m_isNotUsingUI && !isOn_DeployMode &&
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+		Check_ObjectPicking();
+
 
 	//if (isOn_DeployMode)
 		//Deploy_Object();
@@ -95,7 +100,6 @@ HRESULT CLevel_Editor::Ready_ImGui(HWND hWnd, ID3D11Device* pDevice, ID3D11Devic
 
 HRESULT CLevel_Editor::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
-	// ksta : 마우스 카메라가 있어야 제대로 될 듯. 아래는 임시용
 	CCamera_Editor::CAMERA_EDITOR_DESC		CameraDesc{};
 
 	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
@@ -148,12 +152,78 @@ void CLevel_Editor::ImGui_MenuBar_Render()
 	//}
 }
 
-void CLevel_Editor::Picking_Check()
+void CLevel_Editor::Check_NotUsingUI()
 {
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
-		m_isPicking = true;
+		m_isNotUsingUI = true;
 	else
-		m_isPicking = false;
+		m_isNotUsingUI = false;
+}
+
+_bool CLevel_Editor::Check_ObjectPicking()
+{
+	if (m_pObject.empty())
+	{
+		pSelectedObject = nullptr;
+		return false;
+	}
+
+	// 커서와 겹친 모든 오브젝트를 확인, 컨테이너에 담음.
+	// 단일 오브젝트만 겹쳤다면 즉시 할당 및 리턴
+	// 겹친 오브젝트가 없다면 즉시 nullptr, 리턴
+	vector<CGameObject*> pPickedObjects = {};
+
+	for (auto object : m_pObject)
+		if (object->isPicked())
+			pPickedObjects.push_back(object);
+
+	if (pPickedObjects.size() == 1)
+	{
+		pSelectedObject = pPickedObjects[0];
+		return true;
+	}
+	else if (pPickedObjects.empty())
+	{
+		pSelectedObject = nullptr;
+		return false;
+	}
+
+	// 겹친 오브젝트들 중 가장 가까운 오브젝트와
+	// 두 번째로 가까운 오브젝트를 찾음
+	vector<_float> vecLengthOrigin = {};
+	vector<_float> vecLength = {};
+	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+
+	for (auto object : pPickedObjects)
+	{
+		_vector vObjPos = dynamic_cast<CTransform*>(object->Get_Component(L"Com_Transform"))->Get_State(STATE::POSITION);
+		_vector vCamPosLoad = XMLoadFloat4(vCamPos);
+
+		_float4 vDiff;
+		XMStoreFloat4(&vDiff, XMVector3LengthSq(vObjPos - vCamPosLoad));
+
+		vecLengthOrigin.push_back(vDiff.x);
+		vecLength.push_back(vDiff.x);
+	}
+
+	_int iNearObjIndex = 0, iNextObjIndex = 0;
+	
+	sort(vecLength.begin(), vecLength.end());
+	for (_int i = 0; i < vecLengthOrigin.size(); i++)
+	{ 
+		if			(vecLengthOrigin[i] == vecLength[0]) iNearObjIndex = i; 
+		else if		(vecLengthOrigin[i] == vecLength[1]) iNextObjIndex = i;
+	}
+
+	// 가장 가까운 오브젝트를 할당하되,
+	// 이미 선택된 오브젝트라면 두 번째로 가까운 오브젝트 할당
+	if (pSelectedObject == nullptr ||
+		pSelectedObject != pPickedObjects[iNearObjIndex])
+		pSelectedObject = pPickedObjects[iNearObjIndex];
+	else
+		pSelectedObject = pPickedObjects[iNextObjIndex];
+
+	return true;
 }
 
 CLevel_Editor* CLevel_Editor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -362,83 +432,84 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	static _int iObjIndex = 0;
 
 	// 클릭하면 모델 설치
-	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isPicking)
+	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
 	{
 		// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
 		CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
-		pTerrain->isPicked(&vPickedPos); // 이거 false 뜨면 생성 안되게
 
-		switch (iCurrentItem)
+		if (pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
 		{
-		case 0:
-		{
-			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-			break;
-		}
-		case 1:
-		{
-			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
-			break;
-		}
-		case 2:
-		{
-			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
-			break;
-		}
-		case 3:
-		{
-			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
-			break;
-		}
-		case 4:
-		{
-			m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-				ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
-			break;
-		}
-		default:
-			break;
+			switch (iCurrentItem)
+			{
+			case 0:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
+				break;
+			}
+			case 1:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
+				break;
+			}
+			case 2:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+				break;
+			}
+			case 3:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
+				break;
+			}
+			case 4:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
+				break;
+			}
+			default:
+				break;
+			}
+
+			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+			if (!m_pTerrainObject.empty())
+			{
+				CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+				pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
+				pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
+			}
+			m_pObject.push_back(pGameObject);
+
+			iObjIndex++; // 이거 안내려서 문제생긴듯
 		}
 
-		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-		if (!m_pTerrainObject.empty())
-		{
-			CTransform* pObjectTransformCom = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", L"Com_Transform", iObjIndex));
-			//CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
-			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
-			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
-		}
-		m_pObject.push_back(pGameObject);
+		ImGui::Text("Pos Debug");
+		ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vPickedPos), 0.01f);
 
-		iObjIndex++; // 이거 안내려서 문제생긴듯
+		//ImGui::Separator();
+		//if (ImGui::Button("Undo"))
+		//	if (!m_pObject.empty())
+		//	{
+		//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+		//		m_pObject.pop_back();
+		//	}
+		//if (ImGui::CollapsingHeader("Danger Section"))
+		//{
+		//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+		//	if (ImGui::Button("All Reset"))
+		//	{
+		//		for (size_t i = 0; i < m_pObject.size(); i++)
+		//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+		//		m_pObject.clear();
+		//	}
+		//	ImGui::PopStyleColor();
+		//}
+
 	}
-
-	ImGui::Text("Pos Debug");
-	ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vPickedPos), 0.01f);
-
-	//ImGui::Separator();
-	//if (ImGui::Button("Undo"))
-	//	if (!m_pObject.empty())
-	//	{
-	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-	//		m_pObject.pop_back();
-	//	}
-	//if (ImGui::CollapsingHeader("Danger Section"))
-	//{
-	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	//	if (ImGui::Button("All Reset"))
-	//	{
-	//		for (size_t i = 0; i < m_pObject.size(); i++)
-	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-	//		m_pObject.clear();
-	//	}
-	//	ImGui::PopStyleColor();
-	//}
-
 	ImGui::EndGroup();
 
 #pragma endregion
@@ -483,6 +554,7 @@ void CLevel_Editor::ImGui_Inspector()
 														  vSelectedObjSca = { 1.f, 1.f, 1.f }; }
 				ImGui::EndMenu();
 			}
+			ImGui::Separator();
 
 			ImGui::PushItemWidth(60);
 

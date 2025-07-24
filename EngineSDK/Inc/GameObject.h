@@ -35,14 +35,16 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _bool isPicked(_float3* pOut) {
+	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요
+	virtual _bool isPicked(_float3* pOut = nullptr) {
 		_bool isPicked = false;
 		_float3 vOut = {}, vTempOut = {};
 		if (!m_pVIBufferVecRef.empty())
 			for (size_t i = 0; i < m_pVIBufferVecRef.size(); i++) // 메쉬 갯수만큼 loop
 				if (m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, &vTempOut))
 					{ isPicked = true; vOut = vTempOut; };
-		*pOut = vOut;
+
+		if (pOut != nullptr)	*pOut = vOut;
 		return isPicked;
 	}
 
