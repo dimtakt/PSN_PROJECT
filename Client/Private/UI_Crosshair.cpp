@@ -94,9 +94,9 @@ HRESULT CUI_Crosshair::Ready_Components()
 
     // 텍스쳐.
     // ksta : 크로스헤어 이미지로 변경할 것
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Black"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-        return E_FAIL;
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Black"),
+    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+    //    return E_FAIL;
 
 
 

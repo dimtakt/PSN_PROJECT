@@ -18,10 +18,17 @@ CModel::CModel(const CModel& Prototype)
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
-    , m_Bones{ Prototype.m_Bones }
+    , m_iNumAnimations{ Prototype.m_iNumAnimations }
+    , m_Animations{ Prototype.m_Animations }
 {
-    for (auto& pBone : m_Bones)
-        Safe_AddRef(pBone);
+
+    for (auto& pAnimation : m_Animations)
+        Safe_AddRef(pAnimation);
+
+    // Clone 즉 복사를 통해 개별 객체를 생성.
+    // 이렇게 해야만 동일한 객체를 사용하는 데에서 오는 간섭 문제 없음.
+    for (auto& pPrototypeBone : Prototype.m_Bones)
+        m_Bones.push_back(pPrototypeBone->Clone()); 
 
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
@@ -58,8 +65,8 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
     if (FAILED(Ready_Materials(pModelFilePath)))
         return E_FAIL;
 
-    //if (FAILED(Ready_Animations()))
-    //    return E_FAIL;
+    if (FAILED(Ready_Animations()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -90,17 +97,25 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
-void CModel::Play_Animation(_float fTimeDelta)
+_bool CModel::Play_Animation(_float fTimeDelta)
 {
+    m_isFinished = false;
+
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
     //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta);
 
     /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+
+    m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta);
+
     for (auto& pBone : m_Bones)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
     }
+    return m_isFinished;
 }
+
+
 
 HRESULT CModel::Render(_uint iMeshIndex)
 {
@@ -113,11 +128,12 @@ HRESULT CModel::Render(_uint iMeshIndex)
     return S_OK;
 }
 
-void CModel::Set_Animation(_uint iIndex)
+void CModel::Set_Animation(_uint iIndex, _bool isLoop)
 {
     if (iIndex >= m_iNumAnimations)
         return;
 
+    m_isLoop = isLoop;
     m_iCurrentAnimIndex = iIndex;
 }
 
@@ -183,11 +199,10 @@ HRESULT CModel::Ready_Animations()
 
     for (size_t i = 0; i < m_iNumAnimations; i++)
     {
-        //CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i]);
-        //if (nullptr == pAnimation)
-            //return E_FAIL;
+        CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);        if (nullptr == pAnimation)
+            return E_FAIL;
 
-        //m_Animations.push_back(pAnimation);
+        m_Animations.push_back(pAnimation);
     }
 
     return S_OK;
@@ -223,21 +238,26 @@ void CModel::Free()
 {
     __super::Free();
 
+    for (auto& pAnimation : m_Animations)
+        Safe_Release(pAnimation);
+
+    m_Animations.clear();
+
     for (auto& pBone : m_Bones)
         Safe_Release(pBone);
+
     m_Bones.clear();
 
     for (auto& pMesh : m_Meshes)
         Safe_Release(pMesh);
+
     m_Meshes.clear();
 
     for (auto& pMaterial : m_Materials)
         Safe_Release(pMaterial);
+
     m_Materials.clear();
 
 
     m_Importer.FreeScene();
-
-
-
 }

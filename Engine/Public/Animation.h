@@ -14,7 +14,7 @@ private:
 
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
-	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta);
+	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
 
 private:
 

@@ -47,6 +47,7 @@ private:
 	_int				m_iParentBoneIndex = { -1 };
 
 public:
+	CBone* Clone();
 	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
 	virtual void Free() override;
 };

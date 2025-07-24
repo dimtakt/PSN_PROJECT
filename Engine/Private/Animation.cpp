@@ -7,6 +7,8 @@ CAnimation::CAnimation()
 
 HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones)
 {
+    m_fDuration = pAIAnimation->mDuration;
+    m_fTickPerSecond = pAIAnimation->mTicksPerSecond;
 
     m_iNumChannels = pAIAnimation->mNumChannels;
 
@@ -22,20 +24,27 @@ HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<cla
     return S_OK;
 }
 
-void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+    if (m_fCurrentTrackPosition >= m_fDuration)
+    {
+        if (false == isLoop)
+        {
+            *pFinished = true;
+            m_fCurrentTrackPosition = m_fDuration;
+            return;
+        }
+        else
+            m_fCurrentTrackPosition = 0.f;
+
+    }
 
     for (auto& pChannel : m_Channels)
     {
         pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
     }
-
-
-
-
-
-
 }
 
 CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones)

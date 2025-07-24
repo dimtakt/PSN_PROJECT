@@ -40,6 +40,8 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
+	//CVIBuffer*					m_pVIBufferRef = { nullptr };
+
 	_int			m_iHp			=	{};
 	_int			m_iMaxHp		=	{};
 	

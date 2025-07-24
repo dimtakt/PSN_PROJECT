@@ -23,6 +23,16 @@ HRESULT CEnemy::Initialize(void* pArg)
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
 
+	m_pModelCom->Set_Animation(4, true);
+
+	//m_pTransformCom->Set_State(STATE::POSITION,
+	//	XMVectorSet(
+	//		m_pGameInstance->Rand(0.f, 10.f),
+	//		2.f,
+	//		m_pGameInstance->Rand(0.f, 10.f),
+	//		1.f
+	//	));
+
 	m_iMaxHp	= 3;
 	m_iHp		= 3;	// ksta : 일정 시간 공격받지 않으면 다시 최대 체력으로 회복되어야 함.
 
@@ -43,8 +53,8 @@ void CEnemy::Update(_float fTimeDelta)
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 
-	if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::GAMEPLAY))
-		m_pTransformCom->Go_Straight(fTimeDelta * 1.f);
+	//if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::GAMEPLAY))
+	//	m_pTransformCom->Go_Straight(fTimeDelta * 1.f);
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)

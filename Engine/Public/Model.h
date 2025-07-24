@@ -30,12 +30,12 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Set_Animation(_uint iIndex);
+	void Set_Animation(_uint iIndex, _bool isLoop = false);
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	void Play_Animation(_float fTimeDelta);
+	_bool Play_Animation(_float fTimeDelta);
 
 private:
 	/* 파일로부터 읽은 모든 정보를 다 저장해주는 구조체. */
@@ -62,6 +62,11 @@ private:
 	_uint							m_iCurrentAnimIndex = { 0 };
 	_uint							m_iNumAnimations = { 0 };
 	vector<class CAnimation*>		m_Animations;
+	_bool							m_isLoop = {};
+	_bool							m_isFinished = {};
+
+	vector<_float>					m_fCurrentTrackPositions;
+	//vector<vector<_uint>>			m_
 
 private:
 	HRESULT Ready_Meshes();

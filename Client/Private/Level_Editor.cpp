@@ -358,12 +358,16 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 #pragma region Model Deploy Logic & Button & Debug
 
-	static _float3 vDebugPos = {}; //
+	static _float3 vPickedPos = {}; //
 	static _int iObjIndex = 0;
 
 	// 클릭하면 모델 설치
 	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isPicking)
 	{
+		// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
+		CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
+		pTerrain->isPicked(&vPickedPos); // 이거 false 뜨면 생성 안되게
+
 		switch (iCurrentItem)
 		{
 		case 0:
@@ -403,16 +407,10 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 		if (!m_pTerrainObject.empty())
 		{
-			CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
-
-			_float3 vPos = {};
-			pTerrain->isPicked(&vPos);
 			CTransform* pObjectTransformCom = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", L"Com_Transform", iObjIndex));
 			//CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
-			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPos.x, vPos.y, vPos.z, 1)); // ksta : 이게 문제였음 이게!!
-
-			vDebugPos = vPos; //
+			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
 		}
 		m_pObject.push_back(pGameObject);
 
@@ -420,7 +418,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	}
 
 	ImGui::Text("Pos Debug");
-	ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vDebugPos), 0.01f);
+	ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vPickedPos), 0.01f);
 
 	//ImGui::Separator();
 	//if (ImGui::Button("Undo"))
@@ -469,7 +467,7 @@ void CLevel_Editor::ImGui_Inspector()
 	if (isOn_ComViewer_Transform)
 	{
 		static _float3 vSelectedObjPos = {};
-		static _float3 vSelectedObjRot = {};
+		static _float3 vSelectedObjRot = {};	// 보일 각도는 오일러, degree 기준. 내부적으로는 radian 변환 후 쿼터니언 처리.
 		static _float3 vSelectedObjSca = {};
 
 		if (ImGui::CollapsingHeader("Transform"))
