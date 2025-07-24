@@ -82,6 +82,7 @@ HRESULT CProps_ServerRack2::Ready_Components(void* pArg)
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_ServerRack2"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
+    Set_BufferRef(m_pModelCom);
 
     return S_OK;
 }

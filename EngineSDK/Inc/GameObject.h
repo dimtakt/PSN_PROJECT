@@ -1,10 +1,15 @@
 #pragma once
 
 #include "Transform.h"
+#include "VIBuffer.h"
+#include "Model.h"
+#include "Mesh.h"
 
 /* 게임오브젝트들의 부모가 되는 클래스. */
 
 NS_BEGIN(Engine)
+
+class CMesh;
 
 class ENGINE_DLL CGameObject abstract : public CBase
 {
@@ -29,9 +34,30 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-	virtual _bool isPicked(CTransform* pTransform, _float3* pOut);
-	virtual _bool isPicked(_float3* pOut);
+public:
+	virtual _bool isPicked(_float3* pOut) {
+		_bool isPicked = false;
+		_float3 vOut = {}, vTempOut = {};
+		if (!m_pVIBufferVecRef.empty())
+			for (size_t i = 0; i < m_pVIBufferVecRef.size(); i++) // 메쉬 갯수만큼 loop
+				if (m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, &vTempOut))
+					{ isPicked = true; vOut = vTempOut; };
+		*pOut = vOut;
+		return isPicked;
+	}
 
+protected:
+	// 이를 부모로 갖는 자식 오브젝트 생성시, 버퍼 정보가 있다면 반드시 할당해야 함.
+	// 반드시 "버퍼 컴포넌트 생성 뒤 호출"할 것
+	virtual void Set_BufferRef(CVIBuffer* pVuffer) { m_pVIBufferVecRef.push_back(pVuffer); }
+	virtual void Set_BufferRef(CModel* pModel) {
+		for (auto& mesh : pModel->Get_Meshes()) {
+			if (auto pBuffer = dynamic_cast<CVIBuffer*>(mesh))
+				m_pVIBufferVecRef.push_back(pBuffer);
+		}
+	}
+	// 이거 이제 다른 게임오브젝트에서도 호출해주기
+	
 protected:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
@@ -40,7 +66,8 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
-	//CVIBuffer*					m_pVIBufferRef = { nullptr };
+	// 자식 객체 생성시, 모델의 VIBuffer 주소를 여기에 저장 필요. isPicked 를 위함.
+	vector<CVIBuffer*>		m_pVIBufferVecRef = {};
 
 	_int			m_iHp			=	{};
 	_int			m_iMaxHp		=	{};

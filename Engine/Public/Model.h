@@ -23,6 +23,9 @@ public:
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
+	vector<class CMesh*> Get_Meshes() const {
+		return m_Meshes;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);

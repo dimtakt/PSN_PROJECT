@@ -27,16 +27,6 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-public:
-	_bool isPicked(CTransform* pTransform, _float3* pOut) override
-	{
-		return m_pVIBufferCom->isPicked(pTransform, pOut);
-	}
-	_bool isPicked(_float3* pOut) override
-	{
-		return m_pVIBufferCom->isPicked(m_pTransformCom, pOut);
-	}
-
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };

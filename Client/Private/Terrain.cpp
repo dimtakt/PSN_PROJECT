@@ -69,7 +69,6 @@ HRESULT CTerrain::Ready_Components()
 
     //eLevel = static_cast<LEVEL>(m_pGameInstance->Get_CurLevel()); // 현재 레벨이 아니니까.. 로딩 레벨이 리턴되는게 문제.
 
-
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Shader_VtxNorTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
@@ -77,6 +76,7 @@ HRESULT CTerrain::Ready_Components()
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_VIBuffer_Terrain"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
+    Set_BufferRef(m_pVIBufferCom);
 
     //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Texture_Terrain"),
     //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))

@@ -69,16 +69,6 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
-_bool CGameObject::isPicked(CTransform* pTransform, _float3* pOut)
-{
-	return false;
-}
-
-_bool CGameObject::isPicked(_float3* pOut)
-{
-	return false;
-}
-
 HRESULT CGameObject::Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg)
 {
 	if (nullptr != Get_Component(strComponentTag))
