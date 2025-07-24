@@ -16,7 +16,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	virtual _bool isPicked(class CTransform* pTransform, _float3* pOut);
+	_bool isPicked(class CTransform* pTransform, _float3* pOut);
 
 public:
 	/* 준비된 자원을 이용하여 어떠한 기능(렌더링)을 수행하기위하여 자원을 장치에 바인딩한다. */

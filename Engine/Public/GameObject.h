@@ -29,6 +29,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+	virtual _bool isPicked(CTransform* pTransform, _float3* pOut);
+	virtual _bool isPicked(_float3* pOut);
+
 protected:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };

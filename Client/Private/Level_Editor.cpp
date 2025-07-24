@@ -128,6 +128,14 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
+	// 오브젝트를 선택한 상태면 컴포넌트 뷰어 창이 뜨고,
+	// 그 하위의 컴포넌트 에디터 창을 띄우는 식으로?
+
+	//if (isObject_Selected)
+		ImGui_Inspector();
+	//if (isOn_ComViewer_Transform)
+	//	ImGui_ComViewer_Transform();
+
 
 	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
@@ -325,6 +333,8 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	// 모델 배치기
 	ImGui::Begin("Model Deployer", &isOn_ModelDeployer);
 
+#pragma region Model Deploy UI
+
 	ImGui::Text("Create Menu");
 	ImGui::Separator();
 
@@ -344,6 +354,9 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			isOn_DeployMode = false;
 	}
 
+#pragma endregion
+
+#pragma region Model Deploy Logic & Button & Debug
 
 	static _float3 vDebugPos = {}; //
 	static _int iObjIndex = 0;
@@ -387,8 +400,6 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			break;
 		}
 
-	
-
 		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 		if (!m_pTerrainObject.empty())
 		{
@@ -430,9 +441,91 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	//	ImGui::PopStyleColor();
 	//}
 
-
-
 	ImGui::EndGroup();
+
+#pragma endregion
+
+	ImGui::End();
+}
+
+void CLevel_Editor::ImGui_Inspector()
+{
+	// 트랜스폼 컴포넌트 존재여부 검사.
+	if (pSelectedObject == nullptr)
+	{
+		isOn_ComViewer_Transform = false;
+		isObject_Selected = false;
+		return;
+	}
+
+	ImGui::Begin("Inspector");
+
+	CTransform* pTransformCom = dynamic_cast<CTransform*>(pSelectedObject->Get_Component(L"Com_Transform"));
+	isOn_ComViewer_Transform = (pTransformCom == nullptr)? false : true;
+	
+#pragma region Inspector : Transform UI
+
+	// 선택한 오브젝트가 Transform 컴포넌트가 있을 때 보여짐.
+	if (isOn_ComViewer_Transform)
+	{
+		static _float3 vSelectedObjPos = {};
+		static _float3 vSelectedObjRot = {};
+		static _float3 vSelectedObjSca = {};
+
+		if (ImGui::CollapsingHeader("Transform"))
+		{	
+			if (ImGui::BeginMenu("Reset Menu"))
+			{
+				if (ImGui::MenuItem("Reset Position"))	{ vSelectedObjPos = { 0.f, 0.f, 0.f }; }
+				if (ImGui::MenuItem("Reset Rotation"))	{ vSelectedObjRot = { 0.f, 0.f, 0.f }; }
+				if (ImGui::MenuItem("Reset Scale"))		{ vSelectedObjSca = { 1.f, 1.f, 1.f }; }
+				ImGui::Separator();
+				if (ImGui::MenuItem("Reset Transform"))	{ vSelectedObjPos = { 0.f, 0.f, 0.f };
+														  vSelectedObjRot = { 0.f, 0.f, 0.f };
+														  vSelectedObjSca = { 1.f, 1.f, 1.f }; }
+				ImGui::EndMenu();
+			}
+
+			ImGui::PushItemWidth(60);
+
+			// Position Ctrl
+			ImGui::Text("Position");
+
+			ImGui::DragFloat("X##pos", &vSelectedObjPos.x, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Y##pos", &vSelectedObjPos.y, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Z##pos", &vSelectedObjPos.z, 0.1f);
+
+			ImGui::Separator();
+
+			// Rotation Ctrl
+			ImGui::Text("Position");
+
+			ImGui::DragFloat("X##rot", &vSelectedObjRot.x, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Y##rot", &vSelectedObjRot.y, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Z##rot", &vSelectedObjRot.z, 0.1f);
+
+			ImGui::Separator();
+
+			// Scale Ctrl
+			ImGui::Text("Scale");
+
+			ImGui::DragFloat("X##sca", &vSelectedObjSca.x, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Y##sca", &vSelectedObjSca.y, 0.1f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Z##sca", &vSelectedObjSca.z, 0.1f);
+
+			ImGui::Separator();
+
+			ImGui::PopItemWidth();
+		}
+	}
+
+#pragma endregion
 
 	ImGui::End();
 }

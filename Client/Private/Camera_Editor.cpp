@@ -32,7 +32,7 @@ HRESULT CCamera_Editor::Initialize(void* pArg)
 void CCamera_Editor::Priority_Update(_float fTimeDelta)
 {
     // * 키보드 WASD 에 의한 카메라 이동
-    _float fSpeed = 10.f;
+    _float fSpeed = 5.f;
 
     if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
         m_pTransformCom->Go_Straight(fTimeDelta * fSpeed);

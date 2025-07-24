@@ -28,11 +28,11 @@ public:
 	virtual HRESULT Render();
 
 public:
-	_bool isPicked(CTransform* pTransform, _float3* pOut)
+	_bool isPicked(CTransform* pTransform, _float3* pOut) override
 	{
 		return m_pVIBufferCom->isPicked(pTransform, pOut);
 	}
-	_bool isPicked(_float3* pOut)
+	_bool isPicked(_float3* pOut) override
 	{
 		return m_pVIBufferCom->isPicked(m_pTransformCom, pOut);
 	}
