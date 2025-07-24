@@ -440,6 +440,19 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		static _float3 vManualDeployObjRot = {};
 		static _float3 vManualDeployObjSca = {1.f, 1.f, 1.f};
 
+		if (ImGui::BeginMenu("Reset Menu"))
+		{
+			if (ImGui::MenuItem("Reset Position"))	{ vManualDeployObjPos = { 0.f, 0.f, 0.f }; }
+			if (ImGui::MenuItem("Reset Rotation"))	{ vManualDeployObjRot = { 0.f, 0.f, 0.f }; }
+			if (ImGui::MenuItem("Reset Scale"))		{ vManualDeployObjSca = { 1.f, 1.f, 1.f }; }
+			ImGui::Separator();
+			if (ImGui::MenuItem("Reset Transform"))	{	vManualDeployObjPos = { 0.f, 0.f, 0.f };
+														vManualDeployObjRot = { 0.f, 0.f, 0.f };
+														vManualDeployObjSca = { 1.f, 1.f, 1.f }; }
+			ImGui::EndMenu();
+		}
+
+
 		ImGui::PushItemWidth(60);
 
 		// Position Ctrl
@@ -707,7 +720,7 @@ void CLevel_Editor::ImGui_Inspector()
 			ImGui::Separator();
 
 			// Rotation Ctrl
-			ImGui::Text("Position");
+			ImGui::Text("Rotation");
 
 			ImGui::DragFloat("X##rot", &vSelectedObjRot.x, 0.1f);
 			ImGui::SameLine();
@@ -737,7 +750,7 @@ void CLevel_Editor::ImGui_Inspector()
 		_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(TO_RAD(vSelectedObjRot.x), TO_RAD(vSelectedObjRot.y), TO_RAD(vSelectedObjRot.z));
 		_matrix matXMEditScale = XMMatrixScalingFromVector(XMLoadFloat3(&vSelectedObjSca));
 
-		_matrix matXMEditResult = matXMEditPosition * matXMEditRotation * matXMEditScale;
+		_matrix matXMEditResult = matXMEditScale * matXMEditRotation * matXMEditPosition;
 
 		pTransformCom->Set_WorldMatrix(matXMEditResult);
 
