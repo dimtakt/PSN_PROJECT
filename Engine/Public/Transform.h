@@ -38,6 +38,13 @@ public:
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
 	}
 
+	void Set_WorldMatrix(_matrix matrix) {
+		XMStoreFloat4x4(&m_WorldMatrix, matrix);
+	}
+	void Set_WorldMatrix(_float4x4 matrix) {
+		m_WorldMatrix = matrix;
+	}
+
 	void Set_State(STATE eState, _fvector vState) {
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ENUM_CLASS(eState)]), vState);
 	}
@@ -62,6 +69,7 @@ public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void LookAt(_fvector vAt);
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
+
 private:
 	_float4x4				m_WorldMatrix = {};
 	_float					m_fSpeedPerSec = {};

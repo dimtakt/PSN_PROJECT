@@ -416,28 +416,152 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::Separator();
 
 	if (!isOn_DeployMode) {
-		if (ImGui::Button("Active Deploy Mode"))
+		if (ImGui::Button("Active Instant Deploy Mode"))
 			isOn_DeployMode = true;
 	}
 	else {
-		if (ImGui::Button("Deactive Deploy Mode"))
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+		if (ImGui::Button("Deactive Instant Deploy Mode"))
 			isOn_DeployMode = false;
+		ImGui::PopStyleColor(3);
 	}
+
+
+	static _int iObjIndex = 0;
+	static _float3 vPickedPos = {};
+
+	if (ImGui::CollapsingHeader("Manual Deploy Menu"))
+	{
+#pragma region Manual Deploy UI
+
+		static _float3 vManualDeployObjPos = {};
+		static _float3 vManualDeployObjRot = {};
+		static _float3 vManualDeployObjSca = {1.f, 1.f, 1.f};
+
+		ImGui::PushItemWidth(60);
+
+		// Position Ctrl
+		ImGui::Text("Position");
+
+		ImGui::DragFloat("X##pos", &vManualDeployObjPos.x, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Y##pos", &vManualDeployObjPos.y, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Z##pos", &vManualDeployObjPos.z, 0.1f);
+
+		ImGui::Separator();
+
+		// Rotation Ctrl
+		ImGui::Text("Position");
+
+		ImGui::DragFloat("X##rot", &vManualDeployObjRot.x, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Y##rot", &vManualDeployObjRot.y, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Z##rot", &vManualDeployObjRot.z, 0.1f);
+
+		ImGui::Separator();
+
+		// Scale Ctrl
+		ImGui::Text("Scale");
+
+		ImGui::DragFloat("X##sca", &vManualDeployObjSca.x, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Y##sca", &vManualDeployObjSca.y, 0.1f);
+		ImGui::SameLine();
+		ImGui::DragFloat("Z##sca", &vManualDeployObjSca.z, 0.1f);
+
+		ImGui::Separator();
+
+		ImGui::PopItemWidth();
+
+#pragma endregion
+
+#pragma region Manual Deploy Button & Logic
+
+		if (ImGui::Button("Deploy!"))
+		{
+			// Create Logic..
+
+			// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
+		
+
+			switch (iCurrentItem)
+			{
+			case 0:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
+				break;
+			}
+			case 1:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
+				break;
+			}
+			case 2:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+				break;
+			}
+			case 3:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
+				break;
+			}
+			case 4:
+			{
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
+				break;
+			}
+			default:
+				break;
+			}
+			
+			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+			pSelectedObject = pGameObject;
+
+			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+				
+			_matrix matPosition = XMMatrixTranslationFromVector(XMLoadFloat3(&vManualDeployObjPos));
+			_matrix matRotation = XMMatrixRotationRollPitchYaw(TO_RAD(vManualDeployObjRot.x), TO_RAD(vManualDeployObjRot.y), TO_RAD(vManualDeployObjRot.z));
+			_matrix matScale	= XMMatrixScalingFromVector(XMLoadFloat3(&vManualDeployObjSca));
+				
+			_matrix matResult	= matScale * matRotation * matPosition;
+
+			pObjectTransformCom->Set_WorldMatrix(matResult);
+
+			m_pObject.push_back(pGameObject);
+
+			iObjIndex++; // 이거 안내려서 문제생긴듯
+
+		}
+
+#pragma endregion
+
+	}
+
 
 #pragma endregion
 
 #pragma region Model Deploy Logic & Button & Debug
 
-	static _float3 vPickedPos = {}; //
-	static _int iObjIndex = 0;
-
 	// 클릭하면 모델 설치
 	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
 	{
 		// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
-		CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
-
-		if (pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
+		CTerrain* pTerrain = nullptr;
+		if (!m_pTerrainObject.empty())
+			pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
+		
+		if (pTerrain != nullptr &&
+			pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
 		{
 			switch (iCurrentItem)
 			{
@@ -476,40 +600,40 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			}
 
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-			if (!m_pTerrainObject.empty())
-			{
-				CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
-				pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
-				pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
-			}
+			pSelectedObject = pGameObject;
+
+			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
+			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
+
 			m_pObject.push_back(pGameObject);
 
 			iObjIndex++; // 이거 안내려서 문제생긴듯
 		}
-
-		ImGui::Text("Pos Debug");
-		ImGui::DragFloat3("##vPos", reinterpret_cast<float*>(&vPickedPos), 0.01f);
-
-		//ImGui::Separator();
-		//if (ImGui::Button("Undo"))
-		//	if (!m_pObject.empty())
-		//	{
-		//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-		//		m_pObject.pop_back();
-		//	}
-		//if (ImGui::CollapsingHeader("Danger Section"))
-		//{
-		//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-		//	if (ImGui::Button("All Reset"))
-		//	{
-		//		for (size_t i = 0; i < m_pObject.size(); i++)
-		//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-		//		m_pObject.clear();
-		//	}
-		//	ImGui::PopStyleColor();
-		//}
-
 	}
+
+
+
+
+	//ImGui::Separator();
+	//if (ImGui::Button("Undo"))
+	//	if (!m_pObject.empty())
+	//	{
+	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+	//		m_pObject.pop_back();
+	//	}
+	//if (ImGui::CollapsingHeader("Danger Section"))
+	//{
+	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	//	if (ImGui::Button("All Reset"))
+	//	{
+	//		for (size_t i = 0; i < m_pObject.size(); i++)
+	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+	//		m_pObject.clear();
+	//	}
+	//	ImGui::PopStyleColor();
+	//}
+
 	ImGui::EndGroup();
 
 #pragma endregion
@@ -537,9 +661,22 @@ void CLevel_Editor::ImGui_Inspector()
 	// 선택한 오브젝트가 Transform 컴포넌트가 있을 때 보여짐.
 	if (isOn_ComViewer_Transform)
 	{
-		static _float3 vSelectedObjPos = {};
-		static _float3 vSelectedObjRot = {};	// 보일 각도는 오일러, degree 기준. 내부적으로는 radian 변환 후 쿼터니언 처리.
-		static _float3 vSelectedObjSca = {};
+		// 선택한 오브젝트의 Transform 정보를 받아옴
+		_vector		vXMObjPosition		= {},	vXMObjQuaternion	= {},	vXMObjScale		= {};
+		_float3		vStoreObjPosition	= {},	vStoreObjRotation	= {},	vStoreObjScale	= {};
+		XMMatrixDecompose(&vXMObjScale, &vXMObjQuaternion, &vXMObjPosition, pTransformCom->Get_WorldMatrix());
+		
+		_float4x4	matStoreObjQuaternion = {};
+		XMStoreFloat4x4(&matStoreObjQuaternion, QUAT_TO_MAT(vXMObjQuaternion));
+
+		XMStoreFloat3(&vStoreObjPosition, vXMObjPosition);
+		vStoreObjRotation = MAT_TO_ROT(matStoreObjQuaternion);
+		XMStoreFloat3(&vStoreObjScale, vXMObjScale);
+
+		// 대입하여 보여줌
+		static _float3 vSelectedObjPos = vStoreObjPosition;
+		static _float3 vSelectedObjRot = vStoreObjRotation;	// 보일 각도는 오일러, degree 기준. 내부적으로는 radian 변환 후 쿼터니언 처리.
+		static _float3 vSelectedObjSca = vStoreObjScale;
 
 		if (ImGui::CollapsingHeader("Transform"))
 		{	
@@ -593,6 +730,20 @@ void CLevel_Editor::ImGui_Inspector()
 
 			ImGui::PopItemWidth();
 		}
+
+
+
+		_matrix matXMEditPosition = XMMatrixTranslationFromVector(XMLoadFloat3(&vSelectedObjPos));
+		_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(TO_RAD(vSelectedObjRot.x), TO_RAD(vSelectedObjRot.y), TO_RAD(vSelectedObjRot.z));
+		_matrix matXMEditScale = XMMatrixScalingFromVector(XMLoadFloat3(&vSelectedObjSca));
+
+		_matrix matXMEditResult = matXMEditPosition * matXMEditRotation * matXMEditScale;
+
+		pTransformCom->Set_WorldMatrix(matXMEditResult);
+
+
+
+
 	}
 
 #pragma endregion

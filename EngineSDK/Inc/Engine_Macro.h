@@ -91,7 +91,11 @@ namespace Engine
 	#define			FAILED_CHECK_NOMSG(_hr)							if( ((HRESULT)(_hr)) < 0 )	\
 																		{ return E_FAIL;}
 
+	#define			ROT_TO_QUAT(ROT_X, ROT_Y, ROT_Z)				XMQuaternionRotationRollPitchYaw(ROT_X, ROT_Y, ROT_Z)
 
+	#define			MAT_TO_ROT(QUAT)								_float3{asin(-QUAT._32), atan2(QUAT._31, QUAT._33), atan2(QUAT._12, QUAT._22)}
+
+	#define			QUAT_TO_MAT(QUAT)								XMMatrixRotationQuaternion(QUAT)
 // END===========================
 
 #endif // Engine_Macro_h__
