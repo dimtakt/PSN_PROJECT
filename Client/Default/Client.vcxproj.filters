@@ -91,6 +91,9 @@
     <Filter Include="02.GameObject\_NonAnimObject\ServerRack">
       <UniqueIdentifier>{f2a27300-1377-431d-b7b1-3aa42c9eb9ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Player\Body">
+      <UniqueIdentifier>{cda27a66-05b2-4e3a-8e8c-489507d36161}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -189,6 +192,9 @@
     <ClInclude Include="..\Public\Props_ServerRack2.h">
       <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Body_Player.h">
+      <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -284,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Props_ServerRack2.cpp">
       <Filter>02.GameObject\_NonAnimObject\ServerRack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Body_Player.cpp">
+      <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

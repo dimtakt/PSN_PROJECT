@@ -1,12 +1,15 @@
 #include "Player.h"
+#include "GameInstance.h"
+
+#include "Body_Player.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject(pDevice, pContext)
+	: CContainerObject (pDevice, pContext)
 {
 }
 
-CPlayer::CPlayer(const CGameObject& Prototype)
-	: CGameObject(Prototype)
+CPlayer::CPlayer(const CPlayer& Prototype)
+	: CContainerObject { Prototype }
 {
 }
 
@@ -19,8 +22,13 @@ HRESULT CPlayer::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
+
+	if (FAILED(Ready_PartObjects()))
+		return E_FAIL;
+
 
 	m_iMaxHp	= 1;
 	m_iHp		= 1;
@@ -62,6 +70,18 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	return S_OK;
 }
 
+HRESULT CPlayer::Ready_PartObjects()
+{
+	CBody_Player::BODY_DESC         BodyDesc{};
+	BodyDesc.pState = &m_iState;
+	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Body_Player"), &BodyDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CPlayer* pInstance = new CPlayer(pDevice, pContext);
@@ -75,7 +95,7 @@ CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CPlayer* CPlayer::Clone(void* pArg)
+CGameObject* CPlayer::Clone(void* pArg)
 {
 	CPlayer* pInstance = new CPlayer(*this);
 

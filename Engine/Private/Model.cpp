@@ -19,16 +19,12 @@ CModel::CModel(const CModel& Prototype)
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
     , m_iNumAnimations{ Prototype.m_iNumAnimations }
-    , m_Animations{ Prototype.m_Animations }
 {
+    for (auto& pPrototypeAnimation : Prototype.m_Animations)
+        m_Animations.push_back(pPrototypeAnimation->Clone());
 
-    for (auto& pAnimation : m_Animations)
-        Safe_AddRef(pAnimation);
-
-    // Clone 즉 복사를 통해 개별 객체를 생성.
-    // 이렇게 해야만 동일한 객체를 사용하는 데에서 오는 간섭 문제 없음.
     for (auto& pPrototypeBone : Prototype.m_Bones)
-        m_Bones.push_back(pPrototypeBone->Clone()); 
+        m_Bones.push_back(pPrototypeBone->Clone());
 
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
@@ -39,8 +35,7 @@ CModel::CModel(const CModel& Prototype)
 
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
-    /* aiProcess_PreTransformVertices : 각각의 메시를 붙여야할 위치에 적절히 배치한다.
-        (NOANIM에만 사용, ANIM에 사용 시 트랜스폼 이중 적용으로 인한 문제 발생) */
+    /* aiProcess_PreTransformVertices : 각각의 메시를 붙여야할 위치에 적절히 배치한다. */
     /* 배치 : 각 메시의 정점들을 배치를 위한 임의의 행렬과 곱하여 로드한다. */
 
     m_eModelType = eModelType;
@@ -102,20 +97,17 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     m_isFinished = false;
 
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
-    //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta);
-
-    /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
-
     m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta);
 
+
+    /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
     for (auto& pBone : m_Bones)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
     }
+
     return m_isFinished;
 }
-
-
 
 HRESULT CModel::Render(_uint iMeshIndex)
 {
@@ -152,7 +144,6 @@ HRESULT CModel::Ready_Meshes()
 
     return S_OK;
 }
-
 
 HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
@@ -208,6 +199,8 @@ HRESULT CModel::Ready_Animations()
     return S_OK;
 }
 
+
+
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     CModel* pInstance = new CModel(pDevice, pContext);
@@ -260,4 +253,7 @@ void CModel::Free()
 
 
     m_Importer.FreeScene();
+
+
+
 }

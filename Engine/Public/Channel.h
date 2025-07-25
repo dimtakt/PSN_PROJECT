@@ -14,14 +14,13 @@ private:
 
 public:
 	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
-	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition);
+	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
 private:
 	_char							m_szName[MAX_PATH] = { };
 
 	_uint							m_iBoneIndex = {};
 
-	/* 시간에 따른 뼈의 상태들을 보관한다. */
-	_uint							m_iCurrentKeyFrameIndex = {};
+
 	_uint							m_iNumKeyFrames = {};
 	vector<KEYFRAME>				m_KeyFrames;
 

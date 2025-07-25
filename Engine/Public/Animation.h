@@ -10,6 +10,7 @@ class CAnimation final : public CBase
 {
 private:
 	CAnimation();
+	CAnimation(const CAnimation& Prototype);
 	virtual ~CAnimation() = default;
 
 public:
@@ -30,9 +31,11 @@ private:
 	/* CChannel == 뼈(시간에 따른 뼈의 상태행렬) */
 	_uint						m_iNumChannels = {};
 	vector<class CChannel*>		m_Channels;
+	vector<_uint>				m_CurrentKeyFrameIndices;
 
 public:
 	static CAnimation* Create(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
+	CAnimation* Clone();
 	virtual void Free() override;
 };
 

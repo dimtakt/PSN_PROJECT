@@ -3,6 +3,19 @@
 
 CAnimation::CAnimation()
 {
+    /*   XMMatrixDecompose(스케일, 로테이션, 이동, 행렬);*/
+}
+
+CAnimation::CAnimation(const CAnimation& Prototype)
+    : m_fDuration(Prototype.m_fDuration)
+    , m_fTickPerSecond(Prototype.m_fTickPerSecond)
+    , m_fCurrentTrackPosition(Prototype.m_fCurrentTrackPosition)
+    , m_iNumChannels(Prototype.m_iNumChannels)
+    , m_Channels(Prototype.m_Channels)
+    , m_CurrentKeyFrameIndices(Prototype.m_CurrentKeyFrameIndices)
+{
+    for (auto& pChannel : m_Channels)
+        Safe_AddRef(pChannel);
 }
 
 HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones)
@@ -11,6 +24,8 @@ HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<cla
     m_fTickPerSecond = pAIAnimation->mTicksPerSecond;
 
     m_iNumChannels = pAIAnimation->mNumChannels;
+
+    m_CurrentKeyFrameIndices.resize(m_iNumChannels);
 
     for (size_t i = 0; i < m_iNumChannels; i++)
     {
@@ -41,9 +56,10 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 
     }
 
-    for (auto& pChannel : m_Channels)
+
+    for (_uint i = 0; i < m_iNumChannels; ++i)
     {
-        pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
+        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
     }
 }
 
@@ -58,6 +74,11 @@ CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<cla
     }
 
     return pInstance;
+}
+
+CAnimation* CAnimation::Clone()
+{
+    return new CAnimation(*this);
 }
 
 void CAnimation::Free()

@@ -34,6 +34,11 @@ public:
 	_matrix Get_WorldMatrix() {
 		return XMLoadFloat4x4(&m_WorldMatrix);
 	}
+
+	const _float4x4* Get_WorldMatrixPtr() {
+		return &m_WorldMatrix;
+	}
+
 	_matrix Get_WorldMatrix_Inverse() {
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
 	}

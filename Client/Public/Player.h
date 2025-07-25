@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "ContainerObject.h"
 
 NS_BEGIN(Client)
 
-class CPlayer final : public CGameObject
+class CPlayer final : public CContainerObject
 {
 public:
 	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
@@ -14,7 +14,7 @@ public:
 	}PLAYER_DESC;
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayer(const CGameObject& Prototype);
+	CPlayer(const CPlayer& Prototype);
 	virtual ~CPlayer() = default;
 
 public:
@@ -32,17 +32,19 @@ public:
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
+	HRESULT		Ready_PartObjects();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::PLAYER;
 	_int			m_iHp = {};
 
+	_uint			m_iState = { };
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayer*		Clone(void* pArg)					override;
-	void			Free()								override;
+	CGameObject*	Clone(void* pArg)				override;
+	void			Free()							override;
 
 
 };

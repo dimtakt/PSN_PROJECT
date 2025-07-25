@@ -115,6 +115,12 @@
     <Filter Include="00.System\02.Picking">
       <UniqueIdentifier>{22cc4b8d-8f87-4cf3-94bf-6f90fea8d930}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.GameObject\_ContainerObject">
+      <UniqueIdentifier>{36a6f6a3-4d3b-4e3e-9f61-d9e45d5065fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.GameObject\_ContainerObject\_PartObject">
+      <UniqueIdentifier>{94a875bb-62fb-4bfe-a7ea-a1725cb27229}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -218,6 +224,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Picking.cpp">
       <Filter>00.System\02.Picking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ContainerObject.cpp">
+      <Filter>01.Utility\02.GameObject\_ContainerObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PartObject.cpp">
+      <Filter>01.Utility\02.GameObject\_ContainerObject\_PartObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +352,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Picking.h">
       <Filter>00.System\02.Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ContainerObject.h">
+      <Filter>01.Utility\02.GameObject\_ContainerObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PartObject.h">
+      <Filter>01.Utility\02.GameObject\_ContainerObject\_PartObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

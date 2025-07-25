@@ -68,9 +68,6 @@ private:
 	_bool							m_isLoop = {};
 	_bool							m_isFinished = {};
 
-	vector<_float>					m_fCurrentTrackPositions;
-	//vector<vector<_uint>>			m_
-
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);

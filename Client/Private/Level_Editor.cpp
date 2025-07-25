@@ -44,6 +44,8 @@ HRESULT CLevel_Editor::Initialize()
 
 void CLevel_Editor::Update(_float fTimeDelta)
 {
+	pPrevSelectedObject = pSelectedObject;
+
 	if (!ImGui::GetIO().WantCaptureMouse)	// m_isNotUsingUI 제어
 		Check_NotUsingUI();
 
@@ -222,7 +224,7 @@ _bool CLevel_Editor::Check_ObjectPicking()
 		pSelectedObject = pPickedObjects[iNearObjIndex];
 	else
 		pSelectedObject = pPickedObjects[iNextObjIndex];
-
+	
 	return true;
 }
 
@@ -674,22 +676,29 @@ void CLevel_Editor::ImGui_Inspector()
 	// 선택한 오브젝트가 Transform 컴포넌트가 있을 때 보여짐.
 	if (isOn_ComViewer_Transform)
 	{
-		// 선택한 오브젝트의 Transform 정보를 받아옴
-		_vector		vXMObjPosition		= {},	vXMObjQuaternion	= {},	vXMObjScale		= {};
-		_float3		vStoreObjPosition	= {},	vStoreObjRotation	= {},	vStoreObjScale	= {};
-		XMMatrixDecompose(&vXMObjScale, &vXMObjQuaternion, &vXMObjPosition, pTransformCom->Get_WorldMatrix());
+		static _float3 vSelectedObjPos;
+		static _float3 vSelectedObjRot;
+		static _float3 vSelectedObjSca;
 		
-		_float4x4	matStoreObjQuaternion = {};	// 쿼터니언
-		XMStoreFloat4x4(&matStoreObjQuaternion, QUAT_TO_MAT(vXMObjQuaternion));
+		if (pPrevSelectedObject != pSelectedObject)
+			// 선택한 오브젝트의 Transform 정보를 받아옴
+		{
+			_vector		vXMObjPosition = {}, vXMObjQuaternion = {}, vXMObjScale = {};
+			_float3		vStoreObjPosition = {}, vStoreObjRotation = {}, vStoreObjScale = {};
+			XMMatrixDecompose(&vXMObjScale, &vXMObjQuaternion, &vXMObjPosition, pTransformCom->Get_WorldMatrix());
 
-		XMStoreFloat3(&vStoreObjPosition, vXMObjPosition);
-		vStoreObjRotation = MAT_TO_ROT(matStoreObjQuaternion);
-		XMStoreFloat3(&vStoreObjScale, vXMObjScale);
+			_float4x4	matStoreObjQuaternion = {};	// 쿼터니언
+			XMStoreFloat4x4(&matStoreObjQuaternion, QUAT_TO_MAT(vXMObjQuaternion));
 
-		// 대입하여 보여줌
-		static _float3 vSelectedObjPos = vStoreObjPosition;
-		static _float3 vSelectedObjRot = vStoreObjRotation;	// 보일 각도는 오일러, degree 기준. 내부적으로는 radian 변환 후 쿼터니언 처리.
-		static _float3 vSelectedObjSca = vStoreObjScale;
+			XMStoreFloat3(&vStoreObjPosition, vXMObjPosition);
+			vStoreObjRotation = MAT_TO_ROT(matStoreObjQuaternion);
+			XMStoreFloat3(&vStoreObjScale, vXMObjScale);
+
+			// 대입하여 보여줌
+			vSelectedObjPos = vStoreObjPosition;
+			vSelectedObjRot = vStoreObjRotation;	// 보일 각도는 오일러, degree 기준. 내부적으로는 radian 변환 후 쿼터니언 처리.
+			vSelectedObjSca = vStoreObjScale;
+		}
 
 		if (ImGui::CollapsingHeader("Transform"))
 		{	
