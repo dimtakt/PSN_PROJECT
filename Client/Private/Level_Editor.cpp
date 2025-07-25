@@ -656,7 +656,8 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 void CLevel_Editor::ImGui_Inspector()
 {
-	// 트랜스폼 컴포넌트 존재여부 검사.
+	// 선택 오브젝트 존재여부 및
+	// 오브젝트가 가진 컴포넌트들의 존재여부 검사.
 	if (pSelectedObject == nullptr)
 	{
 		isOn_ComViewer_Transform = false;
@@ -666,10 +667,9 @@ void CLevel_Editor::ImGui_Inspector()
 
 	ImGui::Begin("Inspector");
 
+#pragma region Inspector : Transform UI
 	CTransform* pTransformCom = dynamic_cast<CTransform*>(pSelectedObject->Get_Component(L"Com_Transform"));
 	isOn_ComViewer_Transform = (pTransformCom == nullptr)? false : true;
-	
-#pragma region Inspector : Transform UI
 
 	// 선택한 오브젝트가 Transform 컴포넌트가 있을 때 보여짐.
 	if (isOn_ComViewer_Transform)
@@ -679,7 +679,7 @@ void CLevel_Editor::ImGui_Inspector()
 		_float3		vStoreObjPosition	= {},	vStoreObjRotation	= {},	vStoreObjScale	= {};
 		XMMatrixDecompose(&vXMObjScale, &vXMObjQuaternion, &vXMObjPosition, pTransformCom->Get_WorldMatrix());
 		
-		_float4x4	matStoreObjQuaternion = {};
+		_float4x4	matStoreObjQuaternion = {};	// 쿼터니언
 		XMStoreFloat4x4(&matStoreObjQuaternion, QUAT_TO_MAT(vXMObjQuaternion));
 
 		XMStoreFloat3(&vStoreObjPosition, vXMObjPosition);
@@ -745,7 +745,7 @@ void CLevel_Editor::ImGui_Inspector()
 		}
 
 
-
+		// UI를 통해 수정한 값을 반영해줌
 		_matrix matXMEditPosition = XMMatrixTranslationFromVector(XMLoadFloat3(&vSelectedObjPos));
 		_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(TO_RAD(vSelectedObjRot.x), TO_RAD(vSelectedObjRot.y), TO_RAD(vSelectedObjRot.z));
 		_matrix matXMEditScale = XMMatrixScalingFromVector(XMLoadFloat3(&vSelectedObjSca));
@@ -760,6 +760,8 @@ void CLevel_Editor::ImGui_Inspector()
 	}
 
 #pragma endregion
+
+
 
 	ImGui::End();
 }
