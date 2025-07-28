@@ -1,33 +1,28 @@
-#include "Body_Player.h"
+#include "Weapon.h"
 #include "GameInstance.h"
 
-CBody_Player::CBody_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject{ pDevice, pContext }
 {
 
 }
 
-CBody_Player::CBody_Player(const CBody_Player& Prototype)
+CWeapon::CWeapon(const CWeapon& Prototype)
     : CPartObject{ Prototype }
 {
 
 }
 
-_float4x4* CBody_Player::Get_BoneMatrix(const _char* pBoneName)
-{
-    return m_pModelCom->Get_BoneMatrix(pBoneName);
-}
-
-
-HRESULT CBody_Player::Initialize_Prototype()
+HRESULT CWeapon::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CBody_Player::Initialize(void* pArg)
+HRESULT CWeapon::Initialize(void* pArg)
 {
-    BODY_DESC* pDesc = static_cast<BODY_DESC*>(pArg);
+    WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
     m_pParentState = pDesc->pState;
+    m_pSocketMatrix = pDesc->pSocketMatrix;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -35,55 +30,49 @@ HRESULT CBody_Player::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(1, true);
+    m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
+    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));
 
     return S_OK;
 }
 
-void CBody_Player::Priority_Update(_float fTimeDelta)
+void CWeapon::Priority_Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CBody_Player::Update(_float fTimeDelta)
+void CWeapon::Update(_float fTimeDelta)
 {
-    if (*m_pParentState & CPlayer::RUN)
-    {
-        m_pModelCom->Set_Animation(4, true);
-    }
+    _matrix     BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
-    if (*m_pParentState & CPlayer::IDLE)
-    {
-        m_pModelCom->Set_Animation(3, true);
-    }
-
-    m_pModelCom->Play_Animation(fTimeDelta);
+    for (size_t i = 0; i < 3; i++)
+        BoneMatrix.r[i] = XMVector3Normalize(BoneMatrix.r[i]);
 
 
-    Update_CombinedMatrix();
+    XMStoreFloat4x4(&m_CombinedWorldMatrix,
+        m_pTransformCom->Get_WorldMatrix() *
+        BoneMatrix *
+        XMLoadFloat4x4(m_pParentMatrix));
+
 }
 
-void CBody_Player::Late_Update(_float fTimeDelta)
+void CWeapon::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 }
 
-HRESULT CBody_Player::Render()
+HRESULT CWeapon::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-
-
 
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
         m_pShaderCom->Begin(0);
@@ -96,22 +85,23 @@ HRESULT CBody_Player::Render()
     return S_OK;
 }
 
-HRESULT CBody_Player::Ready_Components()
+HRESULT CWeapon::Ready_Components()
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_"/* // ksta : 이 부분 사용할 모델 부분으로 수정 필요 */),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT CBody_Player::Bind_ShaderResources()
+HRESULT CWeapon::Bind_ShaderResources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
         return E_FAIL;
@@ -137,33 +127,33 @@ HRESULT CBody_Player::Bind_ShaderResources()
     return S_OK;
 }
 
-CBody_Player* CBody_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CBody_Player* pInstance = new CBody_Player(pDevice, pContext);
+    CWeapon* pInstance = new CWeapon(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CBody_Player"));
+        MSG_BOX(TEXT("Failed to Created : CWeapon"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CBody_Player::Clone(void* pArg)
+CGameObject* CWeapon::Clone(void* pArg)
 {
-    CBody_Player* pInstance = new CBody_Player(*this);
+    CWeapon* pInstance = new CWeapon(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CBody_Player"));
+        MSG_BOX(TEXT("Failed to Created : CWeapon"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CBody_Player::Free()
+void CWeapon::Free()
 {
     __super::Free();
 

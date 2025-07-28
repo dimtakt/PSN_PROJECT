@@ -37,18 +37,29 @@ private:
 private:
 	CImGui_Manager* m_pImGui_Manager = nullptr;
 
-private:	// Default Window & Var Ctrl
+private:	// Default Window + 변수 컨트롤
 	void ImGui_Render();
-	void ImGui_MenuBar_Render();
-	void Check_NotUsingUI();
-	_bool Check_ObjectPicking();
+
+	void Check_NotUsingUI();		// UI에 커서를 사용중인지를 리턴
+	_bool Check_ObjectPicking();	// 컨테이너 내 obj 피킹여부 리턴, 선택중 Obj에 할당
 
 private:	// Custom Window
-	void ImGui_MainMenu();
+	void ImGui_MainMenu();			// 최상단 메뉴
+
 	void ImGui_TerrainEditor();
 	void ImGui_ModelDeployer();
 
 	void ImGui_Inspector();
+
+private:	// 해당 클래스에서만 사용할 함수
+	enum class FILETYPE {
+		FBX,			// fbx 원본
+		DATMODEL,		// fbx 를 바이너리화 한 data
+		DATMAP,			// map data.
+
+		FILETYPE_END
+	};
+	wstring GetFilePath(FILETYPE eFileType);
 
 private:
 	//bool show_demo_window = true;
@@ -78,10 +89,10 @@ private:
 
 
 
-	_bool isObject_Selected = false;				// 선택된 오브젝트가 존재할 때 True.
-	CGameObject* pSelectedObject = {};				// 선택된 오브젝트를 담을 임시 포인터 변수
-	CGameObject* pPrevSelectedObject = {};				// 선택된 오브젝트를 담을 임시 포인터 변수
-	_bool m_isNotUsingUI = false;						// UI창이 사용중이 아닐 때 True.
+	_bool isObject_Selected = false;		// 선택된 오브젝트가 존재할 때 True.
+	CGameObject* pSelectedObject = {};		// 현재 선택된 오브젝트. 임시 포인터 변수
+	CGameObject* pPrevSelectedObject = {};	// 이전 선택된 오브젝트. 임시 포인터 변수
+	_bool m_isNotUsingUI = false;			// UI창이 사용중이 아닐 때 True.
 
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

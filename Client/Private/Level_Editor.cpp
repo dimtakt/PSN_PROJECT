@@ -147,13 +147,6 @@ void CLevel_Editor::ImGui_Render()
 	m_pImGui_Manager->GUI_Render_End();
 }
 
-void CLevel_Editor::ImGui_MenuBar_Render()
-{
-	//if (ImGui::BeginMenuBar())
-	//{
-	//}
-}
-
 void CLevel_Editor::Check_NotUsingUI()
 {
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
@@ -228,6 +221,51 @@ _bool CLevel_Editor::Check_ObjectPicking()
 	return true;
 }
 
+wstring CLevel_Editor::GetFilePath(FILETYPE eFileType)
+{
+	OPENFILENAMEW ofn = {};
+	_tchar szFile[260] = { 0 };
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	
+	switch (eFileType)
+	{
+	case FILETYPE::FBX:
+		ofn.lpstrFilter = L"FBX Files (*.fbx)\0*.fbx\0";
+		break;
+	case FILETYPE::DATMODEL:
+		ofn.lpstrFilter = L"Binary Model Files (*.datmodel)\0*.datmodel\0";
+		break;
+	case FILETYPE::DATMAP:
+		ofn.lpstrFilter = L"Binary Map Files (*.datmap)\0*.datmap\0";
+		break;
+
+	case FILETYPE::FILETYPE_END:
+	default:
+		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 로드 시도. Level_Editor::GetFilePath()", MB_OK);
+		return L"";
+	}
+	
+	wstring szFileOutput = {};
+	if (GetOpenFileNameW(&ofn))
+		szFileOutput = ofn.lpstrFile;
+	else
+		szFileOutput = L"";
+
+	if (!szFileOutput.empty())
+		MessageBoxW(NULL, L"파일 경로 잘 불러옴.", L"Load Success", MB_ICONASTERISK);
+	else
+		MessageBoxW(NULL, L"파일 경로 로드실패.", L"Load Fail", MB_ICONERROR);
+
+
+	return szFileOutput;
+}
+
 CLevel_Editor* CLevel_Editor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Editor* pInstance = new CLevel_Editor(pDevice, pContext);
@@ -266,6 +304,53 @@ void CLevel_Editor::ImGui_MainMenu()
 			if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
 			if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
 			//if (ImGui::MenuItem("Close", "Ctrl+W")) { isOn_GUITerrain = false; }
+			ImGui::Separator();
+			if (ImGui::BeginMenu("Open File.."))
+			{
+				if (ImGui::MenuItem("[Raw] FBX"))
+				{
+					wstring strLoadFilePath = GetFilePath(FILETYPE::FBX);
+
+					if (!strLoadFilePath.empty())
+					{
+						// 받아온 경로 문자열을 이용하여 원본 모델 로드 진행
+					}
+				}
+				if (ImGui::MenuItem("[Binary] Model"))
+				{
+					wstring strLoadFilePath = GetFilePath(FILETYPE::DATMODEL);
+					
+					if (!strLoadFilePath.empty())
+					{
+						// 받아온 경로 문자열을 이용하여 바이너리화 모델 로드 진행
+					}
+				}
+				if (ImGui::MenuItem("[Binary] Map"))
+				{
+					wstring strLoadFilePath = GetFilePath(FILETYPE::DATMAP);
+					
+					if (!strLoadFilePath.empty())
+					{
+						// 받아온 경로 문자열을 이용하여 맵 로드 진행
+					}
+				}
+
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Convert to Binary.."))
+			{
+				if (ImGui::MenuItem("[Raw] FBX"))
+				{
+					wstring strLoadFilePath = GetFilePath(FILETYPE::FBX);
+
+					if (!strLoadFilePath.empty())
+					{
+						// 받아온 경로 문자열을 이용하여 로드 및 파일 바이너리화 진행
+					}
+				}
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Window"))

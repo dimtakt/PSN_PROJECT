@@ -94,6 +94,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _wstring& strLayerTag)
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Terrain"))))
 		return E_FAIL;
 	
+	// Player »ý¼º
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
+	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"))))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 

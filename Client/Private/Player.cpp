@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 
 #include "Body_Player.h"
+#include "Weapon.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject (pDevice, pContext)
@@ -20,7 +21,12 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	GAMEOBJECT_DESC         Desc{};
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(180.0f);
+
+
+	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
 	if (FAILED(this->Ready_Components(pArg)))
@@ -48,7 +54,37 @@ void CPlayer::Update(_float fTimeDelta)
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 
+	if (GetKeyState(VK_DOWN) & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+	if (GetKeyState(VK_LEFT) & 0x8000)
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
+	}
+	if (GetKeyState(VK_RIGHT) & 0x8000)
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 1.f);
+	}
 
+	if (GetKeyState(VK_UP) & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+
+		if (m_iState & IDLE)
+			m_iState ^= IDLE;
+
+		m_iState |= RUN;
+	}
+	else
+	{
+		if (m_iState & RUN)
+			m_iState ^= RUN;
+
+		m_iState |= IDLE;
+	}
+
+	__super::Update(fTimeDelta);
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -59,6 +95,19 @@ void CPlayer::Late_Update(_float fTimeDelta)
 HRESULT CPlayer::Render()
 {
 	// 렌더
+
+	CPartObject* pBody = Find_PartObject(TEXT("Part_Body"));
+	if (nullptr == pBody)
+		return E_FAIL;
+
+	CWeapon::WEAPON_DESC                 WeaponDesc{};
+	WeaponDesc.pState = &m_iState;
+	WeaponDesc.pSocketMatrix = dynamic_cast<CBody_Player*>(pBody)->Get_BoneMatrix("SWORD");
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

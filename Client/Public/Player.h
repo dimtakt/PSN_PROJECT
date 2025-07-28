@@ -8,6 +8,13 @@ NS_BEGIN(Client)
 class CPlayer final : public CContainerObject
 {
 public:
+	enum STATE { 
+		IDLE	= (1 << 0),
+		RUN		= (1 << 1),
+		ATTACK	= (1 << 2)
+	};
+
+public:
 	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
 	{
 

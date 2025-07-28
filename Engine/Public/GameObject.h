@@ -51,7 +51,7 @@ public:
 protected:
 	// 이를 부모로 갖는 자식 오브젝트 생성시, 버퍼 정보가 있다면 반드시 할당해야 함.
 	// 반드시 "버퍼 컴포넌트 생성 뒤 호출"할 것
-	virtual void Set_BufferRef(CVIBuffer* pVuffer) { m_pVIBufferVecRef.push_back(pVuffer); }
+	virtual void Set_BufferRef(CVIBuffer* pBuffer) { m_pVIBufferVecRef.push_back(pBuffer); }
 	virtual void Set_BufferRef(CModel* pModel) {
 		for (auto& mesh : pModel->Get_Meshes()) {
 			if (auto pBuffer = dynamic_cast<CVIBuffer*>(mesh))

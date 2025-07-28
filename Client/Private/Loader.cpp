@@ -8,7 +8,11 @@
 #include "Enemy.h"
 #include "Camera_Free.h"
 #include "Camera_Editor.h"
-//#include "Player.h"
+
+#include "Player.h"
+#include "Body_Player.h"
+#include "Weapon.h"
+
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -126,10 +130,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/GridBox_Default.dds"), 1))))
 		return E_FAIL;
 
-	///* Prototype_Component_Texture_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Player"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Player/Player0.png"), 1))))
-	//	return E_FAIL;
+#pragma region old
 
 	///* Prototype_Component_Texture_Explosion */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Explosion"),
@@ -141,6 +142,8 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Sky"),
 	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::CUBE, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 	//	return E_FAIL;
+
+#pragma endregion
 
 
 	// ==============================
@@ -155,11 +158,6 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		return E_FAIL;
 
 	// 기존 모델 로드부분은, Enemy 가 모든 레벨에서 쓰일 예정이므로 Static (MainApp)으로 옮김.
-
-	///* Prototype_Component_VIBuffer_Cube */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Cube"),
-	//	CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
 
 	// ksta : 나중에 이런 셰이더들도 Static으로 옮기는걸 고려해봐야 할 듯
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));
@@ -192,6 +190,22 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 
 
+	/* Prototype_GameObject_Player */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
+	//	CPlayer::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+	/* Prototype_GameObject_Body_Player */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Body_Player"),
+	//	CBody_Player::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+	/* Prototype_GameObject_Weapon */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"),
+	//	CWeapon::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+#pragma region old
 
 	///* Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Player"),
@@ -213,6 +227,8 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	//	CEffect::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 
+
+#pragma endregion
 	
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 

@@ -28,9 +28,6 @@
     <Filter Include="02.GameObject">
       <UniqueIdentifier>{85081ef4-12c5-4457-a79f-32e32125ccd1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\BackGround">
-      <UniqueIdentifier>{dd1b4364-796d-40a5-aad0-a826b661a0f4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\Terrain">
       <UniqueIdentifier>{576b5eae-f1d8-48b3-ac05-b253fc808748}</UniqueIdentifier>
     </Filter>
@@ -94,6 +91,12 @@
     <Filter Include="02.GameObject\_AnimObject\Player\Body">
       <UniqueIdentifier>{cda27a66-05b2-4e3a-8e8c-489507d36161}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Player\SubObj_Weapon">
+      <UniqueIdentifier>{e956ac9c-df4a-4a24-bf43-6467ce1a1334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UI\BackGround">
+      <UniqueIdentifier>{dd1b4364-796d-40a5-aad0-a826b661a0f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -127,7 +130,7 @@
       <Filter>01.Levels\Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObject\BackGround</Filter>
+      <Filter>02.GameObject\UI\BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObject\Terrain</Filter>
@@ -195,6 +198,9 @@
     <ClInclude Include="..\Public\Body_Player.h">
       <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Weapon.h">
+      <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -229,7 +235,7 @@
       <Filter>01.Levels\Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObject\BackGround</Filter>
+      <Filter>02.GameObject\UI\BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObject\Terrain</Filter>
@@ -293,6 +299,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Body_Player.cpp">
       <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon.cpp">
+      <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

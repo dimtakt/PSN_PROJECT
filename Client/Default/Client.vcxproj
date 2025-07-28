@@ -172,6 +172,7 @@
     <ClInclude Include="..\Public\Props_ServerRack2.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
+    <ClInclude Include="..\public\Weapon.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\Private\Props_ServerRack2.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
+    <ClCompile Include="..\private\Weapon.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp" />

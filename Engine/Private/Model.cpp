@@ -33,6 +33,20 @@ CModel::CModel(const CModel& Prototype)
         Safe_AddRef(pMaterial);
 }
 
+_float4x4* CModel::Get_BoneMatrix(const _char* pBoneName)
+{
+    auto    iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone) {
+        if (true == pBone->Compare_Name(pBoneName))
+            return true;
+        return false;
+        });
+
+    if (iter == m_Bones.end())
+        return nullptr;
+
+    return (*iter)->Get_CombinedTransformationMatrixPtr();
+}
+
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     /* aiProcess_PreTransformVertices : 각각의 메시를 붙여야할 위치에 적절히 배치한다. */
