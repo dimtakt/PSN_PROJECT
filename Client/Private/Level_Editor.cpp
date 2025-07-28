@@ -324,7 +324,7 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 	// 바이너리화 후 저장...
 	// ksta : 이거 확인해야 함, 실질 구현부는 Model.cpp 126Line 에 해야 할 듯
 	CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom")));
-	pTargetModel->Save_ToBinary(strSavePath);
+	pTargetModel->Export_ToBinary(strSavePath);
 
 	// 다 됐으면 제거해
 	if (FAILED(m_pGameInstance->Remove_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom"))))

@@ -15,7 +15,9 @@ NS_BEGIN(Engine)
 class CBone;
 class CMesh;
 class CMeshMaterial;
+
 class CAnimation;
+class CChannel;
 
 class ENGINE_DLL CModel final : public CComponent
 {
@@ -49,8 +51,36 @@ public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	_bool Play_Animation(_float fTimeDelta);
 
-public:
-	typedef struct tagBinaryModelDesc {
+public: // output 용
+	typedef struct tagAIChannelDesc {			// 채널 저장 데이터
+		aiString				szChannelName;
+
+		_uint					iNumPosKeys;
+		_uint					iNumRotKeys;
+		_uint					iNumScaKeys;
+
+		_uint					iNumKeyFrames;	// channel.cpp 내에서 계산하는 과정 있으니 없어도될듯
+		vector<KEYFRAME>		vecKeyFrame;
+	}AICHANNEL_DESC;
+	typedef struct tagAIAnimationDesc {		// 애니메이션 저장 데이터
+		_float					fDuration;
+		_float					fTicksPerSecond;
+		_int					iNumChannels;
+
+		vector<AICHANNEL_DESC>	vecChannels;
+	}AIANIM_DESC;
+	typedef struct tagBoneDesc {
+		aiString				szBoneName;
+		_float4x4				matTransformation;
+		_uint					iNumChildren;
+	}BONE_DESC;
+	typedef struct tagMeshDesc {
+
+	}MESH_DESC;
+	typedef struct tagMaterialDesc {
+
+	}MATERIAL_DESC;
+	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터
 		MODELTYPE				eAnimtype;
 		_float4x4				matPreTransformMatrix;
 
@@ -58,12 +88,12 @@ public:
 		_int					iNumMeshes;
 		_int					iNumMaterials;
 		_int					iNumAnimations;
-		vector<CBone>			vecBones;
-		vector<CMesh>			vecMeshes;
-		vector<CMeshMaterial>	vecMaterials;
-		vector<CAnimation>		vecAnimations;
+		vector<BONE_DESC>		vecBones;
+		vector<MESH_DESC>		vecMeshes;
+		vector<MATERIAL_DESC>	vecMaterials;
+		vector<AIANIM_DESC>		vecAiAnimations;
 	}MODEL_DESC;
-	HRESULT Save_ToBinary(_wstring* strSavePath);
+	HRESULT Export_ToBinary(_wstring* strSavePath);
 
 private:
 	/* 파일로부터 읽은 모든 정보를 다 저장해주는 구조체. */

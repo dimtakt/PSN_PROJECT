@@ -5,6 +5,8 @@
 #include "MeshMaterial.h"
 #include "Animation.h"
 
+#include <fstream>
+
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent{ pDevice ,pContext }
 {
@@ -123,8 +125,94 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     return m_isFinished;
 }
 
-HRESULT CModel::Save_ToBinary(_wstring* strSavePath)
+HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 {
+    // 데이터를 구조체에 담기..
+
+    MODEL_DESC tModelDesc = {};
+
+    tModelDesc.eAnimtype = m_eModelType;
+    tModelDesc.matPreTransformMatrix = m_PreTransformMatrix;
+
+    tModelDesc.iNumBones = m_Bones.size();
+    tModelDesc.iNumMeshes = m_iNumMeshes;
+    tModelDesc.iNumMaterials = m_iNumMaterials;
+    tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM)? m_iNumAnimations : 0;
+
+    for (auto bone : m_Bones)
+        tModelDesc.vecBones.push_back(*bone);
+    for (auto mesh : m_Meshes)
+        tModelDesc.vecMeshes.push_back(*mesh);
+    for (auto material : m_Materials)
+        tModelDesc.vecMaterials.push_back(*material);
+
+    // if modeltype animation..
+    if (m_eModelType == MODELTYPE::ANIM)
+    {
+        // 애니메이션..
+        for (size_t i = 0; i < m_iNumAnimations; i++)
+        {
+            AIANIM_DESC tAiAnimDesc = {};
+            aiAnimation* aiAnim = m_pAIScene->mAnimations[i];
+
+            tAiAnimDesc.fDuration = aiAnim->mDuration;
+            tAiAnimDesc.fTicksPerSecond = aiAnim->mTicksPerSecond;
+            tAiAnimDesc.iNumChannels = aiAnim->mNumChannels;
+            
+            // 애니메이션 내의 채널..
+            for (size_t j = 0; j < tAiAnimDesc.iNumChannels; j++)
+            {
+                AICHANNEL_DESC tAiChannelDesc = {};
+                aiNodeAnim* aiChan = aiAnim->mChannels[j];
+
+                tAiChannelDesc.szChannelName = aiChan->mNodeName;
+                tAiChannelDesc.iNumScaKeys = aiChan->mNumScalingKeys;
+                tAiChannelDesc.iNumRotKeys = aiChan->mNumRotationKeys;
+                tAiChannelDesc.iNumPosKeys = aiChan->mNumPositionKeys;
+                tAiChannelDesc.iNumKeyFrames = max(max(tAiChannelDesc.iNumPosKeys, tAiChannelDesc.iNumRotKeys), tAiChannelDesc.iNumScaKeys);
+
+                // 애니메이션 내의 채널 내의 키프레임..
+                for (size_t k = 0; k < tAiChannelDesc.iNumKeyFrames; k++)
+                {
+                    KEYFRAME tKeyFrame = {};
+
+                    if (k < aiChan->mNumScalingKeys) {
+                        memcpy(&tKeyFrame.vScale, &aiChan->mScalingKeys[k].mValue, sizeof(_float3));
+
+                        tKeyFrame.fTrackPosition = aiChan->mScalingKeys[k].mTime;
+                    }
+                    if (k < aiChan->mNumRotationKeys) {
+                        tKeyFrame.vRotation.x = aiChan->mRotationKeys[k].mValue.x;
+                        tKeyFrame.vRotation.y = aiChan->mRotationKeys[k].mValue.y;
+                        tKeyFrame.vRotation.z = aiChan->mRotationKeys[k].mValue.z;
+                        tKeyFrame.vRotation.w = aiChan->mRotationKeys[k].mValue.w;
+
+                        tKeyFrame.fTrackPosition = aiChan->mRotationKeys[k].mTime;
+                    }
+                    if (k < aiChan->mNumPositionKeys) {
+                        memcpy(&tKeyFrame.vTranslation, &aiChan->mPositionKeys[k].mValue, sizeof(_float3));
+
+                        tKeyFrame.fTrackPosition = aiChan->mPositionKeys[k].mTime;
+                    }
+                    
+                    tAiChannelDesc.vecKeyFrame.push_back(tKeyFrame);
+                }
+                tAiAnimDesc.vecChannels.push_back(tAiChannelDesc);
+            }
+            tModelDesc.vecAiAnimations.push_back(tAiAnimDesc);
+        }
+
+    }
+
+
+
+    //  데이터를 저장하기..
+    ofstream ofs(strSavePath->c_str(), ios::binary);
+
+    if (ofs.is_open()) {
+        ofs.write(reinterpret_cast<char*>(&tModelDesc), sizeof(MODEL_DESC));
+        ofs.close();
+    }
 
 
     return S_OK;
@@ -190,9 +278,9 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
     if (nullptr == pBone)
         return E_FAIL;
 
-    m_Bones.push_back(pBone);
+    m_Bones.push_back(pBone);           // 여기서 1개 추가했으니까,
 
-    _int   iIndex = m_Bones.size() - 1;
+    _int   iIndex = m_Bones.size() - 1; // 여기서 1 빼 주는 것. 1개 추가했으면 0번째 인덱스여야 하므로.
 
     for (size_t i = 0; i < pAINode->mNumChildren; i++)
     {
