@@ -123,6 +123,13 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     return m_isFinished;
 }
 
+HRESULT CModel::Save_ToBinary(_wstring* strSavePath)
+{
+
+
+    return S_OK;
+}
+
 HRESULT CModel::Render(_uint iMeshIndex)
 {
     if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources()))

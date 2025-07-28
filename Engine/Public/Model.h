@@ -12,6 +12,11 @@
 
 NS_BEGIN(Engine)
 
+class CBone;
+class CMesh;
+class CMeshMaterial;
+class CAnimation;
+
 class ENGINE_DLL CModel final : public CComponent
 {
 private:
@@ -43,6 +48,22 @@ public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	_bool Play_Animation(_float fTimeDelta);
+
+public:
+	typedef struct tagBinaryModelDesc {
+		MODELTYPE				eAnimtype;
+		_float4x4				matPreTransformMatrix;
+
+		_int					iNumBones;
+		_int					iNumMeshes;
+		_int					iNumMaterials;
+		_int					iNumAnimations;
+		vector<CBone>			vecBones;
+		vector<CMesh>			vecMeshes;
+		vector<CMeshMaterial>	vecMaterials;
+		vector<CAnimation>		vecAnimations;
+	}MODEL_DESC;
+	HRESULT Save_ToBinary(_wstring* strSavePath);
 
 private:
 	/* 파일로부터 읽은 모든 정보를 다 저장해주는 구조체. */

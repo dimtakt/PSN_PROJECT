@@ -221,7 +221,7 @@ _bool CLevel_Editor::Check_ObjectPicking()
 	return true;
 }
 
-wstring CLevel_Editor::GetFilePath(FILETYPE eFileType)
+_bool CLevel_Editor::LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 {
 	OPENFILENAMEW ofn = {};
 	_tchar szFile[260] = { 0 };
@@ -247,23 +247,90 @@ wstring CLevel_Editor::GetFilePath(FILETYPE eFileType)
 
 	case FILETYPE::FILETYPE_END:
 	default:
-		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 로드 시도. Level_Editor::GetFilePath()", MB_OK);
-		return L"";
+		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 로드 시도. Level_Editor::LoadExternalFile()", MB_OK);
+		return false;
 	}
 	
-	wstring szFileOutput = {};
-	if (GetOpenFileNameW(&ofn))
-		szFileOutput = ofn.lpstrFile;
-	else
-		szFileOutput = L"";
 
-	if (!szFileOutput.empty())
-		MessageBoxW(NULL, L"파일 경로 잘 불러옴.", L"Load Success", MB_ICONASTERISK);
-	else
-		MessageBoxW(NULL, L"파일 경로 로드실패.", L"Load Fail", MB_ICONERROR);
+	_bool isLoaded = false;
+	isLoaded = GetOpenFileNameW(&ofn);
+
+	if (isLoaded)		*strPathOut = ofn.lpstrFile;
+	else				*strPathOut = L"";
+
+	return isLoaded;
+}
+
+_bool CLevel_Editor::SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut)
+{
+	OPENFILENAMEW ofn = {};
+	_tchar szFile[260] = { 0 };
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+
+	switch (eFileType)
+	{
+	case FILETYPE::FBX:
+		ofn.lpstrFilter = L"FBX Files (*.fbx)\0*.fbx\0";
+		break;
+	case FILETYPE::DATMODEL:
+		ofn.lpstrFilter = L"Binary Model Files (*.datmodel)\0*.datmodel\0";
+		break;
+	case FILETYPE::DATMAP:
+		ofn.lpstrFilter = L"Binary Map Files (*.datmap)\0*.datmap\0";
+		break;
+
+	case FILETYPE::FILETYPE_END:
+	default:
+		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 저장 시도. Level_Editor::SaveExternalFile()", MB_OK);
+		return false;
+	}
 
 
-	return szFileOutput;
+	_bool isSaved = false;
+	isSaved = GetSaveFileNameW(&ofn);
+
+	if (isSaved)		*strPathOut = ofn.lpstrFile;
+	else				*strPathOut = L"";
+
+	return isSaved;
+}
+
+HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType)
+{
+	// 어찌할꼬..
+	// 일단 NONANIM만 만들기
+	if (eAnimType == MODELTYPE::ANIM)
+		return E_FAIL;
+
+	// 문자열 호환안되는거 변환
+	char szLoadPath[256] = { 0 };
+	char szSavePath[256] = { 0 };
+	WideCharToMultiByte(CP_ACP, 0, (*strLoadPath).c_str(), -1, szLoadPath, 256, nullptr, nullptr);
+	WideCharToMultiByte(CP_ACP, 0, (*strSavePath).c_str(), -1, szSavePath, 256, nullptr, nullptr);
+
+	// 일단 모델 로드해봐
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom"),
+		CModel::Create(m_pDevice, m_pContext, eAnimType, szLoadPath, PreTransformMatrix))))
+		return E_FAIL;
+
+	// 바이너리화 후 저장...
+	// ksta : 이거 확인해야 함, 실질 구현부는 Model.cpp 126Line 에 해야 할 듯
+	CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom")));
+	pTargetModel->Save_ToBinary(strSavePath);
+
+	// 다 됐으면 제거해
+	if (FAILED(m_pGameInstance->Remove_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom"))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 CLevel_Editor* CLevel_Editor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -309,29 +376,38 @@ void CLevel_Editor::ImGui_MainMenu()
 			{
 				if (ImGui::MenuItem("[Raw] FBX"))
 				{
-					wstring strLoadFilePath = GetFilePath(FILETYPE::FBX);
+					wstring strLoadFilePath = L"";
+					_bool isLoaded = false;
+					
+					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
 
-					if (!strLoadFilePath.empty())
+					if (!isLoaded)
 					{
 						// 받아온 경로 문자열을 이용하여 원본 모델 로드 진행
 					}
 				}
 				if (ImGui::MenuItem("[Binary] Model"))
 				{
-					wstring strLoadFilePath = GetFilePath(FILETYPE::DATMODEL);
-					
-					if (!strLoadFilePath.empty())
+					wstring strLoadFilePath = L"";
+					_bool isLoaded = false;
+
+					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+
+					if (!isLoaded)
 					{
-						// 받아온 경로 문자열을 이용하여 바이너리화 모델 로드 진행
+						// 받아온 경로 문자열을 이용하여 바이너리 모델 로드 진행
 					}
 				}
 				if (ImGui::MenuItem("[Binary] Map"))
 				{
-					wstring strLoadFilePath = GetFilePath(FILETYPE::DATMAP);
-					
-					if (!strLoadFilePath.empty())
+					wstring strLoadFilePath = L"";
+					_bool isLoaded = false;
+
+					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+
+					if (!isLoaded)
 					{
-						// 받아온 경로 문자열을 이용하여 맵 로드 진행
+						// 받아온 경로 문자열을 이용하여 바이너리 맵 로드 진행
 					}
 				}
 
@@ -339,16 +415,38 @@ void CLevel_Editor::ImGui_MainMenu()
 			}
 			if (ImGui::BeginMenu("Convert to Binary.."))
 			{
-				if (ImGui::MenuItem("[Raw] FBX"))
+				if (ImGui::MenuItem("[Raw] FBX : Non Anim"))
 				{
-					wstring strLoadFilePath = GetFilePath(FILETYPE::FBX);
+					wstring strLoadFilePath = L"";
+					wstring strSaveFilePath = L"";
+					_bool isLoaded = false;
+					_bool isSaved = false;
 
-					if (!strLoadFilePath.empty())
-					{
-						// 받아온 경로 문자열을 이용하여 로드 및 파일 바이너리화 진행
-					}
+					// 단순 경로를 받아오는 창을 띄우는 함수
+					isLoaded	= LoadExternalFile(FILETYPE::FBX,		&strLoadFilePath);
+					isSaved		= SaveExternalFile(FILETYPE::DATMODEL,	&strSaveFilePath);
+
+					// 경로를 잘 받아왔으면 변환 진행
+					if (isLoaded && isSaved)
+						Convert_FBXToBinary(&strLoadFilePath, &strSaveFilePath, MODELTYPE::NONANIM);
+					
 				}
+				if (ImGui::MenuItem("[Raw] FBX : Anim", nullptr, false, false))
+				{
+					wstring strLoadFilePath = L"";
+					wstring strSaveFilePath = L"";
+					_bool isLoaded = false;
+					_bool isSaved = false;
 
+					// 단순 경로를 받아오는 창을 띄우는 함수
+					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+					isSaved = SaveExternalFile(FILETYPE::DATMODEL, &strSaveFilePath);
+
+					// 경로를 잘 받아왔으면 변환 진행
+					if (isLoaded && isSaved)
+						Convert_FBXToBinary(&strLoadFilePath, &strSaveFilePath, MODELTYPE::ANIM);
+
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();

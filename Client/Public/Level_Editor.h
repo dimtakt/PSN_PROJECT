@@ -3,6 +3,13 @@
 #include "Level.h"
 #include "Client_Defines.h"
 #include <array>
+
+
+#include "MeshMaterial.h"
+#include "Mesh.h"
+#include "Animation.h"
+#include "Bone.h"
+
 //#include "Client_Struct.h"
 
 NS_BEGIN(Engine)
@@ -59,7 +66,10 @@ private:	// 해당 클래스에서만 사용할 함수
 
 		FILETYPE_END
 	};
-	wstring GetFilePath(FILETYPE eFileType);
+
+	_bool LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut);
+	_bool SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut);
+	HRESULT Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType);
 
 private:
 	//bool show_demo_window = true;

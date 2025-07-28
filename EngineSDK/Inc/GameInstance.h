@@ -43,8 +43,10 @@ public:
 
 #pragma region PROTOTYPE_MANAGER
 public:
-	HRESULT Add_Prototype(_uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
-	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
+	HRESULT Remove_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag);
+	CBase* Find_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag);
+	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
 #pragma endregion
 
 	// ==============================

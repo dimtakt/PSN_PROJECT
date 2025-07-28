@@ -185,6 +185,22 @@ HRESULT CGameInstance::Add_Prototype(_uint iPrototypeLevelIndex, const _wstring&
 	return m_pPrototype_Manager->Add_Prototype(iPrototypeLevelIndex, strPrototypeTag, pPrototype);
 }
 
+HRESULT CGameInstance::Remove_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
+{
+	if (nullptr == m_pPrototype_Manager)
+		return E_FAIL;
+
+	return m_pPrototype_Manager->Remove_Prototype(iPrototypeLevelIndex, strPrototypeTag);
+}
+
+CBase* CGameInstance::Find_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
+{
+	if (nullptr == m_pPrototype_Manager)
+		return nullptr;
+
+	return m_pPrototype_Manager->Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
+}
+
 CBase* CGameInstance::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pPrototype_Manager)

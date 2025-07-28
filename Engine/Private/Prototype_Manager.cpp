@@ -30,6 +30,22 @@ HRESULT CPrototype_Manager::Add_Prototype(_uint iPrototpyeLevelIndex, const _wst
 	return S_OK;
 }
 
+HRESULT CPrototype_Manager::Remove_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
+{
+	if (nullptr == m_pPrototypes ||
+		m_iNumLevels <= iPrototypeLevelIndex)
+		return E_FAIL;
+
+	CBase* pPrototype = Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
+	if (nullptr == pPrototype)
+		return E_FAIL;
+
+	Safe_Release(pPrototype);
+	m_pPrototypes[iPrototypeLevelIndex].erase(strPrototypeTag);
+
+	return S_OK;
+}
+
 CBase* CPrototype_Manager::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
 	CBase* pPrototype = Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
