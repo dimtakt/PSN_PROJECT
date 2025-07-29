@@ -139,12 +139,13 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
     tModelDesc.iNumMaterials = m_iNumMaterials;
     tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM)? m_iNumAnimations : 0;
 
-    for (auto bone : m_Bones)
-        tModelDesc.vecBones.push_back(*bone);
-    for (auto mesh : m_Meshes)
-        tModelDesc.vecMeshes.push_back(*mesh);
-    for (auto material : m_Materials)
-        tModelDesc.vecMaterials.push_back(*material);
+    m_pAIScene->mMaterials;
+    //for (auto bone : m_Bones)
+    //    tModelDesc.vecBones.push_back(*bone);
+    //for (auto mesh : m_Meshes)
+    //    tModelDesc.vecMeshes.push_back(*mesh);
+    //for (auto material : m_Materials)
+    //    tModelDesc.vecMaterials.push_back(*material);
 
     // if modeltype animation..
     if (m_eModelType == MODELTYPE::ANIM)

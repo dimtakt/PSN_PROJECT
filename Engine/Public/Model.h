@@ -53,7 +53,7 @@ public:
 
 public: // output 용
 	typedef struct tagAIChannelDesc {		// 채널 저장 데이터
-		// 본 인덱스, 키프레임갯수, 키프레임정보 4종
+		// 키프레임갯수, 본 인덱스, 키프레임정보 4종
 		aiString				szChannelName;
 
 		_uint					iNumPosKeys;
@@ -86,7 +86,9 @@ public: // output 용
 	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터
 		// 메쉬이름, 마테리얼인덱스, 버텍스갯수, 버텍스스트라이드, 인덱스갯수, 면갯수
 		// 
-		// Face갯수, Face데이터 // 버텍스갯수, 버텍스데이터 // 본갯수 // 본인덱스갯수, 본인덱스데이터
+		// Face갯수, Face데이터
+		// 버텍스갯수, 버텍스데이터 
+		// 본갯수, 본인덱스갯수, 본인덱스데이터
 		MODELTYPE				eAnimtype;
 		_float4x4				matPreTransformMatrix;
 
