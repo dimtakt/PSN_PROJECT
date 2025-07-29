@@ -129,23 +129,77 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 {
     // 데이터를 구조체에 담기..
 
+    const aiScene* pScene = m_pAIScene;
+
     MODEL_DESC tModelDesc = {};
 
     tModelDesc.eAnimtype = m_eModelType;
     tModelDesc.matPreTransformMatrix = m_PreTransformMatrix;
 
-    tModelDesc.iNumBones = m_Bones.size();
-    tModelDesc.iNumMeshes = m_iNumMeshes;
-    tModelDesc.iNumMaterials = m_iNumMaterials;
-    tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM)? m_iNumAnimations : 0;
+    tModelDesc.iNumMeshes = pScene->mNumMeshes;
+    tModelDesc.iNumMaterials = pScene->mNumMaterials;
+    tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM)? pScene->mNumAnimations : 0;
+    
 
-    m_pAIScene->mMaterials;
-    //for (auto bone : m_Bones)
-    //    tModelDesc.vecBones.push_back(*bone);
-    //for (auto mesh : m_Meshes)
-    //    tModelDesc.vecMeshes.push_back(*mesh);
-    //for (auto material : m_Materials)
-    //    tModelDesc.vecMaterials.push_back(*material);
+    // 마테리얼..
+    for (size_t i = 0; i < pScene->mNumMaterials; i++)
+    {
+        MATERIAL_DESC tMatDesc = {};
+        aiMaterial* pMat = pScene->mMaterials[i];
+
+        tMatDesc.szMaterialName = pMat->GetName();
+        tMatDesc.iMaterialIndex = static_cast<_uint>(i);
+
+        // 마테리얼 내의 텍스쳐..
+        _uint iTextureCount = 0;
+        for (int texType = aiTextureType_NONE + 1; texType <= aiTextureType_UNKNOWN; ++texType)
+        {
+            const _uint numTex = pMat->GetTextureCount((aiTextureType)texType);
+            iTextureCount += numTex;
+
+            for (_uint j = 0; j < numTex; ++j)
+            {
+                aiString path;
+                if (AI_SUCCESS == pMat->GetTexture((aiTextureType)texType, j, &path))
+                    tMatDesc.vecTexturePaths.push_back(path);
+            }
+        }
+
+        tMatDesc.iNumTextures = iTextureCount;
+        tModelDesc.vecMaterials.push_back(tMatDesc);        // 뽑아온 데이터를 벡터에 저장!
+    }
+
+    // 본..
+    //for 
+
+    // 메쉬..
+    for (size_t i = 0; i < pScene->mNumMeshes; i++)
+    {
+        MESH_DESC tMeshDesc = {};
+        aiMesh* pMesh = pScene->mMeshes[i];
+
+        tMeshDesc.szMeshName = pMesh->mName;
+        tMeshDesc.iMaterialIndex = pMesh->mMaterialIndex;
+
+        tMeshDesc.iNumVertices = pMesh->mNumVertices;
+        tMeshDesc.iVertexStride = sizeof(_float3) * 3;
+        tMeshDesc.iNumIndices = pMesh->mNumFaces * 3;
+
+        tMeshDesc.iNumFaces = pMesh->mNumFaces;
+        // 메쉬 내의 면..
+        for (size_t i = 0; i < pMesh->mNumFaces; i++)
+        {
+            //tMeshDesc.vecFaces.push_back(pMesh->mFaces[i].);
+        }
+
+        tMeshDesc.iNumUsingBones = pMesh->mNumBones;
+        // 따로 전체 본 구조에서 비교해와서 저장하는 과정 필요..
+        // _uint가 아니라 aiString 으로 둬야 할 수도 있음
+        //tMeshDesc.vecUsingBonesIndex.push_back();
+
+
+        tModelDesc.vecMeshes.push_back(tMeshDesc);          // 뽑아온 데이터를 벡터에 저장!
+    }
 
     // if modeltype animation..
     if (m_eModelType == MODELTYPE::ANIM)
@@ -156,6 +210,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
             AIANIM_DESC tAiAnimDesc = {};
             aiAnimation* aiAnim = m_pAIScene->mAnimations[i];
 
+            tAiAnimDesc.szAnimName = aiAnim->mName;
             tAiAnimDesc.fDuration = aiAnim->mDuration;
             tAiAnimDesc.fTicksPerSecond = aiAnim->mTicksPerSecond;
             tAiAnimDesc.iNumChannels = aiAnim->mNumChannels;
