@@ -52,7 +52,8 @@ public:
 	_bool Play_Animation(_float fTimeDelta);
 
 public: // output 용
-	typedef struct tagAIChannelDesc {			// 채널 저장 데이터
+	typedef struct tagAIChannelDesc {		// 채널 저장 데이터
+		// 본 인덱스, 키프레임갯수, 키프레임정보 4종
 		aiString				szChannelName;
 
 		_uint					iNumPosKeys;
@@ -63,13 +64,15 @@ public: // output 용
 		vector<KEYFRAME>		vecKeyFrame;
 	}AICHANNEL_DESC;
 	typedef struct tagAIAnimationDesc {		// 애니메이션 저장 데이터
+		// 애니메이션 갯수, 채널 갯수, 재생시간, 초당Tick, 채널 정보들
 		_float					fDuration;
 		_float					fTicksPerSecond;
 		_int					iNumChannels;
 
 		vector<AICHANNEL_DESC>	vecChannels;
 	}AIANIM_DESC;
-	typedef struct tagBoneDesc {
+	typedef struct tagBoneDesc {			// 본 저장 데이터
+		// 본이름,트랜스폼행렬, 부모본인덱스
 		aiString				szBoneName;
 		_float4x4				matTransformation;
 		_uint					iNumChildren;
@@ -81,6 +84,9 @@ public: // output 용
 
 	}MATERIAL_DESC;
 	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터
+		// 메쉬이름, 마테리얼인덱스, 버텍스갯수, 버텍스스트라이드, 인덱스갯수, 면갯수
+		// 
+		// Face갯수, Face데이터 // 버텍스갯수, 버텍스데이터 // 본갯수 // 본인덱스갯수, 본인덱스데이터
 		MODELTYPE				eAnimtype;
 		_float4x4				matPreTransformMatrix;
 
