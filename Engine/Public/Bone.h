@@ -41,6 +41,9 @@ public:
 		return !strcmp(pName, m_szName);
 	}
 
+public:
+	BONE_DESC			Get_BinaryBone()	{ return m_BinBone;}
+
 
 private:
 	_char				m_szName[MAX_PATH] = {};
@@ -49,9 +52,13 @@ private:
 
 	_int				m_iParentBoneIndex = { -1 };
 
+private:
+	BONE_DESC			m_BinBone = {};
+
+
 public:
-	CBone* Clone();
 	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
+	CBone* Clone();
 	virtual void Free() override;
 };
 

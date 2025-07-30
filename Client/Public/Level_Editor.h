@@ -59,14 +59,6 @@ private:	// Custom Window
 	void ImGui_Inspector();
 
 private:	// 해당 클래스에서만 사용할 함수
-	enum class FILETYPE {
-		FBX,			// fbx 원본
-		DATMODEL,		// fbx 를 바이너리화 한 data
-		DATMAP,			// map data.
-
-		FILETYPE_END
-	};
-
 	_bool LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut);
 	_bool SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut);
 	HRESULT Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType);

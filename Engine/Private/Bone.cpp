@@ -11,6 +11,10 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	// 2. 받아온 열 기준의 행렬 데이터를 DX환경에 맞게 전치 후, 본인 Transform 로컬 변수에 담음
 	// 3. 최종 Transform 로컬 변수는 항등행렬로 초기화.
 
+	// ==============================
+	// || load fbx
+	// ==============================
+
 	strcpy_s(m_szName, pAINode->mName.data);
 	memcpy(&m_TransformationMatrix, &pAINode->mTransformation, sizeof(_float4x4));
 
@@ -18,6 +22,22 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
 
 	m_iParentBoneIndex = iParentBoneIndex;
+
+
+	// ==============================
+    // || store for binary
+    // ==============================
+
+	m_BinBone.szBoneName = pAINode->mName.data;
+
+	m_BinBone.matTransformation /*= m_BinBone.matTransformation*/;
+	memcpy(&m_BinBone.matTransformation, &pAINode->mTransformation, sizeof(_float4x4));
+	XMStoreFloat4x4(&m_BinBone.matTransformation, XMMatrixTranspose(XMLoadFloat4x4(&m_BinBone.matTransformation)));
+	m_BinBone.iNumChildren = pAINode->mNumChildren;
+	m_BinBone.iParentBoneIndex = iParentBoneIndex;
+
+
+
 
 	return S_OK;
 }

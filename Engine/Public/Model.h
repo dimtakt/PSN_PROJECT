@@ -51,90 +51,18 @@ public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	_bool Play_Animation(_float fTimeDelta);
 
-public: // output 용
-#pragma region Output Description
-	typedef struct tagAIChannelDesc {		// 채널 저장 데이터
-		// 키프레임갯수, 본 인덱스, 키프레임정보 4종
-		aiString				szChannelName;
-
-		_uint					iBoneIndex;		// 해당 채널이 적용되는 본 인덱스
-
-		_uint					iNumPosKeys;
-		_uint					iNumRotKeys;
-		_uint					iNumScaKeys;
-
-		_uint					iNumKeyFrames;	// channel.cpp 내에서 계산하는 과정 있으니 없어도될듯
-		vector<KEYFRAME>		vecKeyFrame;
-	}AICHANNEL_DESC;
-	typedef struct tagAIAnimationDesc {		// 애니메이션 저장 데이터
-		// 애니메이션 갯수, 채널 갯수, 재생시간, 초당Tick, 채널 정보들
-		aiString				szAnimName;
-
-		_float					fDuration;
-		_float					fTicksPerSecond;
-		_uint					iNumChannels;
-
-		vector<AICHANNEL_DESC>	vecChannels;
-	}AIANIM_DESC;
-	typedef struct tagBoneDesc {			// 본 저장 데이터
-		aiString				szBoneName;
-		_float4x4				matTransformation;
-		_uint					iNumChildren;
-
-		_int					iParentBoneIndex;      // 추가
-		_float4x4				matOffset;       // 추가 (스키닝용)
-	} BONE_DESC;
-	struct MeshFace { _uint iIndices[3]; };
-	typedef struct tagMeshDesc {
-		aiString				szMeshName;
-
-		_uint					iMaterialIndex;
-
-		_uint					iNumVertices;
-		_uint					iVertexStride;
-
-		_uint					iNumIndices;
-
-
-		_uint					iNumFaces;
-		vector<MeshFace>		vecFaces;   // 추가
-
-		_uint					iNumUsingBones;
-		vector<_uint>			vecUsingBonesIndex;
-	} MESH_DESC;
-	typedef struct tagMaterialDesc {
-		aiString				szMaterialName;
-
-		_uint					iMaterialIndex;
-		_uint					iNumTextures;
-
-		vector<aiString> vecTexturePaths; // 실제 텍스처 경로 저장
-	} MATERIAL_DESC;
-	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터
-		// 메쉬이름, 마테리얼인덱스, 버텍스갯수, 버텍스스트라이드, 인덱스갯수, 면갯수
-		// 
-		// Face갯수, Face데이터
-		// 버텍스갯수, 버텍스데이터 
-		// 본갯수, 본인덱스갯수, 본인덱스데이터
-		MODELTYPE				eAnimtype;
-		_float4x4				matPreTransformMatrix;
-
-		_uint					iNumBones;
-		_uint					iNumMeshes;
-		_uint					iNumMaterials;
-		_uint					iNumAnimations;
-		vector<BONE_DESC>		vecBones;
-		vector<MESH_DESC>		vecMeshes;
-		vector<MATERIAL_DESC>	vecMaterials;
-		vector<AIANIM_DESC>		vecAiAnimations;
-	}MODEL_DESC;
-#pragma endregion
-
+public:
 	HRESULT Export_ToBinary(_wstring* strSavePath);
+
+//public:
+//	FILETYPE Get_FileType() { return m_eFileType; };
 
 private:
 	/* 파일로부터 읽은 모든 정보를 다 저장해주는 구조체. */
 	const aiScene*			m_pAIScene = { nullptr };
+	/* raw fbx의 경우 위에 담기나, binary model 의 경우에는 아래에 담기도록. */
+	BINARY_MODEL_DESC		m_BinModel = {};
+
 	Assimp::Importer		m_Importer = {};
 	MODELTYPE				m_eModelType = {};
 	_float4x4				m_PreTransformMatrix = {};
@@ -142,23 +70,25 @@ private:
 	// m_pAIScene = m_Importer.ReadFile(경로);
 
 private:
-	_uint					m_iNumMeshes = {};
-	vector<class CMesh*>	m_Meshes;
+	_uint							m_iNumMeshes = {};
+	vector<class CMesh*>			m_Meshes;
 
-private:
-	/* Diffuse, Ambient, Specular */
 	_uint							m_iNumMaterials = {};
 	vector<class CMeshMaterial*>	m_Materials;
 
-private:
 	vector<class CBone*>			m_Bones;
 
-private:
-	_uint							m_iCurrentAnimIndex = { 0 };
 	_uint							m_iNumAnimations = { 0 };
 	vector<class CAnimation*>		m_Animations;
+
+	_uint							m_iCurrentAnimIndex = { 0 };
 	_bool							m_isLoop = {};
 	_bool							m_isFinished = {};
+
+
+	FILETYPE						m_eFileType = {};
+
+
 
 private:
 	HRESULT Ready_Meshes();

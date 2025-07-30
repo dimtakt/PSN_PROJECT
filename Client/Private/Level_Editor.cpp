@@ -247,7 +247,7 @@ _bool CLevel_Editor::LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 
 	case FILETYPE::FILETYPE_END:
 	default:
-		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 로드 시도. Level_Editor::LoadExternalFile()", MB_OK);
+		MessageBoxW(NULL, L"Wrong Type", L"잘못된 파일 형식 로드 시도. \nLevel_Editor::LoadExternalFile()", MB_OK);
 		return false;
 	}
 	

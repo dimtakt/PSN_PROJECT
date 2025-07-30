@@ -12,6 +12,15 @@ namespace Engine
 	enum class WINMODE { FULL, WIN, END };
 	enum class MOUSEKEYSTATE { LB, RB, MB, END	};
 	enum class MOUSEMOVESTATE {	X, Y, Z, END	};
+
+	enum class FILETYPE {
+		FBX,			// fbx 원본
+		DATMODEL,		// fbx 를 바이너리화 한 data
+		DATMAP,			// map data.
+
+		FILETYPE_END
+	};
+
 }
 
 #endif // Engine_Enum_h__

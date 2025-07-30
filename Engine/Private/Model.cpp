@@ -58,26 +58,61 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
-    _uint           iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
+    _uint   iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
     if (MODELTYPE::NONANIM == m_eModelType)
         iFlag |= aiProcess_PreTransformVertices;
 
-    m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
-    if (nullptr == m_pAIScene)
-        return E_FAIL;
+    // 파일 확장자 확인, 모델타입 지정.
+    _char   szExt[MAX_PATH] = {};
+    _splitpath_s(pModelFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
-    if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+    if (!strcmp(szExt, ".fbx"))
+        m_eFileType = FILETYPE::FBX;
+    else if (!strcmp(szExt, ".datmodel"))
+        m_eFileType = FILETYPE::DATMODEL;
+    else
+    {
+        MessageBoxW(NULL, L"Wrong Type", L"지원하지 않는 확장자 로드 시도. 확장자는 \".fbx\" 또는 \".datmodel\"만 가능. \nModel::Initialize_Prototype()", MB_OK);
         return E_FAIL;
+    }
 
-    if (FAILED(Ready_Meshes()))
-        return E_FAIL;
 
-    if (FAILED(Ready_Materials(pModelFilePath)))
-        return E_FAIL;
+    // fbx 인지, datmodel 인지에 따라 다르게 읽어옴.
+    // 만약 fbx 라면, export 용 로컬 함수에 데이터 또한 저장.
+    // (어차피 실 게임에서는 datmodel 을 사용할 것이기에, 최적화 문제는 괜찮을 듯?)
+    if (m_eFileType == FILETYPE::FBX)
+    {
+        m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
 
-    if (FAILED(Ready_Animations()))
-        return E_FAIL;
+        if (nullptr == m_pAIScene)
+            return E_FAIL;
+
+        // for export
+        m_BinModel.szModelName = m_pAIScene->mName;
+        m_BinModel.eAnimtype = eModelType;
+        XMStoreFloat4x4(&m_BinModel.matPreTransformMatrix, PreTransformMatrix);
+
+        if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))     // do..comp
+            return E_FAIL;
+
+        if (FAILED(Ready_Meshes()))                             // do..comp
+            return E_FAIL;
+
+        if (FAILED(Ready_Materials(pModelFilePath)))            // do..comp
+            return E_FAIL;
+
+        if (FAILED(Ready_Animations()))                         // do..
+            return E_FAIL;
+    }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
+    }
+
+
+
+
 
     return S_OK;
 }
@@ -131,7 +166,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
     const aiScene* pScene = m_pAIScene;
 
-    MODEL_DESC tModelDesc = {};
+    BINARY_MODEL_DESC tModelDesc = {};
 
     tModelDesc.eAnimtype = m_eModelType;
     tModelDesc.matPreTransformMatrix = m_PreTransformMatrix;
@@ -152,7 +187,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
         // 마테리얼 내의 텍스쳐..
         _uint iTextureCount = 0;
-        for (int texType = aiTextureType_NONE + 1; texType <= aiTextureType_UNKNOWN; ++texType)
+        for (int texType = aiTextureType_NONE + 1; texType <= AI_TEXTURE_TYPE_MAX; ++texType)
         {
             const _uint numTex = pMat->GetTextureCount((aiTextureType)texType);
             iTextureCount += numTex;
@@ -262,11 +297,11 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
 
 
-    //  데이터를 저장하기..
+    //  데이터를 저장하기.. 이렇게 저장하면 안됨.
     ofstream ofs(strSavePath->c_str(), ios::binary);
 
     if (ofs.is_open()) {
-        ofs.write(reinterpret_cast<char*>(&tModelDesc), sizeof(MODEL_DESC));
+        ofs.write(reinterpret_cast<char*>(&tModelDesc), sizeof(BINARY_MODEL_DESC));
         ofs.close();
     }
 
@@ -296,32 +331,152 @@ void CModel::Set_Animation(_uint iIndex, _bool isLoop)
 
 HRESULT CModel::Ready_Meshes()
 {
-    m_iNumMeshes = m_pAIScene->mNumMeshes;
-
-    for (size_t i = 0; i < m_iNumMeshes; i++)
+    if (m_eFileType == FILETYPE::FBX)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
-        if (nullptr == pMesh)
-            return E_FAIL;
+        // ==============================
+        // || load fbx
+        // ==============================
+        m_iNumMeshes = m_pAIScene->mNumMeshes;
 
-        m_Meshes.push_back(pMesh);
+        for (size_t i = 0; i < m_iNumMeshes; i++)
+        {
+            CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+            if (nullptr == pMesh)
+                return E_FAIL;
+
+            m_Meshes.push_back(pMesh);
+        }
+
+        // ==============================
+        // || store for binary
+        // ==============================
+        m_BinModel.iNumMeshes = m_iNumMeshes;
+
+        // Mesh
+        for (size_t i = 0; i < m_iNumMeshes; i++)
+        {
+            MESH_DESC tMeshDesc = {};
+
+            aiMesh tAiMesh = *m_pAIScene->mMeshes[i];
+
+            tMeshDesc.szMeshName = tAiMesh.mName;
+            tMeshDesc.iMaterialIndex =  tAiMesh.mMaterialIndex;
+            tMeshDesc.iNumVertices =  tAiMesh.mNumVertices;
+            tMeshDesc.iVertexStride = (m_eModelType == MODELTYPE::NONANIM)? sizeof(VTXMESH) : sizeof(VTXANIMMESH);
+            tMeshDesc.iNumIndices =  tAiMesh.mNumFaces * 3; // face 1개 당 인덱스 정점은 3개.
+
+            tMeshDesc.iNumFaces = tAiMesh.mNumFaces;
+            // Mesh / Faces
+            for (size_t j = 0; j < tAiMesh.mNumFaces; j++)
+            {
+                MeshFace tFace = {
+                    tAiMesh.mFaces[j].mIndices[0],
+                    tAiMesh.mFaces[j].mIndices[1],
+                    tAiMesh.mFaces[j].mIndices[2]                
+                };
+
+                tMeshDesc.vecFaces.push_back(tFace);
+            }
+            
+            
+            //tMeshDesc.vecNonAnimVertices;
+            //tMeshDesc.vecAnimVertices;
+
+            tMeshDesc.iNumUsingBones = tAiMesh.mNumBones;
+            // Mesh / UsingBones
+            for (size_t j = 0; j < tAiMesh.mNumBones; j++)          // compare bone (bone in mesh)
+            {
+                // Mesh / UsingBones / Bones Name Compare Loop
+                for (size_t k = 0; k < m_BinModel.iNumBones; k++)   // origin bone (bone in origin binmodel)
+                {
+                    // 원본 본과 메쉬가 사용중인 본을 비교 후, 이름 일치 시 해당 원본 본의 인덱스를 컨테이너에 추가.
+                    aiString szBoneCompare = tAiMesh.mBones[j]->mName;
+                    aiString szBoneOrigin = m_BinModel.vecBones[k].szBoneName;
+
+                    if (szBoneOrigin == szBoneCompare)
+                    {
+                        _uint iUsingBoneIndex = static_cast<_uint>(j);
+                        tMeshDesc.vecUsingBonesIndices.push_back(iUsingBoneIndex);
+                    }
+                }
+            }
+
+
+
+
+
+            m_BinModel.vecMeshes.push_back(tMeshDesc);
+        }
+
+
     }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
+    }
+
 
     return S_OK;
 }
 
 HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
-    m_iNumMaterials = m_pAIScene->mNumMaterials;
-
-    for (size_t i = 0; i < m_iNumMaterials; i++)
+    if (m_eFileType == FILETYPE::FBX)
     {
+        // ==============================
+        // || load fbx
+        // ==============================
 
-        CMeshMaterial* pMeshMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i]);
-        if (nullptr == pMeshMaterial)
-            return E_FAIL;
+        m_iNumMaterials = m_pAIScene->mNumMaterials;
 
-        m_Materials.push_back(pMeshMaterial);
+        for (size_t i = 0; i < m_iNumMaterials; i++)
+        {
+            CMeshMaterial* pMeshMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i]);
+            if (nullptr == pMeshMaterial)
+                return E_FAIL;
+
+            m_Materials.push_back(pMeshMaterial);
+        }
+
+        // ==============================
+        // || store for binary
+        // ==============================
+
+        m_BinModel.iNumMaterials = m_pAIScene->mNumMaterials;
+
+        // Materials..
+        for (size_t i = 0; i < m_pAIScene->mNumMaterials; i++)
+        {
+            MATERIAL_DESC tMatDesc = {};
+            aiMaterial tAiMat = *m_pAIScene->mMaterials[i];
+            
+            tMatDesc.szMaterialName = tAiMat.GetName();
+            tMatDesc.iMaterialIndex = static_cast<_uint>(i);
+
+            _uint iTextureCount = 0;
+            // Material / Textures..
+            for (int texType = aiTextureType_NONE + 1; texType <= AI_TEXTURE_TYPE_MAX; ++texType)
+            {
+                const _uint numTex = tAiMat.GetTextureCount((aiTextureType)texType);
+                iTextureCount += numTex;
+
+                for (_uint j = 0; j < numTex; ++j)
+                {
+                    aiString path;
+                    if (AI_SUCCESS == tAiMat.GetTexture((aiTextureType)texType, j, &path))
+                        tMatDesc.vecTexturePaths.push_back(path);
+                }
+            }
+
+            tMatDesc.iNumTextures = iTextureCount;
+            m_BinModel.vecMaterials.push_back(tMatDesc);        // 뽑아온 데이터를 벡터에 저장!
+        }
+        
+
+    }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
     }
 
 
@@ -330,18 +485,56 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 
 HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
 {
-    CBone* pBone = CBone::Create(pAINode, iParentIndex);
-    if (nullptr == pBone)
-        return E_FAIL;
-
-    m_Bones.push_back(pBone);           // 여기서 1개 추가했으니까,
-
-    _int   iIndex = m_Bones.size() - 1; // 여기서 1 빼 주는 것. 1개 추가했으면 0번째 인덱스여야 하므로.
-
-    for (size_t i = 0; i < pAINode->mNumChildren; i++)
+    if (m_eFileType == FILETYPE::FBX)
     {
-        Ready_Bones(pAINode->mChildren[i], iIndex);
+        // ==============================
+        // || load fbx
+        // ==============================
+        
+        CBone* pBone = CBone::Create(pAINode, iParentIndex);
+        if (nullptr == pBone)
+            return E_FAIL;
+
+        m_Bones.push_back(pBone);           // 여기서 1개 추가했으니까,
+
+        // ==============================
+        // || store for binary
+        // start=========================
+
+        BONE_DESC tBinBone = pBone->Get_BinaryBone();
+        m_BinModel.vecBones.push_back(tBinBone);
+        
+        // end===========================
+
+
+        _int   iIndex = m_Bones.size() - 1; // 여기서 1 빼 주는 것. 1개 추가했으면 0번째 인덱스여야 하므로.
+
+        for (size_t i = 0; i < pAINode->mNumChildren; i++)
+        {
+            Ready_Bones(pAINode->mChildren[i], iIndex);
+        }
+
+
     }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
+
+    }
+
+ 
+    // for export
+    if (m_eFileType == FILETYPE::FBX)
+    {
+        // store for binary
+        m_BinModel.iNumBones = m_Bones.size();
+    }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
+
+    }
+
 
     return S_OK;
 }
@@ -351,15 +544,93 @@ HRESULT CModel::Ready_Animations()
     /* 시간에 따라 내 뼈들이 어떻게 움직여야하는가? 에 대한 정보가 필요하다.  */
     /* 대기동작을 위해서는 뼈들이 어떤 시간대에 어떤 상태를 취하는가? */
     /* 공격동작을 위해서는 뼈들이 어떤 시간대에 어떤 상태를 취하는가? */
-    m_iNumAnimations = m_pAIScene->mNumAnimations;
 
-    for (size_t i = 0; i < m_iNumAnimations; i++)
+    if (m_eFileType == FILETYPE::FBX)
     {
-        CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);        if (nullptr == pAnimation)
-            return E_FAIL;
+        // ==============================
+        // || load fbx
+        // ==============================
 
-        m_Animations.push_back(pAnimation);
+        m_iNumAnimations = m_pAIScene->mNumAnimations;
+
+        for (size_t i = 0; i < m_iNumAnimations; i++)
+        {
+            CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);
+            if (nullptr == pAnimation)
+                return E_FAIL;
+
+            m_Animations.push_back(pAnimation);
+        }
+
+
+
+        // ==============================
+        // || store for binary
+        // ==============================
+
+
+        // 애니메이션..
+        for (size_t i = 0; i < m_pAIScene->mNumAnimations; i++)
+        {
+            AIANIM_DESC tAiAnimDesc = {};
+            aiAnimation* aiAnim = m_pAIScene->mAnimations[i];
+
+            tAiAnimDesc.szAnimName = aiAnim->mName;
+            tAiAnimDesc.fDuration = aiAnim->mDuration;
+            tAiAnimDesc.fTicksPerSecond = aiAnim->mTicksPerSecond;
+            tAiAnimDesc.iNumChannels = aiAnim->mNumChannels;
+
+            // 애니메이션 내의 채널..
+            for (size_t j = 0; j < tAiAnimDesc.iNumChannels; j++)
+            {
+                AICHANNEL_DESC tAiChannelDesc = {};
+                aiNodeAnim* aiChan = aiAnim->mChannels[j];
+
+                tAiChannelDesc.szChannelName = aiChan->mNodeName;
+                tAiChannelDesc.iNumScaKeys = aiChan->mNumScalingKeys;
+                tAiChannelDesc.iNumRotKeys = aiChan->mNumRotationKeys;
+                tAiChannelDesc.iNumPosKeys = aiChan->mNumPositionKeys;
+                tAiChannelDesc.iNumKeyFrames = max(max(tAiChannelDesc.iNumPosKeys, tAiChannelDesc.iNumRotKeys), tAiChannelDesc.iNumScaKeys);
+
+                // 애니메이션 내의 채널 내의 키프레임..
+                for (size_t k = 0; k < tAiChannelDesc.iNumKeyFrames; k++)
+                {
+                    KEYFRAME tKeyFrame = {};
+
+                    if (k < aiChan->mNumScalingKeys) {
+                        memcpy(&tKeyFrame.vScale, &aiChan->mScalingKeys[k].mValue, sizeof(_float3));
+
+                        tKeyFrame.fTrackPosition = aiChan->mScalingKeys[k].mTime;
+                    }
+                    if (k < aiChan->mNumRotationKeys) {
+                        tKeyFrame.vRotation.x = aiChan->mRotationKeys[k].mValue.x;
+                        tKeyFrame.vRotation.y = aiChan->mRotationKeys[k].mValue.y;
+                        tKeyFrame.vRotation.z = aiChan->mRotationKeys[k].mValue.z;
+                        tKeyFrame.vRotation.w = aiChan->mRotationKeys[k].mValue.w;
+
+                        tKeyFrame.fTrackPosition = aiChan->mRotationKeys[k].mTime;
+                    }
+                    if (k < aiChan->mNumPositionKeys) {
+                        memcpy(&tKeyFrame.vTranslation, &aiChan->mPositionKeys[k].mValue, sizeof(_float3));
+
+                        tKeyFrame.fTrackPosition = aiChan->mPositionKeys[k].mTime;
+                    }
+
+                    tAiChannelDesc.vecKeyFrame.push_back(tKeyFrame);
+                }
+                tAiAnimDesc.vecChannels.push_back(tAiChannelDesc);
+            }
+            m_BinModel.vecAiAnimations.push_back(tAiAnimDesc);
+        }
+
+
+
     }
+    else if (m_eFileType == FILETYPE::DATMODEL)
+    {
+        // ksta : binary
+    }
+
 
     return S_OK;
 }
