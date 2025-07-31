@@ -53,6 +53,7 @@ public:
 
 public:
 	HRESULT Export_ToBinary(_wstring* strSavePath);
+	HRESULT Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 
 //public:
 //	FILETYPE Get_FileType() { return m_eFileType; };

@@ -305,12 +305,12 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 {
 	// 어찌할꼬..
 	// 일단 NONANIM만 만들기
-	if (eAnimType == MODELTYPE::ANIM)
-		return E_FAIL;
+	//if (eAnimType == MODELTYPE::ANIM)
+	//	return E_FAIL;
 
 	// 문자열 호환안되는거 변환
-	char szLoadPath[256] = { 0 };
-	char szSavePath[256] = { 0 };
+	_char szLoadPath[256] = { 0 };
+	_char szSavePath[256] = { 0 };
 	WideCharToMultiByte(CP_ACP, 0, (*strLoadPath).c_str(), -1, szLoadPath, 256, nullptr, nullptr);
 	WideCharToMultiByte(CP_ACP, 0, (*strSavePath).c_str(), -1, szSavePath, 256, nullptr, nullptr);
 
@@ -322,7 +322,7 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 		return E_FAIL;
 
 	// 바이너리화 후 저장...
-	// ksta : 이거 확인해야 함, 실질 구현부는 Model.cpp 126Line 에 해야 할 듯
+	// 실질 구현부는 Model.cpp 에 존재
 	CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Model_Custom")));
 	pTargetModel->Export_ToBinary(strSavePath);
 
@@ -391,11 +391,35 @@ void CLevel_Editor::ImGui_MainMenu()
 					wstring strLoadFilePath = L"";
 					_bool isLoaded = false;
 
-					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+					isLoaded = LoadExternalFile(FILETYPE::DATMODEL, &strLoadFilePath);
 
-					if (!isLoaded)
+					if (isLoaded)
 					{
-						// 받아온 경로 문자열을 이용하여 바이너리 모델 로드 진행
+						// 받아온 경로 문자열을 이용하여 바이너리 모델 로드 진행.
+						// 경로를 char로 변환, 확장자 추출, 확장자는 데이터 추출 후 가져옴.
+						// 파일명을 프로토타입의 suffix 로써 사용하여 프로토타입의 중복을 방지..
+						_char		szLoadPath[256] = {};
+						WideCharToMultiByte(CP_ACP, 0, (strLoadFilePath).c_str(), -1, szLoadPath, 256, nullptr, nullptr);
+
+						_char		szExt[MAX_PATH] = {};
+						_char		szFileName[MAX_PATH] = {};
+						_splitpath_s(szLoadPath, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
+						
+						_matrix		PreTransformMatrix = XMMatrixIdentity();
+						PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+						_wstring	strPrototypeName = L"Prototype_Component_Model_Custom_";
+						_int		len = MultiByteToWideChar(CP_ACP, 0, szFileName, -1, nullptr, 0);
+						_wstring	strFileName(len, 0);
+						MultiByteToWideChar(CP_ACP, 0, szFileName, -1, &strFileName[0], len);
+						strFileName.pop_back(); // null 문자 제거
+						strPrototypeName += strFileName;
+
+						// 이후 로드는 CModel에서 진행..
+						m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName,
+							CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szLoadPath, PreTransformMatrix));
+
+						CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName));
 					}
 				}
 				if (ImGui::MenuItem("[Binary] Map"))
@@ -431,7 +455,7 @@ void CLevel_Editor::ImGui_MainMenu()
 						Convert_FBXToBinary(&strLoadFilePath, &strSaveFilePath, MODELTYPE::NONANIM);
 					
 				}
-				if (ImGui::MenuItem("[Raw] FBX : Anim", nullptr, false, false))
+				if (ImGui::MenuItem("[Raw] FBX : Anim"))
 				{
 					wstring strLoadFilePath = L"";
 					wstring strSaveFilePath = L"";
@@ -439,8 +463,8 @@ void CLevel_Editor::ImGui_MainMenu()
 					_bool isSaved = false;
 
 					// 단순 경로를 받아오는 창을 띄우는 함수
-					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
-					isSaved = SaveExternalFile(FILETYPE::DATMODEL, &strSaveFilePath);
+					isLoaded	= LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+					isSaved		= SaveExternalFile(FILETYPE::DATMODEL, &strSaveFilePath);
 
 					// 경로를 잘 받아왔으면 변환 진행
 					if (isLoaded && isSaved)

@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	enum class MODELTYPE { NONANIM, ANIM };
+	enum class MODELTYPE { NONANIM, ANIM, UNDEFINED, END };
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
