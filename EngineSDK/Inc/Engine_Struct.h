@@ -48,6 +48,18 @@ namespace Engine
 		float		fTrackPosition;
 	}KEYFRAME;
 
+	typedef struct tagVertexCube
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vTexcoord;
+
+		static const unsigned int	iNumElements = { 2 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+	}VTXCUBE;
+
 	typedef struct tagVertexNormalTexcoord
 	{
 		XMFLOAT3		vPosition;
@@ -155,7 +167,7 @@ namespace Engine
 		unsigned int			iNumChildren;
 
 		unsigned int			iParentBoneIndex;      // 추가
-		XMFLOAT4X4				matOffset;       // 추가 (스키닝용)
+		//XMFLOAT4X4				matOffset;       // 스키닝용?
 	} BONE_DESC;
 
 	struct MeshFace { unsigned int iIndices[3]; };
@@ -169,8 +181,8 @@ namespace Engine
 		unsigned int			iNumFaces;
 		vector<MeshFace>		vecFaces;
 
-		vector<VTXMESH>			vecNonAnimVertices;
-		vector<VTXANIMMESH>		vecAnimVertices;
+		//vector<VTXMESH>			vecNonAnimVertices;
+		//vector<VTXANIMMESH>		vecAnimVertices;
 
 		unsigned int			iNumUsingBones;
 		vector<unsigned int>	vecUsingBonesIndices;
@@ -182,7 +194,7 @@ namespace Engine
 		unsigned int			iMaterialIndex;
 		unsigned int			iNumTextures;
 
-		vector<aiString> vecTexturePaths; // 실제 텍스처 경로 저장
+		vector<aiString>		vecTexturePaths; // 실제 텍스처 경로 저장
 	} MATERIAL_DESC;
 
 	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터

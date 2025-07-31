@@ -161,8 +161,13 @@ _bool CModel::Play_Animation(_float fTimeDelta)
 }
 
 HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
+
 {
+#pragma region Legacy
+
+
     // 데이터를 구조체에 담기..
+    /*
 
     const aiScene* pScene = m_pAIScene;
 
@@ -173,8 +178,8 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
     tModelDesc.iNumMeshes = pScene->mNumMeshes;
     tModelDesc.iNumMaterials = pScene->mNumMaterials;
-    tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM)? pScene->mNumAnimations : 0;
-    
+    tModelDesc.iNumAnimations = (m_eModelType == MODELTYPE::ANIM) ? pScene->mNumAnimations : 0;
+
 
     // 마테리얼..
     for (size_t i = 0; i < pScene->mNumMaterials; i++)
@@ -249,7 +254,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
             tAiAnimDesc.fDuration = aiAnim->mDuration;
             tAiAnimDesc.fTicksPerSecond = aiAnim->mTicksPerSecond;
             tAiAnimDesc.iNumChannels = aiAnim->mNumChannels;
-            
+
             // 애니메이션 내의 채널..
             for (size_t j = 0; j < tAiAnimDesc.iNumChannels; j++)
             {
@@ -285,7 +290,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
                         tKeyFrame.fTrackPosition = aiChan->mPositionKeys[k].mTime;
                     }
-                    
+
                     tAiChannelDesc.vecKeyFrame.push_back(tKeyFrame);
                 }
                 tAiAnimDesc.vecChannels.push_back(tAiChannelDesc);
@@ -295,15 +300,117 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
 
     }
 
+    */
+#pragma endregion
 
+    //  데이터를 저장하기.. 이렇게 저장하면 안됨. 벡터는 포인터가 저장되기 때문
+ofstream ofs(strSavePath->c_str(), ios::binary);
 
-    //  데이터를 저장하기.. 이렇게 저장하면 안됨.
-    ofstream ofs(strSavePath->c_str(), ios::binary);
+if (ofs.is_open())
+{
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.szModelName), sizeof(aiString));
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.eAnimtype), sizeof(MODELTYPE));
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.matPreTransformMatrix), sizeof(_float4x4));
 
-    if (ofs.is_open()) {
-        ofs.write(reinterpret_cast<char*>(&tModelDesc), sizeof(BINARY_MODEL_DESC));
-        ofs.close();
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.iNumBones), sizeof(_uint));
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.iNumMeshes), sizeof(_uint));
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.iNumMaterials), sizeof(_uint));
+    ofs.write(reinterpret_cast<const char*>(&m_BinModel.iNumAnimations), sizeof(_uint));
+
+    // Bone 저장
+    {
+        _uint boneCount = static_cast<_uint>(m_BinModel.vecBones.size());
+        ofs.write(reinterpret_cast<const char*>(&boneCount), sizeof(_uint));
+
+        for (const auto& bone : m_BinModel.vecBones)
+        {
+            ofs.write(reinterpret_cast<const char*>(&bone.szBoneName), sizeof(aiString));
+            ofs.write(reinterpret_cast<const char*>(&bone.matTransformation), sizeof(_float4x4));
+            ofs.write(reinterpret_cast<const char*>(&bone.iNumChildren), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&bone.iParentBoneIndex), sizeof(_uint));
+        }
     }
+
+    // Mesh 저장
+    {
+        _uint meshCount = static_cast<_uint>(m_BinModel.vecMeshes.size());
+        ofs.write(reinterpret_cast<const char*>(&meshCount), sizeof(_uint));
+
+        for (const auto& mesh : m_BinModel.vecMeshes)
+        {
+            ofs.write(reinterpret_cast<const char*>(&mesh.szMeshName), sizeof(aiString));
+            ofs.write(reinterpret_cast<const char*>(&mesh.iMaterialIndex), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&mesh.iNumVertices), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&mesh.iVertexStride), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&mesh.iNumIndices), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&mesh.iNumFaces), sizeof(_uint));
+
+            _uint faceCount = static_cast<_uint>(mesh.vecFaces.size());
+            ofs.write(reinterpret_cast<const char*>(&faceCount), sizeof(_uint));
+            if (faceCount > 0)
+                ofs.write(reinterpret_cast<const char*>(mesh.vecFaces.data()), sizeof(MeshFace) * faceCount);
+
+            _uint boneIdxCount = static_cast<_uint>(mesh.vecUsingBonesIndices.size());
+            ofs.write(reinterpret_cast<const char*>(&boneIdxCount), sizeof(_uint));
+            if (boneIdxCount > 0)
+                ofs.write(reinterpret_cast<const char*>(mesh.vecUsingBonesIndices.data()), sizeof(_uint) * boneIdxCount);
+        }
+    }
+
+    // Material 저장
+    {
+        _uint matCount = static_cast<_uint>(m_BinModel.vecMaterials.size());
+        ofs.write(reinterpret_cast<const char*>(&matCount), sizeof(_uint));
+
+        for (const auto& mat : m_BinModel.vecMaterials)
+        {
+            ofs.write(reinterpret_cast<const char*>(&mat.szMaterialName), sizeof(aiString));
+            ofs.write(reinterpret_cast<const char*>(&mat.iMaterialIndex), sizeof(_uint));
+            ofs.write(reinterpret_cast<const char*>(&mat.iNumTextures), sizeof(_uint));
+
+            _uint texCount = static_cast<_uint>(mat.vecTexturePaths.size());
+            ofs.write(reinterpret_cast<const char*>(&texCount), sizeof(_uint));
+            for (const auto& texPath : mat.vecTexturePaths)
+            {
+                ofs.write(reinterpret_cast<const char*>(&texPath), sizeof(aiString));
+            }
+        }
+    }
+
+    // Animation 저장
+    {
+        _uint animCount = static_cast<_uint>(m_BinModel.vecAiAnimations.size());
+        ofs.write(reinterpret_cast<const char*>(&animCount), sizeof(_uint));
+
+        for (const auto& anim : m_BinModel.vecAiAnimations)
+        {
+            ofs.write(reinterpret_cast<const char*>(&anim.szAnimName), sizeof(aiString));
+            ofs.write(reinterpret_cast<const char*>(&anim.fDuration), sizeof(float));
+            ofs.write(reinterpret_cast<const char*>(&anim.fTicksPerSecond), sizeof(float));
+            ofs.write(reinterpret_cast<const char*>(&anim.iNumChannels), sizeof(_uint));
+
+            _uint channelCount = static_cast<_uint>(anim.vecChannels.size());
+            ofs.write(reinterpret_cast<const char*>(&channelCount), sizeof(_uint));
+
+            for (const auto& channel : anim.vecChannels)
+            {
+                ofs.write(reinterpret_cast<const char*>(&channel.szChannelName), sizeof(aiString));
+                ofs.write(reinterpret_cast<const char*>(&channel.iBoneIndex), sizeof(_uint));
+                ofs.write(reinterpret_cast<const char*>(&channel.iNumPosKeys), sizeof(_uint));
+                ofs.write(reinterpret_cast<const char*>(&channel.iNumRotKeys), sizeof(_uint));
+                ofs.write(reinterpret_cast<const char*>(&channel.iNumScaKeys), sizeof(_uint));
+                ofs.write(reinterpret_cast<const char*>(&channel.iNumKeyFrames), sizeof(_uint));
+
+                _uint keyCount = static_cast<_uint>(channel.vecKeyFrame.size());
+                ofs.write(reinterpret_cast<const char*>(&keyCount), sizeof(_uint));
+                if (keyCount > 0)
+                    ofs.write(reinterpret_cast<const char*>(channel.vecKeyFrame.data()), sizeof(KEYFRAME) * keyCount);
+            }
+        }
+    }
+
+    ofs.close();
+}
 
 
     return S_OK;

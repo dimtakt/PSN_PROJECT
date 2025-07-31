@@ -121,6 +121,9 @@
     <Filter Include="01.Utility\02.GameObject\_ContainerObject\_PartObject">
       <UniqueIdentifier>{94a875bb-62fb-4bfe-a7ea-a1725cb27229}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Component\VIBuffer\Cube">
+      <UniqueIdentifier>{53772d56-5cee-467a-b6b8-2928c097589f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -230,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="..\private\PartObject.cpp">
       <Filter>01.Utility\02.GameObject\_ContainerObject\_PartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Cube.cpp">
+      <Filter>01.Utility\03.Component\VIBuffer\Cube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="..\public\PartObject.h">
       <Filter>01.Utility\02.GameObject\_ContainerObject\_PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Cube.h">
+      <Filter>01.Utility\03.Component\VIBuffer\Cube</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

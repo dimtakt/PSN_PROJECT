@@ -38,7 +38,7 @@ HRESULT CFont::Render_Font_Immediately(
 
     Render_Begin();
 
-    m_pFont->DrawString(m_pBatch, pText, vPosition, vColor, fRotation, vOrigin, fScale);
+    m_pFont->DrawString(m_pBatch, pText, vPosition, vColor, TO_DEG(fRotation), vOrigin, fScale);
 
     Render_End();
 
@@ -53,7 +53,7 @@ HRESULT CFont::Render_Font(
     const _float2& vOrigin,
     _float fScale)
 {
-    m_pFont->DrawString(m_pBatch, pText, vPosition, vColor, fRotation, vOrigin, fScale);
+    m_pFont->DrawString(m_pBatch, pText, vPosition, vColor, TO_DEG(fRotation), vOrigin, fScale);
 
     return S_OK;
 }

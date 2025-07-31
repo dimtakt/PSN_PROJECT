@@ -97,6 +97,9 @@
     <Filter Include="02.GameObject\UI\BackGround">
       <UniqueIdentifier>{dd1b4364-796d-40a5-aad0-a826b661a0f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Skybox">
+      <UniqueIdentifier>{9987aa43-9f3f-4257-94b2-6c3973a945bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -201,6 +204,9 @@
     <ClInclude Include="..\public\Weapon.h">
       <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Skybox.h">
+      <Filter>02.GameObject\Skybox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -303,6 +309,9 @@
     <ClCompile Include="..\private\Weapon.cpp">
       <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Skybox.cpp">
+      <Filter>02.GameObject\Skybox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
@@ -317,5 +326,13 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\..\SR_REF11\Client\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\SR_REF11\Client\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
+      <Filter>97.ShaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

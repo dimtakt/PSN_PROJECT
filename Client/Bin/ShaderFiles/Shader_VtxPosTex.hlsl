@@ -1,4 +1,4 @@
-
+#include "Engine_Shader_Defines.hlsli"
 
 
 /* 
@@ -23,13 +23,6 @@ D3D11_INPUT_ELEMENT_DESC Elements[] =
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_Texture;
 
-
-
-sampler DefaultSampler = sampler_state 
-{     
-    filter = min_mag_mip_linear;
-    
-};
 
 struct VS_IN
 {
@@ -105,6 +98,11 @@ technique11 DefaultTechnique
     /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
     pass DefaultPass
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();   
         PixelShader = compile ps_5_0 PS_MAIN();
     }
