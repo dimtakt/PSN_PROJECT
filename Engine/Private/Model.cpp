@@ -303,7 +303,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
     */
 #pragma endregion
 
-    //  데이터를 저장하기.. 이렇게 저장하면 안됨. 벡터는 포인터가 저장되기 때문
+
 ofstream ofs(strSavePath->c_str(), ios::binary);
 
 if (ofs.is_open())
@@ -412,7 +412,6 @@ if (ofs.is_open())
     ofs.close();
 }
 
-
     return S_OK;
 }
 
@@ -464,22 +463,22 @@ HRESULT CModel::Ready_Meshes()
         {
             MESH_DESC tMeshDesc = {};
 
-            aiMesh tAiMesh = *m_pAIScene->mMeshes[i];
+            aiMesh* tAiMesh = m_pAIScene->mMeshes[i];
 
-            tMeshDesc.szMeshName = tAiMesh.mName;
-            tMeshDesc.iMaterialIndex =  tAiMesh.mMaterialIndex;
-            tMeshDesc.iNumVertices =  tAiMesh.mNumVertices;
+            tMeshDesc.szMeshName = tAiMesh->mName;
+            tMeshDesc.iMaterialIndex =  tAiMesh->mMaterialIndex;
+            tMeshDesc.iNumVertices =  tAiMesh->mNumVertices;
             tMeshDesc.iVertexStride = (m_eModelType == MODELTYPE::NONANIM)? sizeof(VTXMESH) : sizeof(VTXANIMMESH);
-            tMeshDesc.iNumIndices =  tAiMesh.mNumFaces * 3; // face 1개 당 인덱스 정점은 3개.
+            tMeshDesc.iNumIndices =  tAiMesh->mNumFaces * 3; // face 1개 당 인덱스 정점은 3개.
 
-            tMeshDesc.iNumFaces = tAiMesh.mNumFaces;
+            tMeshDesc.iNumFaces = tAiMesh->mNumFaces;
             // Mesh / Faces
-            for (size_t j = 0; j < tAiMesh.mNumFaces; j++)
+            for (size_t j = 0; j < tAiMesh->mNumFaces; j++)
             {
                 MeshFace tFace = {
-                    tAiMesh.mFaces[j].mIndices[0],
-                    tAiMesh.mFaces[j].mIndices[1],
-                    tAiMesh.mFaces[j].mIndices[2]                
+                    tAiMesh->mFaces[j].mIndices[0],
+                    tAiMesh->mFaces[j].mIndices[1],
+                    tAiMesh->mFaces[j].mIndices[2]                
                 };
 
                 tMeshDesc.vecFaces.push_back(tFace);
@@ -489,15 +488,15 @@ HRESULT CModel::Ready_Meshes()
             //tMeshDesc.vecNonAnimVertices;
             //tMeshDesc.vecAnimVertices;
 
-            tMeshDesc.iNumUsingBones = tAiMesh.mNumBones;
+            tMeshDesc.iNumUsingBones = tAiMesh->mNumBones;
             // Mesh / UsingBones
-            for (size_t j = 0; j < tAiMesh.mNumBones; j++)          // compare bone (bone in mesh)
+            for (size_t j = 0; j < tAiMesh->mNumBones; j++)          // compare bone (bone in mesh)
             {
                 // Mesh / UsingBones / Bones Name Compare Loop
                 for (size_t k = 0; k < m_BinModel.iNumBones; k++)   // origin bone (bone in origin binmodel)
                 {
                     // 원본 본과 메쉬가 사용중인 본을 비교 후, 이름 일치 시 해당 원본 본의 인덱스를 컨테이너에 추가.
-                    aiString szBoneCompare = tAiMesh.mBones[j]->mName;
+                    aiString szBoneCompare = tAiMesh->mBones[j]->mName;
                     aiString szBoneOrigin = m_BinModel.vecBones[k].szBoneName;
 
                     if (szBoneOrigin == szBoneCompare)
@@ -507,10 +506,6 @@ HRESULT CModel::Ready_Meshes()
                     }
                 }
             }
-
-
-
-
 
             m_BinModel.vecMeshes.push_back(tMeshDesc);
         }
@@ -555,22 +550,22 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
         for (size_t i = 0; i < m_pAIScene->mNumMaterials; i++)
         {
             MATERIAL_DESC tMatDesc = {};
-            aiMaterial tAiMat = *m_pAIScene->mMaterials[i];
+            aiMaterial* tAiMat = m_pAIScene->mMaterials[i];
             
-            tMatDesc.szMaterialName = tAiMat.GetName();
+            tMatDesc.szMaterialName = tAiMat->GetName();
             tMatDesc.iMaterialIndex = static_cast<_uint>(i);
 
             _uint iTextureCount = 0;
             // Material / Textures..
             for (int texType = aiTextureType_NONE + 1; texType <= AI_TEXTURE_TYPE_MAX; ++texType)
             {
-                const _uint numTex = tAiMat.GetTextureCount((aiTextureType)texType);
+                const _uint numTex = tAiMat->GetTextureCount((aiTextureType)texType);
                 iTextureCount += numTex;
 
                 for (_uint j = 0; j < numTex; ++j)
                 {
                     aiString path;
-                    if (AI_SUCCESS == tAiMat.GetTexture((aiTextureType)texType, j, &path))
+                    if (AI_SUCCESS == tAiMat->GetTexture((aiTextureType)texType, j, &path))
                         tMatDesc.vecTexturePaths.push_back(path);
                 }
             }
@@ -794,8 +789,8 @@ void CModel::Free()
 
     m_Materials.clear();
 
-
-    m_Importer.FreeScene();
+    if (m_pAIScene)
+        m_Importer.FreeScene();
 
 
 
