@@ -114,10 +114,10 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
         
         Import_FromBinary(pModelFilePath, PreTransformMatrix);
 
-        if (FAILED(Ready_Bones(nullptr, 0)))
+        if (FAILED(Ready_Bones(nullptr, 0)))            // done..
             return E_FAIL;
 
-        if (FAILED(Ready_Meshes()))
+        if (FAILED(Ready_Meshes()))                     // do..
             return E_FAIL;
 
         if (FAILED(Ready_Materials(pModelFilePath)))
@@ -499,8 +499,92 @@ HRESULT CModel::Ready_Meshes()
 
                 tMeshDesc.vecFaces.push_back(tFace);
             }
-            
-            
+            // Mesh / Vertices
+            if (m_eModelType == MODELTYPE::NONANIM)
+            {
+                VTXMESH* pVertices = new VTXMESH[tAiMesh->mNumVertices];
+                
+                for (size_t j = 0; j < tAiMesh->mNumVertices; j++)
+                {
+                    // 원래 PreTransformMatrix 반영해서 옮겨줘야 하나, 이는 불러올 때 진행.
+                    // 저장은 우선 원본값 그대로 저장
+                    memcpy(&pVertices[j].vPosition,          &tAiMesh->mVertices[j], sizeof(_float3));
+                    memcpy(&pVertices[j].vNormal,            &tAiMesh->mNormals[j], sizeof(_float3));
+
+                    memcpy(&pVertices[j].vTangent,           &tAiMesh->mTangents[j], sizeof(_float3));
+                    memcpy(&pVertices[j].vBinormal,          &tAiMesh->mBitangents[j], sizeof(_float3));
+                    memcpy(&pVertices[j].vTexcoord,          &tAiMesh->mTextureCoords[0][j], sizeof(_float3));
+
+                    tMeshDesc.vecNonAnimVertices.push_back(pVertices[j]);
+                }
+                Safe_Delete_Array(pVertices);
+            }
+            else if (m_eModelType == MODELTYPE::ANIM)
+            {
+                VTXANIMMESH* pAnimVertices = new VTXANIMMESH[tAiMesh->mNumVertices];
+                
+                for (size_t j = 0; j < tAiMesh->mNumVertices; j++)
+                {
+                    // 원래 PreTransformMatrix 반영해서 옮겨줘야 하나, 이는 불러올 때 진행.
+                    // 저장은 우선 원본값 그대로 저장
+                    memcpy(&pAnimVertices[j].vPosition,      &tAiMesh->mVertices[j], sizeof(_float3)); 
+                    memcpy(&pAnimVertices[j].vNormal,        &tAiMesh->mNormals[j], sizeof(_float3)); 
+
+                    memcpy(&pAnimVertices[j].vTangent,       &tAiMesh->mTangents[j], sizeof(_float3));
+                    memcpy(&pAnimVertices[j].vBinormal,      &tAiMesh->mBitangents[j], sizeof(_float3));
+                    memcpy(&pAnimVertices[j].vTexcoord,      &tAiMesh->mTextureCoords[0][j], sizeof(_float3));
+                }
+                // Mesh 에 영향주는 뻐를 순회하여 찾은 뒤
+                // 해당 뻐가 영향을 주는 버텍스 인덱스릐 vBlendIndex, vBlendWeight 를 할당
+                // ksta : 좌표 문제 발생 시 OffsetMatrix 주는 것 한번 확인해보기 (지금은 저장 시 안줌) 
+
+
+                for (_uint j = 0; j < tAiMesh->mNumBones; j++)
+                {
+                    aiBone* pAIBone = tAiMesh->mBones[j];
+                    _uint iBoneIndex = 0;
+
+                    auto iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)->_bool
+                        {
+                            if (pBone->Compare_Name(pAIBone->mName.data))
+                                return true;
+                            iBoneIndex++;
+                            return false;
+                        });
+                
+                    for (size_t k = 0; k < pAIBone->mNumWeights; k++)
+                    {
+                        aiVertexWeight	AIVertexWeight = pAIBone->mWeights[k];
+
+                        /* j번째 뼈가 영향을 주는 k번째 정점의 정점버퍼상의 인덱스 */
+                        if      (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.x)
+                        {
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.x = j;
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.x = AIVertexWeight.mWeight;
+                        }
+                        else if (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.y)
+                        {
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.y = j;
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.y = AIVertexWeight.mWeight;
+                        }
+                        else if (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.z)
+                        {
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.z = j;
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.z = AIVertexWeight.mWeight;
+                        }
+                        else
+                        {
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.w = j;
+                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.w = AIVertexWeight.mWeight;
+                        }
+                    }
+
+                    tMeshDesc.vecAnimVertices.push_back(pAnimVertices[j]);
+                }
+                Safe_Delete_Array(pAnimVertices);
+            }
+
+
             //tMeshDesc.vecNonAnimVertices;
             //tMeshDesc.vecAnimVertices;
 
@@ -531,6 +615,19 @@ HRESULT CModel::Ready_Meshes()
     else if (m_eFileType == FILETYPE::DATMODEL)
     {
         // ksta : binary
+        m_iNumMeshes = m_BinModel.iNumMeshes;
+
+        for (size_t i = 0; i < m_iNumMeshes; i++)
+        {
+            MESH_DESC tMeshDesc = m_BinModel.vecMeshes[i];
+
+            CMesh* pMesh = CMesh::Create_Binary(m_pDevice, m_pContext, m_eModelType, tMeshDesc, m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+            if (nullptr == pMesh)
+                return E_FAIL;
+
+            m_Meshes.push_back(pMesh);
+        }
+        
     }
 
 
@@ -645,11 +742,11 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
         for (size_t i = 0; i < m_BinModel.iNumBones; i++)
         {
             BONE_DESC tBoneDesc = m_BinModel.vecBones[i];
-            // 로드..?
             
             CBone* pBone = CBone::Create_Binary(tBoneDesc);
             if (nullptr == pBone)
                 return E_FAIL;
+
             m_Bones.push_back(pBone);           // 여기서 1개 추가했으니까,
         }
     }

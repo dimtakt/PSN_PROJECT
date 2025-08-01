@@ -16,6 +16,7 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	// ==============================
 
 	strcpy_s(m_szName, pAINode->mName.data);
+
 	memcpy(&m_TransformationMatrix, &pAINode->mTransformation, sizeof(_float4x4));
 
 	XMStoreFloat4x4(&m_TransformationMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformationMatrix)));
@@ -33,7 +34,8 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	m_BinBone.matTransformation /*= m_BinBone.matTransformation*/;
 	memcpy(&m_BinBone.matTransformation, &pAINode->mTransformation, sizeof(_float4x4));
 	XMStoreFloat4x4(&m_BinBone.matTransformation, XMMatrixTranspose(XMLoadFloat4x4(&m_BinBone.matTransformation)));
-	m_BinBone.iNumChildren = pAINode->mNumChildren;
+
+	m_BinBone.iNumChildren = pAINode->mNumChildren; // maybe useless?
 	m_BinBone.iParentBoneIndex = iParentBoneIndex;
 
 
@@ -45,11 +47,15 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 HRESULT CBone::Initialize_Binary(BONE_DESC tBoneDesc)
 {
 	m_BinBone = tBoneDesc;
-
+	
 	// 상세한 정보들 fbx 로드때와 같게 로컬에 대입 필요.
 
-
-
+	strcpy_s(m_szName, m_BinBone.szBoneName.data);
+	memcpy(&m_TransformationMatrix, &m_BinBone.matTransformation, sizeof(_float4x4));
+	
+	// 이미 전치 적용된 행렬이므로 전치 변환 필요 X
+	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
+	m_iParentBoneIndex = m_BinBone.iParentBoneIndex;
 }
 
 void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones)

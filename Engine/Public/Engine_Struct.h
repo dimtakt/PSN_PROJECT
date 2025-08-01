@@ -180,9 +180,10 @@ namespace Engine
 		unsigned int			iNumIndices;
 		unsigned int			iNumFaces;
 		vector<MeshFace>		vecFaces;
-
-		//vector<VTXMESH>			vecNonAnimVertices;
-		//vector<VTXANIMMESH>		vecAnimVertices;
+		
+		// size follows "iNumVertices" 
+		vector<VTXMESH>			vecNonAnimVertices;
+		vector<VTXANIMMESH>		vecAnimVertices;
 
 		unsigned int			iNumUsingBones;
 		vector<unsigned int>	vecUsingBonesIndices;
