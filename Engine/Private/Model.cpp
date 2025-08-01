@@ -117,10 +117,10 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
         if (FAILED(Ready_Bones(nullptr, 0)))            // done..
             return E_FAIL;
 
-        if (FAILED(Ready_Meshes()))                     // do..
+        if (FAILED(Ready_Meshes()))                     // done..
             return E_FAIL;
 
-        if (FAILED(Ready_Materials(pModelFilePath)))
+        if (FAILED(Ready_Materials(pModelFilePath)))    // do..
             return E_FAIL;
 
         if (FAILED(Ready_Animations()))
@@ -513,7 +513,7 @@ HRESULT CModel::Ready_Meshes()
 
                     memcpy(&pVertices[j].vTangent,           &tAiMesh->mTangents[j], sizeof(_float3));
                     memcpy(&pVertices[j].vBinormal,          &tAiMesh->mBitangents[j], sizeof(_float3));
-                    memcpy(&pVertices[j].vTexcoord,          &tAiMesh->mTextureCoords[0][j], sizeof(_float3));
+                    memcpy(&pVertices[j].vTexcoord,          &tAiMesh->mTextureCoords[0][j], sizeof(_float2));
 
                     tMeshDesc.vecNonAnimVertices.push_back(pVertices[j]);
                 }
@@ -532,12 +532,13 @@ HRESULT CModel::Ready_Meshes()
 
                     memcpy(&pAnimVertices[j].vTangent,       &tAiMesh->mTangents[j], sizeof(_float3));
                     memcpy(&pAnimVertices[j].vBinormal,      &tAiMesh->mBitangents[j], sizeof(_float3));
-                    memcpy(&pAnimVertices[j].vTexcoord,      &tAiMesh->mTextureCoords[0][j], sizeof(_float3));
+                    memcpy(&pAnimVertices[j].vTexcoord,      &tAiMesh->mTextureCoords[0][j], sizeof(_float2));
                 }
+
+
                 // Mesh 에 영향주는 뻐를 순회하여 찾은 뒤
                 // 해당 뻐가 영향을 주는 버텍스 인덱스릐 vBlendIndex, vBlendWeight 를 할당
                 // ksta : 좌표 문제 발생 시 OffsetMatrix 주는 것 한번 확인해보기 (지금은 저장 시 안줌) 
-
 
                 for (_uint j = 0; j < tAiMesh->mNumBones; j++)
                 {
