@@ -114,7 +114,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
         
         Import_FromBinary(pModelFilePath, PreTransformMatrix);
 
-        if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+        if (FAILED(Ready_Bones(nullptr, 0)))
             return E_FAIL;
 
         if (FAILED(Ready_Meshes()))
@@ -638,6 +638,20 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
     {
         // ksta : binary
 
+        // ==============================
+        // || load binary
+        // ==============================
+
+        for (size_t i = 0; i < m_BinModel.iNumBones; i++)
+        {
+            BONE_DESC tBoneDesc = m_BinModel.vecBones[i];
+            // 로드..?
+            
+            CBone* pBone = CBone::Create_Binary(tBoneDesc);
+            if (nullptr == pBone)
+                return E_FAIL;
+            m_Bones.push_back(pBone);           // 여기서 1개 추가했으니까,
+        }
     }
 
  
@@ -649,8 +663,7 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
     }
     else if (m_eFileType == FILETYPE::DATMODEL)
     {
-        // ksta : binary
-
+        m_BinModel.iNumBones = m_Bones.size();
     }
 
 

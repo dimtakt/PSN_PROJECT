@@ -58,6 +58,8 @@ private:
 
 public:
 	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
+	static CBone* Create_Binary(BONE_DESC tBoneDesc);
+
 	CBone* Clone();
 	virtual void Free() override;
 };

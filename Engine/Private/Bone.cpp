@@ -42,6 +42,16 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 	return S_OK;
 }
 
+HRESULT CBone::Initialize_Binary(BONE_DESC tBoneDesc)
+{
+	m_BinBone = tBoneDesc;
+
+	// 상세한 정보들 fbx 로드때와 같게 로컬에 대입 필요.
+
+
+
+}
+
 void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones)
 {
 	if (-1 == m_iParentBoneIndex)
@@ -67,6 +77,20 @@ CBone* CBone::Create(const aiNode* pAINode, _int iParentBoneIndex)
 
 	return pInstance;
 }
+
+CBone* CBone::Create_Binary(BONE_DESC tBoneDesc)
+{
+	CBone* pInstance = new CBone();
+
+	if (FAILED(pInstance->Initialize_Binary(tBoneDesc)))
+	{
+		MSG_BOX(TEXT("Failed to Created : CBone with Binary"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
 
 CBone* CBone::Clone()
 {
