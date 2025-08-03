@@ -123,7 +123,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
         if (FAILED(Ready_Materials(pModelFilePath)))    // do..
             return E_FAIL;
 
-        if (FAILED(Ready_Animations()))
+        if (FAILED(Ready_Animations()))                 // do..
             return E_FAIL;
 
     }
@@ -677,7 +677,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 
             _uint iTextureCount = 0;
             // Material / Textures..
-            for (int texType = aiTextureType_NONE + 1; texType <= AI_TEXTURE_TYPE_MAX; ++texType)
+            for (_uint texType = aiTextureType_NONE + 1; texType <= AI_TEXTURE_TYPE_MAX; ++texType)
             {
                 const _uint numTex = tAiMat->GetTextureCount((aiTextureType)texType);
                 iTextureCount += numTex;
@@ -686,7 +686,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
                 {
                     aiString path;
                     if (AI_SUCCESS == tAiMat->GetTexture((aiTextureType)texType, j, &path))
-                        tMatDesc.vecTexturePaths.push_back(path);
+                        tMatDesc.vecTexturePaths.emplace_back(texType, path);   // pair 만들면서 push_back
                 }
             }
 
@@ -699,6 +699,17 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
     else if (m_eFileType == FILETYPE::DATMODEL)
     {
         // ksta : binary
+        m_iNumMaterials = m_BinModel.iNumMaterials;
+
+        for (size_t i = 0; i < m_iNumMaterials; i++)
+        {
+            MATERIAL_DESC tMatDesc = m_BinModel.vecMaterials[i];
+            CMeshMaterial* pMat = CMeshMaterial::Create_Binary(m_pDevice, m_pContext, pModelFilePath, tMatDesc); // ksta : 8/3 여기 채워야함
+            if (nullptr == pMat)
+                return E_FAIL;
+
+            m_Materials.push_back(pMat);
+        }
     }
 
 
@@ -864,6 +875,17 @@ HRESULT CModel::Ready_Animations()
     else if (m_eFileType == FILETYPE::DATMODEL)
     {
         // ksta : binary
+        m_iNumAnimations = m_BinModel.iNumAnimations;
+
+        for (size_t i = 0; i < m_iNumAnimations; i++)
+        {
+            AIANIM_DESC tAnimDesc = m_BinModel.vecAiAnimations[i];
+            CAnimation* pAnim = CAnimation::Create_Binary(tAnimDesc, m_Bones);
+            if (nullptr == pAnim)
+                return E_FAIL;
+
+            m_Animations.push_back(pAnim);
+        }
     }
 
 

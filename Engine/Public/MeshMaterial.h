@@ -12,6 +12,7 @@ private:
 
 public:
 	HRESULT Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial);
+	HRESULT Initialize_Binary(const _char* pModelFilePath, const MATERIAL_DESC tMatDesc);
 	HRESULT Bind_Resources(class CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iIndex);
 
 private:
@@ -21,6 +22,7 @@ private:
 
 public:
 	static CMeshMaterial* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial);
+	static CMeshMaterial* Create_Binary(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const MATERIAL_DESC tMatDesc);
 	virtual void Free() override;
 };
 

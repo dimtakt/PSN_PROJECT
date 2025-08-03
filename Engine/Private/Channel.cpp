@@ -61,6 +61,16 @@ HRESULT CChannel::Initialize(const aiNodeAnim* pAIChannel, const vector<class CB
     return S_OK;
 }
 
+HRESULT CChannel::Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones)
+{
+    m_iBoneIndex = tChanDesc.iBoneIndex;
+
+    m_iNumKeyFrames = tChanDesc.vecKeyFrame.size();
+    m_KeyFrames = tChanDesc.vecKeyFrame;
+
+    return S_OK;
+}
+
 void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex)
 {
     if (fCurrentTrackPosition == 0.f)
@@ -119,6 +129,19 @@ CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<class CBon
     if (FAILED(pInstance->Initialize(pAIChannel, Bones)))
     {
         MSG_BOX(TEXT("Failed to Created : CChannel"));
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CChannel* CChannel::Create_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones)
+{
+    CChannel* pInstance = new CChannel();
+
+    if (FAILED(pInstance->Initialize_Binary(tChanDesc, Bones)))
+    {
+        MSG_BOX(TEXT("Failed to Created : CChannel with Binary"));
         Safe_Release(pInstance);
     }
 

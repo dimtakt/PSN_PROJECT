@@ -14,18 +14,19 @@ private:
 
 public:
 	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
+	HRESULT Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones);
 	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
 private:
 	_char							m_szName[MAX_PATH] = { };
 
 	_uint							m_iBoneIndex = {};
 
-
 	_uint							m_iNumKeyFrames = {};
 	vector<KEYFRAME>				m_KeyFrames;
 
 public:
 	static CChannel* Create(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
+	static CChannel* Create_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones);
 	virtual void Free() override;
 };
 

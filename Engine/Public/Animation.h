@@ -15,11 +15,13 @@ private:
 
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
+	HRESULT Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones);
 	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
 
 private:
 
 	/* 애니메이션의 전체 재생 길이 */
+	_wstring					m_strAnimName = {};
 	_float						m_fDuration = {};
 
 	/* 초당 이동해야할 거리 : 재생속도 */
@@ -35,6 +37,7 @@ private:
 
 public:
 	static CAnimation* Create(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
+	static CAnimation* Create_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones);
 	CAnimation* Clone();
 	virtual void Free() override;
 };

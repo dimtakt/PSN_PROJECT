@@ -195,7 +195,9 @@ namespace Engine
 		unsigned int			iMaterialIndex;
 		unsigned int			iNumTextures;
 
-		vector<aiString>		vecTexturePaths; // 실제 텍스처 경로 저장
+		vector<pair<aiTextureType, aiString>>	
+								vecTexturePaths; // 실제 텍스처 경로 및 유형의 저장
+
 	} MATERIAL_DESC;
 
 	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터
