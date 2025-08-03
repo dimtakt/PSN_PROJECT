@@ -396,7 +396,7 @@ void CLevel_Editor::ImGui_MainMenu()
 					if (isLoaded)
 					{
 						// 받아온 경로 문자열을 이용하여 바이너리 모델 로드 진행.
-						// 경로를 char로 변환, 확장자 추출, 확장자는 데이터 추출 후 가져옴.
+						// 경로를 char로 변환, 확장자 추출, 확장자는 데/  이터 추출 후 가져옴.
 						// 파일명을 프로토타입의 suffix 로써 사용하여 프로토타입의 중복을 방지..
 						_char		szLoadPath[256] = {};
 						WideCharToMultiByte(CP_ACP, 0, (strLoadFilePath).c_str(), -1, szLoadPath, 256, nullptr, nullptr);

@@ -167,7 +167,7 @@ namespace Engine
 		unsigned int			iNumChildren;
 
 		unsigned int			iParentBoneIndex;      // Ãß°¡
-		//XMFLOAT4X4				matOffset;       // ½ºÅ°´×¿ë?
+		XMFLOAT4X4				matOffset;			// ½ºÅ°´×¿ë?
 	} BONE_DESC;
 
 	struct MeshFace { unsigned int iIndices[3]; };

@@ -604,6 +604,12 @@ HRESULT CModel::Ready_Meshes()
                     {
                         _uint iUsingBoneIndex = static_cast<_uint>(j);
                         tMeshDesc.vecUsingBonesIndices.push_back(iUsingBoneIndex);
+                        
+                        _float4x4	matOffset;
+                        aiBone* pAIBone = tAiMesh->mBones[i];
+                        memcpy(&matOffset, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+
+                        m_BinModel.vecBones[iUsingBoneIndex].matOffset = matOffset;
                     }
                 }
             }
@@ -622,7 +628,7 @@ HRESULT CModel::Ready_Meshes()
         {
             MESH_DESC tMeshDesc = m_BinModel.vecMeshes[i];
 
-            CMesh* pMesh = CMesh::Create_Binary(m_pDevice, m_pContext, m_eModelType, tMeshDesc, m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+            CMesh* pMesh = CMesh::Create_Binary(m_pDevice, m_pContext, m_eModelType, tMeshDesc, &m_BinModel.vecBones, XMLoadFloat4x4(&m_PreTransformMatrix));
             if (nullptr == pMesh)
                 return E_FAIL;
 

@@ -2,6 +2,8 @@
 #include "Bone.h"
 #include "Shader.h"
 
+#include "Engine_Struct.h"
+
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer { pDevice, pContext }
 {
@@ -72,7 +74,7 @@ HRESULT CMesh::Initialize_Prototype(MODELTYPE eType, const aiMesh* pAIMesh, cons
 	return S_OK;
 }
 
-HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, const MESH_DESC tMeshDesc, const vector<class CBone*> Bones, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, const MESH_DESC tMeshDesc, const vector<BONE_DESC>* vecBones, _fmatrix PreTransformMatrix)
 {
 	m_iMaterialIndex = tMeshDesc.iMaterialIndex;
 	m_iNumVertices = tMeshDesc.iNumVertices;
@@ -85,7 +87,7 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, const MESH_DESC tMes
 
 	HRESULT			hr = MODELTYPE::NONANIM == eType ?
 		Ready_Vertices_For_NonAnim_Binary(tMeshDesc, PreTransformMatrix) :
-		Ready_Vertices_For_Anim_Binary(tMeshDesc, Bones);
+		Ready_Vertices_For_Anim_Binary(tMeshDesc, vecBones);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -331,16 +333,16 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(const MESH_DESC tMeshDesc, _fma
 
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
-		memcpy(&pVertices[i].vPosition,		&tMeshDesc.vecNonAnimVertices[i].vPosition, sizeof(_float3));
+		memcpy(&pVertices[i].vPosition, &tMeshDesc.vecNonAnimVertices[i].vPosition, sizeof(_float3));
 		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
 
-		memcpy(&pVertices[i].vNormal,		&tMeshDesc.vecNonAnimVertices[i].vNormal, sizeof(_float3));
+		memcpy(&pVertices[i].vNormal, &tMeshDesc.vecNonAnimVertices[i].vNormal, sizeof(_float3));
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
 
-		memcpy(&pVertices[i].vTangent,		&tMeshDesc.vecNonAnimVertices[i].vTangent, sizeof(_float3));
-		memcpy(&pVertices[i].vBinormal,		&tMeshDesc.vecNonAnimVertices[i].vBinormal, sizeof(_float3));
+		memcpy(&pVertices[i].vTangent, &tMeshDesc.vecNonAnimVertices[i].vTangent, sizeof(_float3));
+		memcpy(&pVertices[i].vBinormal, &tMeshDesc.vecNonAnimVertices[i].vBinormal, sizeof(_float3));
 
-		memcpy(&pVertices[i].vTexcoord,		&tMeshDesc.vecNonAnimVertices[i].vTexcoord, sizeof(_float2));
+		memcpy(&pVertices[i].vTexcoord, &tMeshDesc.vecNonAnimVertices[i].vTexcoord, sizeof(_float2));
 	}
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
@@ -360,8 +362,23 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(const MESH_DESC tMeshDesc, _fma
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const vector<CBone*>& Bones)
+HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const vector<BONE_DESC>* vecBones)
 {
+
+	// ksta : 8/1 14:38 작업중이었음. 원본 저장작업 우선 진행한 뒤 마저 진행하기
+
+	/*
+
+	어디까지 작업하던 중이었나?
+
+	BinModel 에 Mesh Vertex 정보들 누락된 것 담는 것 완료
+	해당 정보를 export 할 때 같이 빠지는 것 미완료
+	import 할 때 Mesh.cpp 부분 Ready_Vertices_For_NonAnim_Binary 부분 진행하던 중이었음
+	이후 유사 함수 애니메이션일 떄에 진행되도록 작업 및 나머지 import 작업 필요
+
+	*/
+
+
 	m_iVertexStride = sizeof(VTXANIMMESH);
 
 	D3D11_BUFFER_DESC		VBDesc{};
@@ -373,12 +390,12 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 	VBDesc.StructureByteStride = m_iVertexStride;
 
 	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
 		memcpy(&pVertices[i].vPosition, &tMeshDesc.vecAnimVertices[i].vPosition, sizeof(_float3));
 		memcpy(&pVertices[i].vNormal, &tMeshDesc.vecAnimVertices[i].vNormal, sizeof(_float3));
-
 		memcpy(&pVertices[i].vTangent, &tMeshDesc.vecAnimVertices[i].vTangent, sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &tMeshDesc.vecAnimVertices[i].vBinormal, sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &tMeshDesc.vecAnimVertices[i].vTexcoord, sizeof(_float2));
@@ -389,28 +406,13 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 
 	m_iNumBones = tMeshDesc.iNumUsingBones;
 
-	if (0 == m_iNumBones)
+	for (_uint i = 0; i < m_iNumBones; i++)
 	{
-		m_iNumBones = 1;
-
-		_uint	iBoneIndex = { 0 };
-
-		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
-			{
-				if (true == pBone->Compare_Name(m_szName))
-					return true;
-
-				iBoneIndex++;
-
-				return false;
-			});
+		_uint iBoneIndex = tMeshDesc.vecUsingBonesIndices[i];
+		const BONE_DESC tBone = (*vecBones)[iBoneIndex];
 
 		m_BoneIndices.push_back(iBoneIndex);
-
-		_float4x4		OffsetMatrix;
-		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
-
-		m_OffsetMatrices.push_back(OffsetMatrix);
+		m_OffsetMatrices.push_back(tBone.matOffset);
 	}
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
@@ -444,11 +446,11 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL
 	return pInstance;
 }
 
-CMesh* CMesh::Create_Binary(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eType, const MESH_DESC tMeshDesc, const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix)
+CMesh* CMesh::Create_Binary(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eType, const MESH_DESC tMeshDesc, const vector<BONE_DESC>* vecBones, _fmatrix PreTransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, tMeshDesc, Bones, PreTransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, tMeshDesc, vecBones, PreTransformMatrix)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CMesh with Binary"));
 		Safe_Release(pInstance);
