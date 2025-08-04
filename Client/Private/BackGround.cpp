@@ -64,11 +64,13 @@ HRESULT CBackGround::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
+    // 이걸로 텍스쳐 삽입. 이를 크로스헤어 출력 시에 사용하면 될 듯
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
     m_pShaderCom->Begin(0);    
 
+    // 셰이더에 삽입된 텍스쳐를 이용 바인딩
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();

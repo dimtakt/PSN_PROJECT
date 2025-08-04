@@ -91,10 +91,10 @@ private:
 
 
 
-	_bool isObject_Selected = false;		// 선택된 오브젝트가 존재할 때 True.
-	CGameObject* pSelectedObject = {};		// 현재 선택된 오브젝트. 임시 포인터 변수
-	CGameObject* pPrevSelectedObject = {};	// 이전 선택된 오브젝트. 임시 포인터 변수
-	_bool m_isNotUsingUI = false;			// UI창이 사용중이 아닐 때 True.
+	_bool isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
+	CGameObject* m_pSelectedObject = {};		// 현재 선택된 오브젝트. 임시 포인터 변수
+	CGameObject* m_pPrevSelectedObject = {};	// 이전 선택된 오브젝트. 임시 포인터 변수
+	_bool m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
 
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

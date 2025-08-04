@@ -204,6 +204,7 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
                 ofs.write(reinterpret_cast<const char*>(&bone.matTransformation), sizeof(_float4x4));
                 ofs.write(reinterpret_cast<const char*>(&bone.iNumChildren), sizeof(_uint));
                 ofs.write(reinterpret_cast<const char*>(&bone.iParentBoneIndex), sizeof(_uint));
+                ofs.write(reinterpret_cast<const char*>(&bone.matOffset), sizeof(_float4x4));
             }
         }
 
@@ -230,6 +231,20 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
                 ofs.write(reinterpret_cast<const char*>(&boneIdxCount), sizeof(_uint));
                 if (boneIdxCount > 0)
                     ofs.write(reinterpret_cast<const char*>(mesh.vecUsingBonesIndices.data()), sizeof(_uint) * boneIdxCount);
+
+
+                // vecNonAnimVertices 저장
+                _uint nonAnimCount = static_cast<_uint>(mesh.vecNonAnimVertices.size());
+                ofs.write(reinterpret_cast<const char*>(&nonAnimCount), sizeof(_uint));
+                if (nonAnimCount > 0)
+                    ofs.write(reinterpret_cast<const char*>(mesh.vecNonAnimVertices.data()), sizeof(VTXMESH) * nonAnimCount);
+
+                // vecAnimVertices 저장
+                _uint animCount = static_cast<_uint>(mesh.vecAnimVertices.size());
+                ofs.write(reinterpret_cast<const char*>(&animCount), sizeof(_uint));
+                if (animCount > 0)
+                    ofs.write(reinterpret_cast<const char*>(mesh.vecAnimVertices.data()), sizeof(VTXANIMMESH) * animCount);
+
             }
         }
 
@@ -248,7 +263,8 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
                 ofs.write(reinterpret_cast<const char*>(&texCount), sizeof(_uint));
                 for (const auto& texPath : mat.vecTexturePaths)
                 {
-                    ofs.write(reinterpret_cast<const char*>(&texPath), sizeof(aiString));
+                    ofs.write(reinterpret_cast<const char*>(&texPath.first), sizeof(aiTextureType));
+                    ofs.write(reinterpret_cast<const char*>(&texPath.second), sizeof(aiString));
                 }
             }
         }
@@ -322,6 +338,7 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
             ifs.read(reinterpret_cast<char*>(&m_BinModel.vecBones[i].matTransformation), sizeof(_float4x4));
             ifs.read(reinterpret_cast<char*>(&m_BinModel.vecBones[i].iNumChildren), sizeof(_uint));
             ifs.read(reinterpret_cast<char*>(&m_BinModel.vecBones[i].iParentBoneIndex), sizeof(_uint));
+            ifs.read(reinterpret_cast<char*>(&m_BinModel.vecBones[i].matOffset), sizeof(_float4x4));
         }
     }
 
@@ -357,6 +374,25 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
                 mesh.vecUsingBonesIndices.resize(boneIdxCount);
                 ifs.read(reinterpret_cast<char*>(mesh.vecUsingBonesIndices.data()), sizeof(_uint) * boneIdxCount);
             }
+
+            // vecNonAnimVertices 로드
+            _uint nonAnimCount = 0;
+            ifs.read(reinterpret_cast<char*>(&nonAnimCount), sizeof(_uint));
+            if (nonAnimCount > 0)
+            {
+                mesh.vecNonAnimVertices.resize(nonAnimCount);
+                ifs.read(reinterpret_cast<char*>(mesh.vecNonAnimVertices.data()), sizeof(VTXMESH) * nonAnimCount);
+            }
+
+            // vecAnimVertices 로드
+            _uint animCount = 0;
+            ifs.read(reinterpret_cast<char*>(&animCount), sizeof(_uint));
+            if (animCount > 0)
+            {
+                mesh.vecAnimVertices.resize(animCount);
+                ifs.read(reinterpret_cast<char*>(mesh.vecAnimVertices.data()), sizeof(VTXANIMMESH) * animCount);
+            }
+
         }
     }
 
@@ -377,9 +413,11 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
             _uint texCount = 0;
             ifs.read(reinterpret_cast<char*>(&texCount), sizeof(_uint));
             mat.vecTexturePaths.resize(texCount);
+
             for (_uint j = 0; j < texCount; ++j)
             {
-                ifs.read(reinterpret_cast<char*>(&mat.vecTexturePaths[j]), sizeof(aiString));
+                ifs.read(reinterpret_cast<char*>(&mat.vecTexturePaths[j].first), sizeof(aiTextureType));   // 텍스처 타입
+                ifs.read(reinterpret_cast<char*>(&mat.vecTexturePaths[j].second), sizeof(aiString));       // 텍스처 경로
             }
         }
     }
@@ -623,6 +661,7 @@ HRESULT CModel::Ready_Meshes()
     {
         // ksta : binary
         m_iNumMeshes = m_BinModel.iNumMeshes;
+        m_eModelType = m_BinModel.eAnimtype;
 
         for (size_t i = 0; i < m_iNumMeshes; i++)
         {
@@ -685,8 +724,8 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
                 for (_uint j = 0; j < numTex; ++j)
                 {
                     aiString path;
-                    if (AI_SUCCESS == tAiMat->GetTexture((aiTextureType)texType, j, &path))
-                        tMatDesc.vecTexturePaths.emplace_back(texType, path);   // pair 만들면서 push_back
+                    if (AI_SUCCESS == tAiMat->GetTexture(static_cast<aiTextureType>(texType), j, &path))
+                        tMatDesc.vecTexturePaths.emplace_back(static_cast<aiTextureType>(texType), path);   // pair 만들면서 push_back
                 }
             }
 

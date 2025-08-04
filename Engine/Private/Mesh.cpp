@@ -364,21 +364,6 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(const MESH_DESC tMeshDesc, _fma
 
 HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const vector<BONE_DESC>* vecBones)
 {
-
-	// ksta : 8/1 14:38 작업중이었음. 원본 저장작업 우선 진행한 뒤 마저 진행하기
-
-	/*
-
-	어디까지 작업하던 중이었나?
-
-	BinModel 에 Mesh Vertex 정보들 누락된 것 담는 것 완료
-	해당 정보를 export 할 때 같이 빠지는 것 미완료
-	import 할 때 Mesh.cpp 부분 Ready_Vertices_For_NonAnim_Binary 부분 진행하던 중이었음
-	이후 유사 함수 애니메이션일 떄에 진행되도록 작업 및 나머지 import 작업 필요
-
-	*/
-
-
 	m_iVertexStride = sizeof(VTXANIMMESH);
 
 	D3D11_BUFFER_DESC		VBDesc{};
@@ -456,7 +441,7 @@ CMesh* CMesh::Create_Binary(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 		Safe_Release(pInstance);
 	}
 
-	return nullptr;
+	return pInstance;
 }
 
 CComponent* CMesh::Clone(void* pArg)

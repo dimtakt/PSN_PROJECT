@@ -167,7 +167,7 @@ namespace Engine
 		unsigned int			iNumChildren;
 
 		unsigned int			iParentBoneIndex;      // 추가
-		//XMFLOAT4X4				matOffset;       // 스키닝용?
+		XMFLOAT4X4				matOffset;			// 스키닝용?
 	} BONE_DESC;
 
 	struct MeshFace { unsigned int iIndices[3]; };
@@ -181,11 +181,12 @@ namespace Engine
 		unsigned int			iNumFaces;
 		vector<MeshFace>		vecFaces;
 
-		//vector<VTXMESH>			vecNonAnimVertices;
-		//vector<VTXANIMMESH>		vecAnimVertices;
-
 		unsigned int			iNumUsingBones;
 		vector<unsigned int>	vecUsingBonesIndices;
+		
+		// size follows "iNumVertices" 
+		vector<VTXMESH>			vecNonAnimVertices;
+		vector<VTXANIMMESH>		vecAnimVertices;
 	} MESH_DESC;
 
 	typedef struct tagMaterialDesc {
@@ -194,7 +195,9 @@ namespace Engine
 		unsigned int			iMaterialIndex;
 		unsigned int			iNumTextures;
 
-		vector<aiString>		vecTexturePaths; // 실제 텍스처 경로 저장
+		vector<pair<aiTextureType, aiString>>	
+								vecTexturePaths; // 실제 텍스처 경로 및 유형의 저장
+
 	} MATERIAL_DESC;
 
 	typedef struct tagBinaryModelDesc {		// 모델 정보 저장 데이터

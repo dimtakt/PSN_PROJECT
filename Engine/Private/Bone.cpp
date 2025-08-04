@@ -56,6 +56,8 @@ HRESULT CBone::Initialize_Binary(BONE_DESC tBoneDesc)
 	// 이미 전치 적용된 행렬이므로 전치 변환 필요 X
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
 	m_iParentBoneIndex = m_BinBone.iParentBoneIndex;
+
+	return S_OK;
 }
 
 void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones)

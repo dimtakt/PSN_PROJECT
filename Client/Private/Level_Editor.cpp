@@ -44,7 +44,7 @@ HRESULT CLevel_Editor::Initialize()
 
 void CLevel_Editor::Update(_float fTimeDelta)
 {
-	pPrevSelectedObject = pSelectedObject;
+	m_pPrevSelectedObject = m_pSelectedObject;
 
 	if (!ImGui::GetIO().WantCaptureMouse)	// m_isNotUsingUI 제어
 		Check_NotUsingUI();
@@ -159,7 +159,7 @@ _bool CLevel_Editor::Check_ObjectPicking()
 {
 	if (m_pObject.empty())
 	{
-		pSelectedObject = nullptr;
+		m_pSelectedObject = nullptr;
 		return false;
 	}
 
@@ -174,12 +174,12 @@ _bool CLevel_Editor::Check_ObjectPicking()
 
 	if (pPickedObjects.size() == 1)
 	{
-		pSelectedObject = pPickedObjects[0];
+		m_pSelectedObject = pPickedObjects[0];
 		return true;
 	}
 	else if (pPickedObjects.empty())
 	{
-		pSelectedObject = nullptr;
+		m_pSelectedObject = nullptr;
 		return false;
 	}
 
@@ -212,11 +212,11 @@ _bool CLevel_Editor::Check_ObjectPicking()
 
 	// 가장 가까운 오브젝트를 할당하되,
 	// 이미 선택된 오브젝트라면 두 번째로 가까운 오브젝트 할당
-	if (pSelectedObject == nullptr ||
-		pSelectedObject != pPickedObjects[iNearObjIndex])
-		pSelectedObject = pPickedObjects[iNearObjIndex];
+	if (m_pSelectedObject == nullptr ||
+		m_pSelectedObject != pPickedObjects[iNearObjIndex])
+		m_pSelectedObject = pPickedObjects[iNearObjIndex];
 	else
-		pSelectedObject = pPickedObjects[iNextObjIndex];
+		m_pSelectedObject = pPickedObjects[iNextObjIndex];
 	
 	return true;
 }
@@ -374,18 +374,6 @@ void CLevel_Editor::ImGui_MainMenu()
 			ImGui::Separator();
 			if (ImGui::BeginMenu("Open File.."))
 			{
-				if (ImGui::MenuItem("[Raw] FBX"))
-				{
-					wstring strLoadFilePath = L"";
-					_bool isLoaded = false;
-					
-					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
-
-					if (!isLoaded)
-					{
-						// 받아온 경로 문자열을 이용하여 원본 모델 로드 진행
-					}
-				}
 				if (ImGui::MenuItem("[Binary] Model"))
 				{
 					wstring strLoadFilePath = L"";
@@ -420,6 +408,25 @@ void CLevel_Editor::ImGui_MainMenu()
 							CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szLoadPath, PreTransformMatrix));
 
 						CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName));
+
+						// ksta : 8/4 로드 테스트. 일단 화면에 띄워보기
+						m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+							ENUM_CLASS(LEVEL::EDITOR), strPrototypeName);
+						CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+						m_pSelectedObject = pGameObject;
+						CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+
+						_float3 vecSpawnPosition = {};
+						_float3 vecSpawnRotation = {};
+						_float3 vecSpawnScale = {10, 10, 10};
+
+						_matrix matXMEditPosition = XMMatrixTranslation(vecSpawnPosition.x, vecSpawnPosition.y, vecSpawnPosition.z);
+						_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(vecSpawnRotation.x, vecSpawnRotation.y, vecSpawnRotation.z);
+						_matrix matXMEditScale = XMMatrixScaling(vecSpawnScale.x, vecSpawnScale.y, vecSpawnScale.z);
+						_matrix matXMEditResult = matXMEditScale * matXMEditRotation * matXMEditPosition;
+
+						pObjectTransformCom->Set_WorldMatrix(matXMEditResult); // 초기값
+
 					}
 				}
 				if (ImGui::MenuItem("[Binary] Map"))
@@ -747,7 +754,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			}
 			
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-			pSelectedObject = pGameObject;
+			m_pSelectedObject = pGameObject;
 
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 				
@@ -822,7 +829,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			}
 
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-			pSelectedObject = pGameObject;
+			m_pSelectedObject = pGameObject;
 
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
@@ -867,7 +874,7 @@ void CLevel_Editor::ImGui_Inspector()
 {
 	// 선택 오브젝트 존재여부 및
 	// 오브젝트가 가진 컴포넌트들의 존재여부 검사.
-	if (pSelectedObject == nullptr)
+	if (m_pSelectedObject == nullptr)
 	{
 		isOn_ComViewer_Transform = false;
 		isObject_Selected = false;
@@ -877,7 +884,7 @@ void CLevel_Editor::ImGui_Inspector()
 	ImGui::Begin("Inspector");
 
 #pragma region Inspector : Transform UI
-	CTransform* pTransformCom = dynamic_cast<CTransform*>(pSelectedObject->Get_Component(L"Com_Transform"));
+	CTransform* pTransformCom = dynamic_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
 	isOn_ComViewer_Transform = (pTransformCom == nullptr)? false : true;
 
 	// 선택한 오브젝트가 Transform 컴포넌트가 있을 때 보여짐.
@@ -887,7 +894,7 @@ void CLevel_Editor::ImGui_Inspector()
 		static _float3 vSelectedObjRot;
 		static _float3 vSelectedObjSca;
 		
-		if (pPrevSelectedObject != pSelectedObject)
+		if (m_pPrevSelectedObject != m_pSelectedObject)
 			// 선택한 오브젝트의 Transform 정보를 받아옴
 		{
 			_vector		vXMObjPosition = {}, vXMObjQuaternion = {}, vXMObjScale = {};

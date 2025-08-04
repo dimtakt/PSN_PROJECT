@@ -180,13 +180,13 @@ namespace Engine
 		unsigned int			iNumIndices;
 		unsigned int			iNumFaces;
 		vector<MeshFace>		vecFaces;
+
+		unsigned int			iNumUsingBones;
+		vector<unsigned int>	vecUsingBonesIndices;
 		
 		// size follows "iNumVertices" 
 		vector<VTXMESH>			vecNonAnimVertices;
 		vector<VTXANIMMESH>		vecAnimVertices;
-
-		unsigned int			iNumUsingBones;
-		vector<unsigned int>	vecUsingBonesIndices;
 	} MESH_DESC;
 
 	typedef struct tagMaterialDesc {
