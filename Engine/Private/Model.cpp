@@ -222,6 +222,9 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
                 ofs.write(reinterpret_cast<const char*>(&mesh.iNumIndices), sizeof(_uint));
                 ofs.write(reinterpret_cast<const char*>(&mesh.iNumFaces), sizeof(_uint));
 
+                ofs.write(reinterpret_cast<const char*>(&mesh.iNumUsingBones), sizeof(_uint));
+
+
                 _uint faceCount = static_cast<_uint>(mesh.vecFaces.size());
                 ofs.write(reinterpret_cast<const char*>(&faceCount), sizeof(_uint));
                 if (faceCount > 0)
@@ -319,7 +322,7 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
     ifs.read(reinterpret_cast<char*>(&m_BinModel.szModelName), sizeof(aiString));
     ifs.read(reinterpret_cast<char*>(&m_BinModel.eAnimtype), sizeof(MODELTYPE));
     ifs.read(reinterpret_cast<char*>(&m_BinModel.matPreTransformMatrix), sizeof(_float4x4));
-    //XMStoreFloat4x4(&m_BinModel.matPreTransformMatrix, PreTransformMatrix);                     // 외부 입력으로 교체시.
+    XMStoreFloat4x4(&m_BinModel.matPreTransformMatrix, PreTransformMatrix);                     // 외부 입력으로 교체시.
 
     ifs.read(reinterpret_cast<char*>(&m_BinModel.iNumBones), sizeof(_uint));
     ifs.read(reinterpret_cast<char*>(&m_BinModel.iNumMeshes), sizeof(_uint));
@@ -358,6 +361,8 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
             ifs.read(reinterpret_cast<char*>(&mesh.iVertexStride), sizeof(_uint));
             ifs.read(reinterpret_cast<char*>(&mesh.iNumIndices), sizeof(_uint));
             ifs.read(reinterpret_cast<char*>(&mesh.iNumFaces), sizeof(_uint));
+
+            ifs.read(reinterpret_cast<char*>(&mesh.iNumUsingBones), sizeof(_uint));
 
             _uint faceCount = 0;
             ifs.read(reinterpret_cast<char*>(&faceCount), sizeof(_uint));
@@ -560,6 +565,7 @@ HRESULT CModel::Ready_Meshes()
             else if (m_eModelType == MODELTYPE::ANIM)
             {
                 VTXANIMMESH* pAnimVertices = new VTXANIMMESH[tAiMesh->mNumVertices];
+                ZeroMemory(pAnimVertices, sizeof(VTXANIMMESH) * tAiMesh->mNumVertices);
                 
                 for (size_t j = 0; j < tAiMesh->mNumVertices; j++)
                 {
@@ -571,6 +577,8 @@ HRESULT CModel::Ready_Meshes()
                     memcpy(&pAnimVertices[j].vTangent,       &tAiMesh->mTangents[j], sizeof(_float3));
                     memcpy(&pAnimVertices[j].vBinormal,      &tAiMesh->mBitangents[j], sizeof(_float3));
                     memcpy(&pAnimVertices[j].vTexcoord,      &tAiMesh->mTextureCoords[0][j], sizeof(_float2));
+
+                    tMeshDesc.vecAnimVertices.push_back(pAnimVertices[j]);
                 }
 
 
@@ -583,6 +591,17 @@ HRESULT CModel::Ready_Meshes()
                     aiBone* pAIBone = tAiMesh->mBones[j];
                     _uint iBoneIndex = 0;
 
+
+                    //뼈의 오프셋 매트릭스를 가져온다
+                    _float4x4	OffsetMatrix;
+
+                    memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+
+                    //뼈의 오프셋 매트릭스 전치
+                    XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+
+
+
                     auto iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)->_bool
                         {
                             if (pBone->Compare_Name(pAIBone->mName.data))
@@ -590,6 +609,11 @@ HRESULT CModel::Ready_Meshes()
                             iBoneIndex++;
                             return false;
                         });
+
+                    m_BinModel.vecBones[iBoneIndex].matOffset = OffsetMatrix;   // test
+                    tMeshDesc.vecUsingBonesIndices.push_back(iBoneIndex);       // test
+                    tMeshDesc.iNumUsingBones = tAiMesh->mNumBones;              // test
+
                 
                     for (size_t k = 0; k < pAIBone->mNumWeights; k++)
                     {
@@ -598,32 +622,32 @@ HRESULT CModel::Ready_Meshes()
                         /* j번째 뼈가 영향을 주는 k번째 정점의 정점버퍼상의 인덱스 */
                         if      (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.x)
                         {
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.x = j;
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.x = AIVertexWeight.mWeight;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.x = j;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.x = AIVertexWeight.mWeight;
                         }
                         else if (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.y)
                         {
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.y = j;
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.y = AIVertexWeight.mWeight;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.y = j;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.y = AIVertexWeight.mWeight;
                         }
                         else if (0.f == pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.z)
                         {
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.z = j;
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.z = AIVertexWeight.mWeight;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.z = j;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.z = AIVertexWeight.mWeight;
                         }
                         else
                         {
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.w = j;
-                            pAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.w = AIVertexWeight.mWeight;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendIndex.w = j;
+                            tMeshDesc.vecAnimVertices[AIVertexWeight.mVertexId].vBlendWeight.w = AIVertexWeight.mWeight;
                         }
                     }
 
-                    tMeshDesc.vecAnimVertices.push_back(pAnimVertices[j]);
+                    
                 }
                 Safe_Delete_Array(pAnimVertices);
             }
 
-
+            /* 임시로 위 3줄로 대체
             //tMeshDesc.vecNonAnimVertices;
             //tMeshDesc.vecAnimVertices;
 
@@ -641,7 +665,7 @@ HRESULT CModel::Ready_Meshes()
                     if (szBoneOrigin == szBoneCompare)
                     {
                         _uint iUsingBoneIndex = static_cast<_uint>(j);
-                        tMeshDesc.vecUsingBonesIndices.push_back(iUsingBoneIndex);
+                        //tMeshDesc.vecUsingBonesIndices.push_back(iUsingBoneIndex);
                         
                         _float4x4	matOffset;
                         aiBone* pAIBone = tAiMesh->mBones[i];
@@ -651,7 +675,7 @@ HRESULT CModel::Ready_Meshes()
                     }
                 }
             }
-
+            */
             m_BinModel.vecMeshes.push_back(tMeshDesc);
         }
 
@@ -853,6 +877,7 @@ HRESULT CModel::Ready_Animations()
         // || store for binary
         // ==============================
 
+        m_BinModel.iNumAnimations = m_pAIScene->mNumAnimations;
 
         // 애니메이션..
         for (size_t i = 0; i < m_pAIScene->mNumAnimations; i++)
