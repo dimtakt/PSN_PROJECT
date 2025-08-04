@@ -207,6 +207,12 @@
     <ClInclude Include="..\public\Skybox.h">
       <Filter>02.GameObject\Skybox</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CustomObj_NonAnim.h">
+      <Filter>02.GameObject\_NonAnimObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CustomObj_Anim.h">
+      <Filter>02.GameObject\_AnimObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -311,6 +317,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Skybox.cpp">
       <Filter>02.GameObject\Skybox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomObj_NonAnim.cpp">
+      <Filter>02.GameObject\_NonAnimObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomObj_Anim.cpp">
+      <Filter>02.GameObject\_AnimObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

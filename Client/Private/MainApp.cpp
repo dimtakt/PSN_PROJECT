@@ -82,6 +82,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"),
 		CEnemy::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),
 		CProps_Pot::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -105,6 +106,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_NonAnim Things */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Pot"),
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/pot/pot.fbx", PreTransformMatrix))))
 		return E_FAIL;

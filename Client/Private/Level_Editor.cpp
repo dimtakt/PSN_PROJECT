@@ -14,6 +14,10 @@
 
 #include "Level_Loading.h"
 
+#include "CustomObj_NonAnim.h"
+#include "CustomObj_Anim.h"
+
+
 CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -396,24 +400,73 @@ void CLevel_Editor::ImGui_MainMenu()
 						_matrix		PreTransformMatrix = XMMatrixIdentity();
 						PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-						_wstring	strPrototypeName = L"Prototype_Component_Model_Custom_";
+						_wstring	strModelPrototypeName = L"Prototype_Component_Model_Custom_";
+						_wstring	strObjectPrototypeName = L"Prototype_GameObject_Model_Custom_";
 						_int		len = MultiByteToWideChar(CP_ACP, 0, szFileName, -1, nullptr, 0);
 						_wstring	strFileName(len, 0);
 						MultiByteToWideChar(CP_ACP, 0, szFileName, -1, &strFileName[0], len);
 						strFileName.pop_back(); // null 문자 제거
-						strPrototypeName += strFileName;
+						strModelPrototypeName += strFileName;
+						strObjectPrototypeName += strFileName;
 
 						// 이후 로드는 CModel에서 진행..
-						m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName,
-							CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szLoadPath, PreTransformMatrix));
+						if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName,
+							CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szLoadPath, PreTransformMatrix))))
+							MSG_BOX(TEXT("Failed to Add Custom Model Prototype.\nLevel_Editor::ImGui_MainMenu() "));
 
-						CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName));
+						CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName));
+						MODELTYPE eTargetModelType = pTargetModel->Get_Modeltype();
+
+
 
 						// ksta : 8/4 로드 테스트. 일단 화면에 띄워보기
-						m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-							ENUM_CLASS(LEVEL::EDITOR), strPrototypeName);
+
+						// 모델로부터 AnimModel 인지 NonAnimModel 인지 정보를 받아와서
+						// 서로 다른 프로토타입 게임오브젝트를 사용하도록.
+						// 단, CustomObj 는 프로토타입으로 로드가 되어있어야 할 듯
+						// 근데 미리 만들어 둘 수가 없음. 프로토타입이 겹치면 문제생길 것 같은데..
+						// ㅇㅇ안됨이거 차라리 그때그때 추가해서 만들어야됨 그래야 프로토타입의 의미가있음
+
+						//m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+						//	ENUM_CLASS(LEVEL::EDITOR), strPrototypeName);	// 이거 게임오브젝트가 아님. 컴포넌트임. 이걸 쓰는 오브젝트를 새로 추가하던가 해야 함
+						
+						// 1. 모델 프로토타입을 만듦			(위에서함)
+						// 2. 오브젝트 프로토타입을 만듦		(아래에서 해줘야함)
+						// 3. 그걸로 레이어에 넣음
+
+						if		(eTargetModelType == MODELTYPE::NONANIM)
+						{
+							if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName,
+								CCustomObj_NonAnim::Create(m_pDevice, m_pContext))))
+								MSG_BOX(TEXT("Failed to Add Custom Object Prototype : Level_Editor::ImGui_MainMenu()"));
+
+							CCustomObj_NonAnim::CUSTOMOBJ_NA_DESC CustomObjDesc = {};
+							CustomObjDesc.strModelComPrototypeTag = strModelPrototypeName;
+							CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
+
+							if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+								ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName, &CustomObjDesc)))
+								MSG_BOX(TEXT("Failed to Add Custom Object To Layer : Level_Editor::ImGui_MainMenu()"));
+						}
+						else if (eTargetModelType == MODELTYPE::ANIM)
+						{
+							if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName,
+								CCustomObj_Anim::Create(m_pDevice, m_pContext))))
+								MSG_BOX(TEXT("Failed to Add Custom Object Prototype : Level_Editor::ImGui_MainMenu()"));
+
+							CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};
+							CustomObjDesc.strModelComPrototypeTag = strModelPrototypeName;
+							CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
+
+							if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+								ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName, &CustomObjDesc)))
+								MSG_BOX(TEXT("Failed to Add Custom Object To Layer : Level_Editor::ImGui_MainMenu()"));
+
+						}
 						CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 						m_pSelectedObject = pGameObject;
+						m_pObject.push_back(pGameObject);
+
 						CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 
 						_float3 vecSpawnPosition = {};
@@ -424,9 +477,7 @@ void CLevel_Editor::ImGui_MainMenu()
 						_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(vecSpawnRotation.x, vecSpawnRotation.y, vecSpawnRotation.z);
 						_matrix matXMEditScale = XMMatrixScaling(vecSpawnScale.x, vecSpawnScale.y, vecSpawnScale.z);
 						_matrix matXMEditResult = matXMEditScale * matXMEditRotation * matXMEditPosition;
-
 						pObjectTransformCom->Set_WorldMatrix(matXMEditResult); // 초기값
-
 					}
 				}
 				if (ImGui::MenuItem("[Binary] Map"))

@@ -35,7 +35,7 @@ public:
 	}
 
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
-
+	MODELTYPE Get_Modeltype() { return m_eModelType; }
 
 
 public:
