@@ -62,6 +62,7 @@ private:	// 해당 클래스에서만 사용할 함수
 	_bool LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut);
 	_bool SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut);
 	HRESULT Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType);
+	void LoadedItemsName();
 
 private:
 	//bool show_demo_window = true;
@@ -83,13 +84,12 @@ private:
 
 
 
+	vector<CGameObject*> m_pObject = {};
+	vector<CGameObject*> m_pTerrainObject = {};
 
-
-	std::vector<CGameObject*> m_pObject = {};
-	std::vector<CGameObject*> m_pTerrainObject = {};
-
-
-
+	vector<_wstring>		m_vLoadedItems = {};	// 모델 요소 저장. 저장 시 FileName 으로 저장할 것.
+	vector<_string>			m_vLoadedItemsConv = {};// 변환용
+	vector<const _char*>	m_vLoadedItemPtrs = {};
 
 	_bool isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
 	CGameObject* m_pSelectedObject = {};		// 현재 선택된 오브젝트. 임시 포인터 변수

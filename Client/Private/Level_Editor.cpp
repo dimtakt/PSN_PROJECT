@@ -43,6 +43,12 @@ HRESULT CLevel_Editor::Initialize()
 	//if (FAILED(Ready_Interaction_Texture_Info()))
 	//	return E_FAIL;
 
+	m_vLoadedItems.push_back(L"[Test]Enemy");
+	m_vLoadedItems.push_back(L"[Test]Props_Pot");
+	m_vLoadedItems.push_back(L"[Test]Props_Fotel");
+	m_vLoadedItems.push_back(L"[Test]Props_ServerRack1");
+	m_vLoadedItems.push_back(L"[Test]Props_ServerRack2");
+
 	return S_OK;
 }
 
@@ -347,6 +353,24 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 	return S_OK;
 }
 
+void CLevel_Editor::LoadedItemsName()
+{
+	m_vLoadedItemsConv.clear();
+	m_vLoadedItemPtrs.clear();
+
+	for (const std::wstring& wstr : m_vLoadedItems)
+	{
+		int size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		if (size <= 0) continue;
+
+		std::string str(size, 0); // null 포함
+		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], size, nullptr, nullptr);
+
+		m_vLoadedItemsConv.push_back(str);
+		m_vLoadedItemPtrs.push_back(m_vLoadedItemsConv.back().c_str());
+	}
+}
+
 CLevel_Editor* CLevel_Editor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Editor* pInstance = new CLevel_Editor(pDevice, pContext);
@@ -473,6 +497,11 @@ void CLevel_Editor::ImGui_MainMenu()
 								MSG_BOX(TEXT("Failed to Add Custom Object To Layer : Level_Editor::ImGui_MainMenu()"));
 
 						}
+
+						m_vLoadedItems.push_back(strFileName);
+
+
+						// 임시로 스폰.
 						CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 						m_pSelectedObject = pGameObject;
 						m_pObject.push_back(pGameObject);
@@ -631,47 +660,16 @@ void CLevel_Editor::ImGui_TerrainEditor()
 		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), strLayerTag);
 		m_pTerrainObject.push_back(pGameObject);
 
-		_float fTiling = 50.f * (iSize / fTerrainDefaultSize);
-		CShader* pShaderCom = static_cast<CShader*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Shader", iIndex));
+		//_float fTiling = 50.f * (iSize / fTerrainDefaultSize);
+		//CShader* pShaderCom = static_cast<CShader*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Shader"));
 		//if (FAILED(pShaderCom->Bind_RawValue("g_fTiling", &fTiling, sizeof(_float))))
 		//	return;
 		
-		CTransform* pTransform = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Transform", iIndex));
+		CTransform* pTransform = static_cast<CTransform*>(m_pGameInstance->Find_Component(ENUM_CLASS(LEVEL::EDITOR), strLayerTag, L"Com_Transform"));
 		pTransform->Scaling(_float3(fMultiplier, fMultiplier, fMultiplier));
 		pTransform->Set_State(STATE::POSITION, XMVectorSet(fPosX, fPosY, fPosZ, 1));
-		
-		iIndex++; // 이거 안내려서 문제생긴듯
 	}
 	
-
-	//ImGui::Separator();
-	//if (ImGui::Button("Undo"))
-	//	if (!m_pTerrainObject.empty())
-	//	{
-	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Terrain");
-	//		m_pTerrainObject.pop_back();
-	//	}
-	//if (ImGui::CollapsingHeader("Danger Section"))
-	//{
-	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	//	if (ImGui::Button("All Reset"))
-	//	{
-	//		for (size_t i = 0; i < m_pTerrainObject.size(); i++)
-	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Terrain");
-	//		m_pTerrainObject.clear();
-	//	}
-	//	ImGui::PopStyleColor();
-	//}
-
-	// 오브젝트 수정 기능은 나중에 만들어도 됨
-	//ImGui::Separator();
-
-	//if (iIndex >= 1)
-	//{
-
-	//}
-
-
 	ImGui::End();
 }
 
@@ -686,10 +684,14 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::Separator();
 
 	ImGui::BeginGroup();
-	const char* szItems[] = { "Enemy", "Props_Pot", "Props_Fotel", "Props_ServerRack1", "Props_ServerRack2" };
+
+
 	static int iCurrentItem = 0;
+
+	LoadedItemsName();
+
 	ImGui::Text("Selected Model");
-	ImGui::Combo("##Selected Model", &iCurrentItem, szItems, IM_ARRAYSIZE(szItems));
+	ImGui::Combo("##Selected Model", &iCurrentItem, m_vLoadedItemPtrs.data(), m_vLoadedItemPtrs.size());
 	ImGui::Separator();
 
 	if (!isOn_DeployMode) {
@@ -706,7 +708,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	}
 
 
-	static _int iObjIndex = 0;
+	//static _int iObjIndex = 0;
 	static _float3 vPickedPos = {};
 
 	if (ImGui::CollapsingHeader("Manual Deploy Menu"))
@@ -811,6 +813,19 @@ void CLevel_Editor::ImGui_ModelDeployer()
 				break;
 			}
 			default:
+				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
+				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
+				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
+
+				_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
+				_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
+
+				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
+				CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
 				break;
 			}
 			
@@ -829,7 +844,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 			m_pObject.push_back(pGameObject);
 
-			iObjIndex++; // 이거 안내려서 문제생긴듯
+			//iObjIndex++; // 이거 안내려서 문제생긴듯
 
 		}
 
@@ -886,6 +901,19 @@ void CLevel_Editor::ImGui_ModelDeployer()
 				break;
 			}
 			default:
+				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
+				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
+				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
+
+				_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
+				_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
+
+				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
+				CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+
+				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
 				break;
 			}
 
@@ -898,7 +926,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 			m_pObject.push_back(pGameObject);
 
-			iObjIndex++; // 이거 안내려서 문제생긴듯
+			//iObjIndex++; // 이거 안내려서 문제생긴듯
 		}
 	}
 
@@ -995,6 +1023,8 @@ void CLevel_Editor::ImGui_Inspector()
 		}
 	}
 	ImGui::PopStyleColor(3);
+
+	ImGui::Separator();
 
 	CTransform* pTransformCom = dynamic_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
 	isOn_ComViewer_Transform = (pTransformCom == nullptr)? false : true;

@@ -52,6 +52,46 @@ namespace Engine
 		return dwRefCnt;
 	}
 
+
+
+
+	// _wstring 을 _string 으로
+	inline std::string WStringToString(const std::wstring& wstr)
+	{
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+		std::string strTo(size_needed, 0);
+		WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+		return strTo;
+	}
+
+	// const _char* 을 _wstring 으로
+	inline std::wstring ConvertCharToWString(const char* pszStr)
+	{
+		if (pszStr == nullptr)
+			return L"";
+
+		int iLength = MultiByteToWideChar(CP_ACP, 0, pszStr, -1, nullptr, 0);
+		std::wstring wstr(iLength, 0);
+
+		MultiByteToWideChar(CP_ACP, 0, pszStr, -1, &wstr[0], iLength);
+
+		// 문자열 끝의 '\0' 제거
+		if (!wstr.empty() && wstr.back() == L'\0')
+			wstr.pop_back();
+
+		return wstr;
+	}
+
+	// _wstring 을 const _char 으로
+	inline char* WStringToChar(const std::wstring& wstr)
+	{
+		int size_needed = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		if (size_needed == 0) return nullptr;
+
+		char* result = new char[size_needed];
+		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, result, size_needed, nullptr, nullptr);
+		return result;
+	}
 }
 
 #endif // Engine_Function_h__
