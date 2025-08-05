@@ -55,6 +55,7 @@ public:
 public:
 	class CComponent* Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Remove_GameObject_FromLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, class CGameObject* pObject);
 	class CGameObject* Get_LastGameObject(_uint iLayerLevelIndex, const _wstring& strLayerTag);
 #pragma endregion
 

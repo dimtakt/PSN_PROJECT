@@ -18,6 +18,19 @@ public:
 		m_GameObjects.push_back(pGameObject);
 		return S_OK;
 	}
+	HRESULT Remove_GameObject(CGameObject* pObject)
+	{
+		if (nullptr == pObject)
+			return E_FAIL;
+		for (auto iter = m_GameObjects.begin(); iter != m_GameObjects.end(); ++iter){
+			if (*iter == pObject){
+				Safe_Release(*iter);
+				m_GameObjects.erase(iter);
+				return S_OK;
+			}
+		}
+		return E_FAIL;
+	}
 
 	void Priority_Update(_float fTimeDelta);
 	void Update(_float fTimeDelta);

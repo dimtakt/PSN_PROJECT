@@ -49,6 +49,18 @@ HRESULT CObject_Manager::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _w
 	return S_OK;
 }
 
+HRESULT CObject_Manager::Remove_GameObject_FromLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, CGameObject* pObject)
+{
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return E_FAIL;
+
+	if (FAILED(pLayer->Remove_GameObject(pObject)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumLevels; i++)

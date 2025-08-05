@@ -69,6 +69,16 @@ HRESULT CLevel_Editor::Render()
 	//m_pImgui_Manage->Render();
 	this->ImGui_Render();
 
+	// Selected Objects Render DebugLine
+	//if (m_pSelectedObject)
+	//{
+	//	CModel* pSelectedObjModelCom = dynamic_cast<CModel*>(m_pSelectedObject->Get_Component(L"Com_Model"));
+	//	vector<CMesh*> pSelectedObjMeshes = pSelectedObjModelCom->Get_Meshes();
+	//
+	//	for (size_t i = 0; i < pSelectedObjMeshes.size(); i++)
+	//		pSelectedObjMeshes[i]->Render_DebugLine();
+	//}
+
 	return S_OK;
 }
 
@@ -935,6 +945,57 @@ void CLevel_Editor::ImGui_Inspector()
 	ImGui::Begin("Inspector");
 
 #pragma region Inspector : Transform UI
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+	if (ImGui::CollapsingHeader("Danger Section##InspectorDangerSection"))
+	{
+		_bool isRunDeleted = false;
+
+		if (ImGui::CollapsingHeader("Instant Delete##Inst_Del_Warn_Front"))
+		{
+			if (ImGui::Button("Instant Delete##Inst_Del_Run"))
+			{
+				m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", m_pSelectedObject);
+
+				auto iter = std::find(m_pObject.begin(), m_pObject.end(), m_pSelectedObject);
+				if (iter != m_pObject.end())
+					m_pObject.erase(iter);
+
+				isRunDeleted = true;
+			}
+		}
+		
+		if (ImGui::CollapsingHeader("All Reset##Reset_Warn_Front"))
+		{
+			if (ImGui::CollapsingHeader("Really?##Reset_Warn_End"))
+			{
+				if (ImGui::Button("All Reset##Reset_Run"))
+				{
+					for (size_t i = 0; i < m_pObject.size(); i++)
+						m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", m_pObject[i]);
+					m_pObject.clear();
+
+					for (size_t i = 0; i < m_pTerrainObject.size(); i++)
+						m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Terrain", m_pTerrainObject[i]);
+					m_pTerrainObject.clear();
+
+					isRunDeleted = true;
+				}
+			}
+		}
+
+		if (isRunDeleted)	// 삭제가 실행됐다면.
+		{
+			m_pSelectedObject = nullptr;
+			ImGui::PopStyleColor(3);
+			ImGui::End();
+			return;
+		}
+	}
+	ImGui::PopStyleColor(3);
+
 	CTransform* pTransformCom = dynamic_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
 	isOn_ComViewer_Transform = (pTransformCom == nullptr)? false : true;
 
