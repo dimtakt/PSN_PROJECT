@@ -890,17 +890,33 @@ HRESULT CModel::Ready_Animations()
             tAiAnimDesc.fTicksPerSecond = aiAnim->mTicksPerSecond;
             tAiAnimDesc.iNumChannels = aiAnim->mNumChannels;
 
+
+
             // 애니메이션 내의 채널..
             for (size_t j = 0; j < tAiAnimDesc.iNumChannels; j++)
             {
                 AICHANNEL_DESC tAiChannelDesc = {};
                 aiNodeAnim* aiChan = aiAnim->mChannels[j];
+                _uint iBoneIndex = 0;
 
                 tAiChannelDesc.szChannelName = aiChan->mNodeName;
                 tAiChannelDesc.iNumScaKeys = aiChan->mNumScalingKeys;
                 tAiChannelDesc.iNumRotKeys = aiChan->mNumRotationKeys;
                 tAiChannelDesc.iNumPosKeys = aiChan->mNumPositionKeys;
                 tAiChannelDesc.iNumKeyFrames = max(max(tAiChannelDesc.iNumPosKeys, tAiChannelDesc.iNumRotKeys), tAiChannelDesc.iNumScaKeys);
+
+                // iBoneIndex 를 구하기 위함
+                auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)->_bool
+                    {
+                        if (true == pBone->Compare_Name(aiChan->mNodeName.data))
+                            return true;
+
+                        iBoneIndex++;
+
+                        return false;
+                    });
+                    
+                tAiChannelDesc.iBoneIndex =iBoneIndex;
 
                 // 애니메이션 내의 채널 내의 키프레임..
                 for (size_t k = 0; k < tAiChannelDesc.iNumKeyFrames; k++)

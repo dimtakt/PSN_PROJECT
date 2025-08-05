@@ -63,6 +63,10 @@ HRESULT CChannel::Initialize(const aiNodeAnim* pAIChannel, const vector<class CB
 
 HRESULT CChannel::Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones)
 {
+    // 원본 initialize 처럼 어딘가에서 본 인덱스 정보를 받아와야 할듯
+    // initialize에서 만들어진 것 꺼내와서 저장한 뒤 나중에 불러오면 되는거 아님?
+    // 그냥 애님에ㅣㅅ션에서 넣는 넙ㅂ 잇으러ㄱ같은데
+    
     m_iBoneIndex = tChanDesc.iBoneIndex;
 
     m_iNumKeyFrames = tChanDesc.vecKeyFrame.size();
