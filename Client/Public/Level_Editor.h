@@ -96,6 +96,8 @@ private:
 	CGameObject* m_pPrevSelectedObject = {};	// 이전 선택된 오브젝트. 임시 포인터 변수
 	_bool m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
 
+
+
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

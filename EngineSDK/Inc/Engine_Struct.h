@@ -135,7 +135,7 @@ namespace Engine
 	//		ㄴKEYFRAME
 
 
-#pragma region Output Description
+#pragma region Output Description [Binary Model]
 	typedef struct tagAIChannelDesc {		// 채널 저장 데이터
 		// 키프레임갯수, 본 인덱스, 키프레임정보 4종
 		aiString				szChannelName;
@@ -220,6 +220,20 @@ namespace Engine
 		vector<AIANIM_DESC>		vecAiAnimations;
 	} BINARY_MODEL_DESC;
 #pragma endregion
+
+
+#pragma region Output Description [Binary Level]
+	typedef struct tagMapDataDesc {
+
+
+	}MAPDATA_DESC;
+
+
+
+#pragma endregion
+
+
+
 }
 
 
