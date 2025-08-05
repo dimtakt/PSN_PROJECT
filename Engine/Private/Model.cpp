@@ -584,7 +584,6 @@ HRESULT CModel::Ready_Meshes()
 
                 // Mesh 에 영향주는 뻐를 순회하여 찾은 뒤
                 // 해당 뻐가 영향을 주는 버텍스 인덱스릐 vBlendIndex, vBlendWeight 를 할당
-                // ksta : 좌표 문제 발생 시 OffsetMatrix 주는 것 한번 확인해보기 (지금은 저장 시 안줌) 
 
                 for (_uint j = 0; j < tAiMesh->mNumBones; j++)
                 {
@@ -676,6 +675,9 @@ HRESULT CModel::Ready_Meshes()
                 }
             }
             */
+
+
+
             m_BinModel.vecMeshes.push_back(tMeshDesc);
         }
 

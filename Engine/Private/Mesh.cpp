@@ -387,6 +387,19 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 
 		memcpy(&pVertices[i].vBlendIndex, &tMeshDesc.vecAnimVertices[i].vBlendIndex, sizeof(XMUINT4));
 		memcpy(&pVertices[i].vBlendWeight, &tMeshDesc.vecAnimVertices[i].vBlendWeight, sizeof(_float4));
+
+		// 버텍스에 할당된 weight (Bone을 따라오는 정도) 합 1로 정규화.
+		// 이렇게 해야만 메쉬가 애매하게 덜 따라오는 현상 없어짐.
+		_float weightTotal = pVertices[i].vBlendWeight.x + pVertices[i].vBlendWeight.y + pVertices[i].vBlendWeight.z + pVertices[i].vBlendWeight.w;
+		_float4 weightCalced = _float4{ 
+			pVertices[i].vBlendWeight.x / weightTotal, 
+			pVertices[i].vBlendWeight.y / weightTotal,
+			pVertices[i].vBlendWeight.z / weightTotal,
+			pVertices[i].vBlendWeight.w / weightTotal 
+		};
+
+		pVertices[i].vBlendWeight = weightCalced;
+
 	}
 
 	m_iNumBones = tMeshDesc.iNumUsingBones;
@@ -398,6 +411,40 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 
 		m_BoneIndices.push_back(iBoneIndex);
 		m_OffsetMatrices.push_back(tBone.matOffset);
+	}
+
+	if (0 == m_iNumBones)	// 본이 없다면 더미본 넣어줌. 매트릭스는 아이덴티티로
+	{
+		m_iNumBones = 1;
+
+		_uint	iBoneIndex = { 0 };
+
+		//auto	iter = find_if(vecBones->begin(), vecBones->end(), [&](CBone* pBone)->_bool
+		//	{
+		//		if (true == pBone->Compare_Name(m_szName))
+		//			return true;
+		//
+		//		iBoneIndex++;
+		//
+		//		return false;
+		//	});
+
+		for (size_t i = 0; i < vecBones->size(); i++)
+		{
+			if ((*vecBones)[i].szBoneName.data != tMeshDesc.szMeshName.data)
+			{
+				iBoneIndex = i;
+				break;
+			}
+		}
+
+
+		m_BoneIndices.push_back(iBoneIndex);
+
+		_float4x4		OffsetMatrix;
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
 	}
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
