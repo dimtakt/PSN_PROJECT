@@ -58,10 +58,18 @@ private:	// Custom Window
 
 	void ImGui_Inspector();
 
+	void ImGui_Descriptions();
+
+
 private:	// 해당 클래스에서만 사용할 함수
 	_bool LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut);
 	_bool SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut);
+		
 	HRESULT Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType);
+	
+	HRESULT Load_BinaryMap(_wstring* strLoadPath);
+	HRESULT Save_BinaryMap(_wstring* strSavePath);
+	
 	void LoadedItemsName();
 
 private:
@@ -75,6 +83,7 @@ private:
 	_bool isOn_GUITerrainEditor = true;				// 터레인 에디터 창
 	_bool isOn_ModelDeployer = false;				// 모델 배치기 창
 	_bool isOn_DeployMode = false;					// ㄴ 모델 배치모드 전환
+	_bool isOn_Descriptions = false;				// 저장 전 맵 정보 기입창
 
 
 	// ===== Inspector Window
@@ -82,20 +91,26 @@ private:
 	// Visibles when "pSelectedObject" has specific component.
 	_bool isOn_ComViewer_Transform = false;			// 현재 선택한 오브젝트의 Transform 제어창.
 
+	
+	LEVEL					m_eTargetLevel = {};
 
+	vector<CGameObject*>	m_pObject = {};
+	vector<_wstring>		m_pObjectNames = {};
+	vector<CGameObject*>	m_pTerrainObject = {};
 
-	vector<CGameObject*> m_pObject = {};
-	vector<CGameObject*> m_pTerrainObject = {};
-
-	vector<_wstring>		m_vLoadedItems = {};	// 모델 요소 저장. 저장 시 FileName 으로 저장할 것.
-	vector<_string>			m_vLoadedItemsConv = {};// 변환용
+	vector<_wstring>		m_vLoadedItems = {};				// 모델 요소 저장. 저장 시 FileName 으로 저장할 것.
+	vector<_string>			m_vLoadedItemsConv = {};			// 변환용
 	vector<const _char*>	m_vLoadedItemPtrs = {};
 
-	_bool isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
-	CGameObject* m_pSelectedObject = {};		// 현재 선택된 오브젝트. 임시 포인터 변수
-	CGameObject* m_pPrevSelectedObject = {};	// 이전 선택된 오브젝트. 임시 포인터 변수
-	_bool m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
+	_bool					isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
+	CGameObject*			m_pSelectedObject = {};				// 현재 선택된 오브젝트. 임시 포인터 변수
+	CGameObject*			m_pPrevSelectedObject = {};			// 이전 선택된 오브젝트. 임시 포인터 변수
+	_bool					m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
 
+
+
+
+	MAPDATA_DESC			m_tMapData = {};
 
 
 public:

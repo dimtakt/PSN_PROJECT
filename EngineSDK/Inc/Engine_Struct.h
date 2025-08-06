@@ -223,13 +223,27 @@ namespace Engine
 
 
 #pragma region Output Description [Binary Level]
+	typedef struct tagLoadedGameObjectsDesc{
+
+		XMFLOAT4X4				matFinalTransform;	// 최종 계산된 오브젝트의 좌표가 담김
+		wstring					strFileName;		// 파일 이름
+
+	}LOADED_OBJ_DESC;
+
 	typedef struct tagMapDataDesc {
 
+		unsigned int			iMapLevel;
 
+		unsigned int			iNumLoadedItems;
+		vector<wstring>			vecLoadedItems;		// 로드된 요소들의 파일명이 담김. 이는 프로토타입 등에 다 사용. 경로는 고정
+
+		unsigned int			iNumGameObj;
+		vector<LOADED_OBJ_DESC>	vecGameObj;			// 불러와진 게임오브젝트들의 정보들이 담길 것.
+
+		unsigned int			iNumTerrains;
+		vector<XMFLOAT4X4>		vecTerrainTransform;
+		
 	}MAPDATA_DESC;
-
-
-
 #pragma endregion
 
 

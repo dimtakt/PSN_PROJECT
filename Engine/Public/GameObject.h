@@ -48,6 +48,9 @@ public:
 		return isPicked;
 	}
 
+	_wstring Get_FileName() { return m_strModelName; }
+	void Set_FileName(_wstring filename) { m_strModelName = filename; }
+
 protected:
 	// 이를 부모로 갖는 자식 오브젝트 생성시, 버퍼 정보가 있다면 반드시 할당해야 함.
 	// 반드시 "버퍼 컴포넌트 생성 뒤 호출"할 것
@@ -68,11 +71,14 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
+
 	// 자식 객체 생성시, 모델의 VIBuffer 주소를 여기에 저장 필요. isPicked 를 위함.
 	vector<CVIBuffer*>		m_pVIBufferVecRef = {};
 
 	_int			m_iHp			=	{};
 	_int			m_iMaxHp		=	{};
+
+	_wstring		m_strModelName	=	{};
 	
 	
 protected:

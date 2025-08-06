@@ -18,6 +18,9 @@
 #include "CustomObj_Anim.h"
 
 
+#include <fstream> 
+
+
 CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -43,11 +46,11 @@ HRESULT CLevel_Editor::Initialize()
 	//if (FAILED(Ready_Interaction_Texture_Info()))
 	//	return E_FAIL;
 
-	m_vLoadedItems.push_back(L"[Test]Enemy");
-	m_vLoadedItems.push_back(L"[Test]Props_Pot");
-	m_vLoadedItems.push_back(L"[Test]Props_Fotel");
-	m_vLoadedItems.push_back(L"[Test]Props_ServerRack1");
-	m_vLoadedItems.push_back(L"[Test]Props_ServerRack2");
+	//m_vLoadedItems.push_back(L"[Test]Enemy");
+	//m_vLoadedItems.push_back(L"[Test]Props_Pot");
+	//m_vLoadedItems.push_back(L"[Test]Props_Fotel");
+	//m_vLoadedItems.push_back(L"[Test]Props_ServerRack1");
+	//m_vLoadedItems.push_back(L"[Test]Props_ServerRack2");
 
 	return S_OK;
 }
@@ -154,14 +157,14 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
-	// 오브젝트를 선택한 상태면 컴포넌트 뷰어 창이 뜨고,
-	// 그 하위의 컴포넌트 에디터 창을 띄우는 식으로?
-
 	//if (isObject_Selected)
-		ImGui_Inspector();
+		ImGui_Inspector();			// 오브젝트 선택 중에만 뜸 (오브젝트 미선택시 함수 내에서 즉시 return 시킴)
+
 	//if (isOn_ComViewer_Transform)
 	//	ImGui_ComViewer_Transform();
-
+	
+	if (isOn_Descriptions)			// 저장용 Desc 변수 설정창 (현재는 레벨만)
+		ImGui_Descriptions();
 
 	// 그리기 끝
 	m_pImGui_Manager->GUI_Render_End();
@@ -353,6 +356,250 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 	return S_OK;
 }
 
+HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
+{
+	// 바이너리 파일로부터 로컬 함수로
+
+	ifstream ifs(strLoadPath->c_str(), ios::binary);
+	if (!ifs.is_open())
+	{
+		MessageBoxW(nullptr, L"파일 열기 실패", L"LoadMapDataFromFile", MB_OK);
+		return E_FAIL;
+	}
+
+	ifs.read(reinterpret_cast<char*>(&m_tMapData.iMapLevel), sizeof(m_tMapData.iMapLevel));
+
+	ifs.read(reinterpret_cast<char*>(&m_tMapData.iNumLoadedItems), sizeof(m_tMapData.iNumLoadedItems));
+	m_tMapData.vecLoadedItems.clear();
+	for (unsigned int i = 0; i < m_tMapData.iNumLoadedItems; ++i)
+	{
+		unsigned int len = 0;
+		ifs.read(reinterpret_cast<char*>(&len), sizeof(len));
+
+		wstring str(len, L'\0');
+		ifs.read(reinterpret_cast<char*>(&str[0]), len * sizeof(wchar_t));
+		m_tMapData.vecLoadedItems.push_back(str);
+	}
+
+	ifs.read(reinterpret_cast<char*>(&m_tMapData.iNumGameObj), sizeof(m_tMapData.iNumGameObj));
+	m_tMapData.vecGameObj.clear();
+	for (unsigned int i = 0; i < m_tMapData.iNumGameObj; ++i)
+	{
+		LOADED_OBJ_DESC desc;
+
+		ifs.read(reinterpret_cast<char*>(&desc.matFinalTransform), sizeof(XMFLOAT4X4));
+
+		unsigned int len = 0;
+		ifs.read(reinterpret_cast<char*>(&len), sizeof(len));
+
+		wstring str(len, L'\0');
+		ifs.read(reinterpret_cast<char*>(&str[0]), len * sizeof(wchar_t));
+		desc.strFileName = str;
+
+		m_tMapData.vecGameObj.push_back(desc);
+	}
+
+	ifs.read(reinterpret_cast<char*>(&m_tMapData.iNumTerrains), sizeof(m_tMapData.iNumTerrains));
+	m_tMapData.vecTerrainTransform.clear();
+	for (unsigned int i = 0; i < m_tMapData.iNumTerrains; ++i)
+	{
+		XMFLOAT4X4 mat;
+		ifs.read(reinterpret_cast<char*>(&mat), sizeof(XMFLOAT4X4));
+		m_tMapData.vecTerrainTransform.push_back(mat);
+	}
+
+	ifs.close();
+
+
+	// 오브젝트 로드
+
+	m_eTargetLevel = static_cast<LEVEL>(m_tMapData.iMapLevel);
+
+	for (_uint i = 0; i < m_tMapData.iNumLoadedItems; i++)
+	{
+		// 프로토타입 생성..
+
+		
+		// 파일 경로 (상대경로)
+		_wstring strFilePathSuffix = m_tMapData.vecLoadedItems[i];					// 파일명
+		_wstring strFilePathPrefix = L"../Bin/Resources/_SUPERHOT/_BinaryModels/";	// 상대경로
+		_wstring strFileExt = L".datmodel";
+
+		_wstring strFilePath = strFilePathPrefix + strFilePathSuffix + strFileExt;
+		const _char* szFilePath = WStringToChar(strFilePath);
+		
+		// 프로토타입명
+		_wstring strPrototypePrefix = L"Prototype_Component_Model_Custom_";
+		_wstring strPrototypeTag = strPrototypePrefix + strFilePathSuffix;
+		
+		// 좌표계 보정
+		_matrix		PreTransformMatrix = XMMatrixIdentity();
+		PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+		// 없을 경우만 생성
+		auto iter = std::find(m_vLoadedItems.begin(), m_vLoadedItems.end(), strFilePathSuffix);
+		//if (iter != m_vLoadedItems.end())
+		//	continue;
+		
+		if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag,
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szFilePath, PreTransformMatrix))))
+			MSG_BOX(TEXT("Failed to Add Custom Model Prototype.\nLevel_Editor::ImGui_MainMenu() "));
+
+
+		// 로컬 변수
+		m_vLoadedItems.push_back(m_tMapData.vecLoadedItems[i]);
+
+
+		Safe_Delete(szFilePath);
+	}
+
+	for (_uint i = 0; i < m_tMapData.iNumGameObj; i++)
+	{
+		// 게임오브젝트 생성 및 삽입..
+		
+		// 프로토타입명 (모델 프로토타입은 Desc에 묶어서 인자로, 오브젝트 프로토타입은 인자로) 
+		LOADED_OBJ_DESC tDesc = m_tMapData.vecGameObj[i];
+
+		_wstring strFilePathSuffix = tDesc.strFileName;					// 파일명
+		_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
+		_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
+
+		_wstring strPrototypeTag = strPrototypePrefix + strFilePathSuffix;
+
+		CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+		CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+		CustomObjDesc.strModelComPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
+
+		_wstring strLayerTag = L"Layer_Editor_Object";
+
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
+			ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc)))
+			MSG_BOX(TEXT("Failed to Add Custom GameObject.\nLevel_Editor::ImGui_MainMenu()"));
+
+		// 좌표반영
+		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+		pGameObject->Set_FileName(strFilePathSuffix);
+		CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
+		pObjectTransformCom->Set_WorldMatrix(tDesc.matFinalTransform);
+
+
+		// 로컬 변수
+		m_pObject.push_back(pGameObject);
+
+	}
+
+	for (_uint i = 0; i < m_tMapData.iNumTerrains; i++)
+	{
+		// 터레인 생성 및 삽입..
+		_float4x4	matTerrainTransform = m_tMapData.vecTerrainTransform[i];
+
+		_wstring strLayerTag = L"Layer_Editor_Terrain";
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
+			ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Terrain"))))
+			return E_FAIL;
+
+		CGameObject* pTerrainObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), strLayerTag);
+		CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pTerrainObject->Get_Component(L"Com_Transform"));
+		pObjectTransformCom->Set_WorldMatrix(m_tMapData.vecTerrainTransform[i]);
+
+		// 로컬 변수
+		m_pTerrainObject.push_back(pTerrainObject);
+
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
+{
+	// 변환용 로컬함수에 저장
+	
+	m_tMapData.iMapLevel = ENUM_CLASS(m_eTargetLevel);
+
+	m_tMapData.iNumLoadedItems = m_vLoadedItems.size();
+	m_tMapData.vecLoadedItems = m_vLoadedItems;
+
+	m_tMapData.iNumGameObj = m_pObject.size();
+
+	for (_uint i = 0; i < m_pObject.size(); i++)
+	{
+		LOADED_OBJ_DESC tLoadObjDesc = {};
+
+		// matFinalTransform
+		CTransform* pTargetTransform = dynamic_cast<CTransform*>(m_pObject[i]->Get_Component(L"Com_Transform"));
+		_float4x4 matTargetTransform = {};
+		
+		XMStoreFloat4x4(&matTargetTransform, pTargetTransform->Get_WorldMatrix());
+		tLoadObjDesc.matFinalTransform = matTargetTransform;
+
+		// strFileName
+		_char		szFilePath[256] = {};
+		_char		szFileName[MAX_PATH] = {};
+
+		WideCharToMultiByte(CP_ACP, 0, (strSavePath)->c_str(), -1, szFilePath, 256, nullptr, nullptr);
+		_splitpath_s(szFilePath, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, nullptr, 0);
+
+		tLoadObjDesc.strFileName = m_pObject[i]->Get_FileName();
+
+		// push_back
+		m_tMapData.vecGameObj.push_back(tLoadObjDesc);
+	}
+
+	m_tMapData.iNumTerrains = m_pTerrainObject.size();
+
+	for (_uint i = 0; i < m_pTerrainObject.size(); i++)
+	{
+		CTransform* pTargetTransform = dynamic_cast<CTransform*>(m_pTerrainObject[i]->Get_Component(L"Com_Transform"));
+		_float4x4 matTargetTransform = {};
+
+		XMStoreFloat4x4(&matTargetTransform, pTargetTransform->Get_WorldMatrix());
+		m_tMapData.vecTerrainTransform.push_back(matTargetTransform);
+	}
+
+
+
+	// 바이너리화 저장
+
+	ofstream ofs(strSavePath->c_str(), ios::binary);
+	if (!ofs.is_open())
+	{
+		MessageBoxW(nullptr, L"파일 열기 실패", L"SaveMapDataToFile", MB_OK);
+		return E_FAIL;
+	}
+
+	ofs.write(reinterpret_cast<const char*>(&m_tMapData.iMapLevel), sizeof(m_tMapData.iMapLevel));
+
+	ofs.write(reinterpret_cast<const char*>(&m_tMapData.iNumLoadedItems), sizeof(m_tMapData.iNumLoadedItems));
+	for (const wstring& name : m_tMapData.vecLoadedItems)
+	{
+		unsigned int len = static_cast<unsigned int>(name.size());
+		ofs.write(reinterpret_cast<const char*>(&len), sizeof(unsigned int));
+		ofs.write(reinterpret_cast<const char*>(name.c_str()), len * sizeof(wchar_t));
+	}
+
+	ofs.write(reinterpret_cast<const char*>(&m_tMapData.iNumGameObj), sizeof(m_tMapData.iNumGameObj));
+	for (const LOADED_OBJ_DESC& obj : m_tMapData.vecGameObj)
+	{
+		ofs.write(reinterpret_cast<const char*>(&obj.matFinalTransform), sizeof(XMFLOAT4X4));
+
+		unsigned int len = static_cast<unsigned int>(obj.strFileName.size());
+		ofs.write(reinterpret_cast<const char*>(&len), sizeof(unsigned int));
+		ofs.write(reinterpret_cast<const char*>(obj.strFileName.c_str()), len * sizeof(wchar_t));
+	}
+
+	ofs.write(reinterpret_cast<const char*>(&m_tMapData.iNumTerrains), sizeof(m_tMapData.iNumTerrains));
+	for (const XMFLOAT4X4& mat : m_tMapData.vecTerrainTransform)
+	{
+		ofs.write(reinterpret_cast<const char*>(&mat), sizeof(XMFLOAT4X4));
+	}
+
+	ofs.close();
+
+
+	return S_OK;
+}
+
 void CLevel_Editor::LoadedItemsName()
 {
 	m_vLoadedItemsConv.clear();
@@ -410,6 +657,20 @@ void CLevel_Editor::ImGui_MainMenu()
 			if (ImGui::MenuItem("Save", "Ctrl+S", nullptr, false)) { /* Do stuff */ }
 			//if (ImGui::MenuItem("Close", "Ctrl+W")) { isOn_GUITerrain = false; }
 			ImGui::Separator();
+			if (ImGui::BeginMenu("Save File.."))
+			{
+				if (ImGui::MenuItem("[Binary] Map"))
+				{
+					wstring strSavePath = L"";
+					_bool isLoaded = false;
+
+					isLoaded = SaveExternalFile(FILETYPE::DATMAP, &strSavePath);
+
+					if (isLoaded)
+						Save_BinaryMap(&strSavePath);
+				}
+				ImGui::EndMenu();
+			}
 			if (ImGui::BeginMenu("Open File.."))
 			{
 				if (ImGui::MenuItem("[Binary] Model"))
@@ -471,7 +732,7 @@ void CLevel_Editor::ImGui_MainMenu()
 								MSG_BOX(TEXT("Failed to Add Custom Model Prototype.\nLevel_Editor::ImGui_MainMenu() "));
 
 							// 모델로부터 애니메이션 타입 여부 가져옴
-							CModel* pTargetModel = dynamic_cast<CModel*> (m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName));
+							CModel* pTargetModel = dynamic_cast<CModel*>(m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName));
 							MODELTYPE eTargetModelType = pTargetModel->Get_Modeltype();
 
 							// 타입에 따라 게임오브젝트 프로토타입 추가
@@ -508,39 +769,17 @@ void CLevel_Editor::ImGui_MainMenu()
 						}
 						else
 							MSG_BOX(TEXT("Failed. Already loaded same object. : Level_Editor::ImGui_MainMenu()"));
-
-						
-
-
-						// 임시로 스폰.
-						//CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-						//m_pSelectedObject = pGameObject;
-						//m_pObject.push_back(pGameObject);
-						//
-						//CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
-						//
-						//_float3 vecSpawnPosition = {};
-						//_float3 vecSpawnRotation = {};
-						//_float3 vecSpawnScale = {10, 10, 10};
-						//
-						//_matrix matXMEditPosition = XMMatrixTranslation(vecSpawnPosition.x, vecSpawnPosition.y, vecSpawnPosition.z);
-						//_matrix matXMEditRotation = XMMatrixRotationRollPitchYaw(vecSpawnRotation.x, vecSpawnRotation.y, vecSpawnRotation.z);
-						//_matrix matXMEditScale = XMMatrixScaling(vecSpawnScale.x, vecSpawnScale.y, vecSpawnScale.z);
-						//_matrix matXMEditResult = matXMEditScale * matXMEditRotation * matXMEditPosition;
-						//pObjectTransformCom->Set_WorldMatrix(matXMEditResult); // 초기값
 					}
 				}
-				if (ImGui::MenuItem("[Binary] Map", nullptr, nullptr, false))
+				if (ImGui::MenuItem("[Binary] Map"))
 				{
 					wstring strLoadFilePath = L"";
 					_bool isLoaded = false;
 
-					isLoaded = LoadExternalFile(FILETYPE::FBX, &strLoadFilePath);
+					isLoaded = LoadExternalFile(FILETYPE::DATMAP, &strLoadFilePath);
 
-					if (!isLoaded)
-					{
-						// 받아온 경로 문자열을 이용하여 바이너리 맵 로드 진행
-					}
+					if (isLoaded)
+						Load_BinaryMap(&strLoadFilePath);
 				}
 
 				ImGui::EndMenu();
@@ -589,6 +828,8 @@ void CLevel_Editor::ImGui_MainMenu()
 				isOn_GUITerrainEditor = !isOn_GUITerrainEditor;
 			if (ImGui::MenuItem("Model Deployer", nullptr))
 				isOn_ModelDeployer = !isOn_ModelDeployer;
+			if (ImGui::MenuItem("Saving Description", nullptr))
+				isOn_Descriptions = !isOn_Descriptions;
 
 			ImGui::EndMenu();
 		}
@@ -697,7 +938,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	ImGui::BeginGroup();
 
 
-	static int iCurrentItem = 0;
+	static _int iCurrentItem = 0;
 
 	LoadedItemsName();
 
@@ -791,39 +1032,39 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
 		
 
-			switch (iCurrentItem)
-			{
-			case 0:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-				break;
-			}
-			case 1:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
-				break;
-			}
-			case 2:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
-				break;
-			}
-			case 3:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
-				break;
-			}
-			case 4:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
-				break;
-			}
-			default:
+			//switch (iCurrentItem)
+			//{
+			//case 0:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
+			//	break;
+			//}
+			//case 1:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
+			//	break;
+			//}
+			//case 2:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+			//	break;
+			//}
+			//case 3:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
+			//	break;
+			//}
+			//case 4:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
+			//	break;
+			//}
+			//default:
 				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
 				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
 				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
@@ -837,10 +1078,11 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
-				break;
-			}
+			//	break;
+			//}
 			
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+			pGameObject->Set_FileName(m_vLoadedItems[iCurrentItem]);
 			m_pSelectedObject = pGameObject;
 
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
@@ -879,39 +1121,39 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		if (pTerrain != nullptr &&
 			pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
 		{
-			switch (iCurrentItem)
-			{
-			case 0:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-				break;
-			}
-			case 1:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
-				break;
-			}
-			case 2:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
-				break;
-			}
-			case 3:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
-				break;
-			}
-			case 4:
-			{
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
-				break;
-			}
-			default:
+			//switch (iCurrentItem)
+			//{
+			//case 0:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
+			//	break;
+			//}
+			//case 1:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
+			//	break;
+			//}
+			//case 2:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
+			//	break;
+			//}
+			//case 3:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
+			//	break;
+			//}
+			//case 4:
+			//{
+			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
+			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
+			//	break;
+			//}
+			//default:
 				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
 				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
 				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
@@ -925,10 +1167,11 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
-				break;
-			}
+			//	break;
+			//}
 
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
+			pGameObject->Set_FileName(m_vLoadedItems[iCurrentItem]);
 			m_pSelectedObject = pGameObject;
 
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
@@ -1138,6 +1381,46 @@ void CLevel_Editor::ImGui_Inspector()
 #pragma endregion
 
 
+
+	ImGui::End();
+}
+
+void CLevel_Editor::ImGui_Descriptions()
+{
+	ImGui::Begin("Level Descriptions");
+
+	static _int iSelectedLevel = 0;
+
+	const _char* szLevels[] = {
+		"STATIC",
+		"LOADING",
+		"LOGO",
+		"GAMEPLAY",		// 임시
+
+		"MENU",			// 메뉴
+		"EDITOR",		// 에디터
+		"DIALOG",		// 대화창
+
+		// 이하 스테이지 열거체
+		// https://superhot.fandom.com/wiki/Category:SUPERHOT_Levels
+		"CH01_KICK",		"CH02_ALLEY",		"CH03_CORRID",		"CH04_DROP",
+		"CH05_SUBWAY",		"CH06_JUMP",		"CH07_SHOTS",		"CH09_FIGHTC",
+		"CH10_DESPER",		"CH11_BREAK",		"CH13_TIRALL",		"CH14_SERV",
+		"CH15_HOSPIT",		"CH16_DONUT",		"CH17_ELEVAT",		"CH19_OLDBOY",
+		"CH20_BALLRO",		"CH21_MEETIN",		"CH22_HACKER",		"CH25_FALL",
+		"CH26_STAIR",		"CH27_OFFICE",		"CH28_STATION",		"CH29_TRAIN",
+		"CH30_GATE",		"CH31_LOBBY",		"CH32_CORE",		"CH32_LONGWAY",
+		"CH34_FREE",		"CH98_DOG2",		"CH99_DOG1",		"CH99_DOG3",
+
+		"CHSP_BREAKIN",		"CHSP_BRIDGE",		"CHSP_HALL",		"CHSP_LAB18",
+		"CHSP_LOBBY",		"CHSP_OFFICE",		"CHSP_PWRPLANT",	"CHSP_STAIRS",
+		"CHSP_WAREHAUS"
+	};
+
+	ImGui::Text("LEVEL");
+	ImGui::Combo("##Selected Level", &iSelectedLevel, szLevels, IM_ARRAYSIZE(szLevels));
+
+	m_eTargetLevel = static_cast<LEVEL>(iSelectedLevel);
 
 	ImGui::End();
 }
