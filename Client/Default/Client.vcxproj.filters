@@ -100,6 +100,9 @@
     <Filter Include="02.GameObject\Skybox">
       <UniqueIdentifier>{9987aa43-9f3f-4257-94b2-6c3973a945bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Chapter\Normal">
+      <UniqueIdentifier>{421358cb-819b-43d7-bb45-13561a00dbb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">

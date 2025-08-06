@@ -1372,15 +1372,44 @@ void CLevel_Editor::ImGui_Inspector()
 		_matrix matXMEditResult = matXMEditScale * matXMEditRotation * matXMEditPosition;
 
 		pTransformCom->Set_WorldMatrix(matXMEditResult);
-
-
-
-
 	}
-
+	
 #pragma endregion
 
 
+#pragma region Inspector : Transform UI
+	if (m_pSelectedObject != nullptr &&
+		dynamic_cast<CModel*>(m_pSelectedObject->Get_Component(L"Com_Model"))->Get_Modeltype() == MODELTYPE::ANIM)
+	{
+		CModel* pTargetModel = dynamic_cast<CModel*>(m_pSelectedObject->Get_Component(L"Com_Model"));
+		_uint iNumAnim = pTargetModel->Get_NumAnim();
+
+
+		if (ImGui::CollapsingHeader("Model_Animation"))
+		{
+			ImGui::Text("Animation Index");
+			ImGui::Separator();
+
+			static _uint iSelectedAnim = 0;
+			if (ImGui::Button("-##IndexMinus"))
+			{
+				if (iSelectedAnim > 0)
+					iSelectedAnim--;
+			}
+			ImGui::SameLine();
+			ImGui::Text("%d", iSelectedAnim);
+			ImGui::SameLine();
+			if (ImGui::Button("+##IndexPlus"))
+			{
+				if (iSelectedAnim < iNumAnim - 1)
+					iSelectedAnim++;
+			}
+
+			pTargetModel->Set_Animation(iSelectedAnim, true);
+		}
+	}
+	
+#pragma endregion
 
 	ImGui::End();
 }

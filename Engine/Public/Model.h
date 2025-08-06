@@ -33,6 +33,9 @@ public:
 	vector<class CMesh*> Get_Meshes() const {
 		return m_Meshes;
 	}
+	_uint Get_NumAnim() {
+		return m_iNumAnimations;
+	}
 
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
 	MODELTYPE Get_Modeltype() { return m_eModelType; }
