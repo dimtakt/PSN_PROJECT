@@ -38,6 +38,8 @@ protected:
 	_float3*				m_pVertexPositions = {};
 	_uint*					m_pIndices = {};
 
+	_bool					m_isRenderWireFrame = false;
+
 public:
 	virtual CComponent* Clone(void* pArg) = 0;
 	virtual void Free();

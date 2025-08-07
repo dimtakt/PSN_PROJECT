@@ -42,6 +42,7 @@ private:
 
 	vector<_float4x4>		m_OffsetMatrices;
 
+
 private:
 	HRESULT Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone*>& Bones);

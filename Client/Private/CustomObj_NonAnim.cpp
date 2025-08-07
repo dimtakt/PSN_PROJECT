@@ -61,6 +61,8 @@ HRESULT CCustomObj_NonAnim::Render()
         m_pShaderCom->Begin(0);
 
         m_pModelCom->Render(i);
+
+
     }
 
     return S_OK;

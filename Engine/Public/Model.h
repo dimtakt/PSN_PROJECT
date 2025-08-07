@@ -92,8 +92,6 @@ private:
 
 	FILETYPE						m_eFileType = {};
 
-
-
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
