@@ -124,9 +124,6 @@
     <Filter Include="01.Utility\03.Component\VIBuffer\Cube">
       <UniqueIdentifier>{53772d56-5cee-467a-b6b8-2928c097589f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97.ShaderFiles">
-      <UniqueIdentifier>{798ce70f-15be-407e-a77b-224cd9ea1d5a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.Component\Navigation">
       <UniqueIdentifier>{c301aa9f-c5de-4400-b850-f75597ebcd3b}</UniqueIdentifier>
     </Filter>
@@ -135,6 +132,12 @@
     </Filter>
     <Filter Include="01.Utility\03.Component\VIBuffer\Cell">
       <UniqueIdentifier>{d7f46b88-4e28-4c34-904e-f56674fb3ed1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ShaderFiles">
+      <UniqueIdentifier>{798ce70f-15be-407e-a77b-224cd9ea1d5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ExternalTool">
+      <UniqueIdentifier>{08c34863-3f75-4207-80a7-2500666884f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -257,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Cell.cpp">
       <Filter>01.Utility\03.Component\VIBuffer\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>98.ExternalTool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -397,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="..\public\VIBuffer_Cell.h">
       <Filter>01.Utility\03.Component\VIBuffer\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>98.ExternalTool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
