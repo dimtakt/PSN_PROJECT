@@ -27,6 +27,16 @@ namespace Engine
 		float		fRange;
 	}LIGHT_DESC;
 
+	typedef struct tagVertexPosition
+	{
+		XMFLOAT3		vPosition;
+
+		static const unsigned int	iNumElements = { 1 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+	}VTXPOS;
+
 	typedef struct tagVertexPositionTexcoord
 	{
 		XMFLOAT3		vPosition;		

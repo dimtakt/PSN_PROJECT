@@ -1385,7 +1385,7 @@ void CLevel_Editor::ImGui_Inspector()
 		_uint iNumAnim = pTargetModel->Get_NumAnim();
 
 
-		if (ImGui::CollapsingHeader("Model_Animation"))
+		if (ImGui::CollapsingHeader("Animation Viewer"))
 		{
 			ImGui::Text("Animation Index");
 			ImGui::Separator();
@@ -1406,6 +1406,9 @@ void CLevel_Editor::ImGui_Inspector()
 			}
 
 			pTargetModel->Set_Animation(iSelectedAnim, true);
+
+			//const char* szAnimName = pTargetModel->
+			//ImGui::Text("");
 		}
 	}
 	

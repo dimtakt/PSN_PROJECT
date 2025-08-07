@@ -160,4 +160,6 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pNavigationCom);
 }

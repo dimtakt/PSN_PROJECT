@@ -2,6 +2,7 @@
 
 #include "GameInstance.h"
 #include "Camera_Free.h"
+#include "Terrain.h"
 
 
 
@@ -71,7 +72,6 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
-
 	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);

@@ -62,17 +62,17 @@ public:
 	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);
 
 public:
-	void Scale(_float3 vScale);
-	void Scaling(_float3 vScale);
-	void Go_Straight(_float fTimeDelta);
-	void Go_Left(_float fTimeDelta);
-	void Go_Right(_float fTimeDelta);
-	void Go_Backward(_float fTimeDelta);
-	void Go_Above(_float fTimeDelta);
-	void Go_Below(_float fTimeDelta);
-	void Rotation(_fvector vAxis, _float fRadian);
-	void Turn(_fvector vAxis, _float fTimeDelta);
-	void LookAt(_fvector vAt);
+	void Scale(_float3 vScale);						// 스케일 (절대적, 해당 수치 변경)
+	void Scaling(_float3 vScale);					// 상대적 (상대적, 현재 대비 변경)
+	void Go_Straight(_float fTimeDelta);			// 앞으로
+	void Go_Left(_float fTimeDelta);				// 왼쪽으로
+	void Go_Right(_float fTimeDelta);				// 오른쪽으로
+	void Go_Backward(_float fTimeDelta);			// 뒤로
+	void Go_Above(_float fTimeDelta);				// 위로
+	void Go_Below(_float fTimeDelta);				// 아래로
+	void Rotation(_fvector vAxis, _float fRadian);	// 회전 (절대적, 해당 수치 변경)
+	void Turn(_fvector vAxis, _float fTimeDelta);	// 회전 (상대적, 현재 대비 변경)
+	void LookAt(_fvector vAt);						// 해당 방향을 바라보도록 회전
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
 
 private:

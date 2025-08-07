@@ -103,6 +103,12 @@
     <Filter Include="01.Levels\Chapter\Normal">
       <UniqueIdentifier>{421358cb-819b-43d7-bb45-13561a00dbb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GValueManager">
+      <UniqueIdentifier>{3a7ed239-b862-423b-a496-8e7a623bf9d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GValueManager\SpeedMultiplyManager">
+      <UniqueIdentifier>{1a4f387c-0019-4b36-ade4-e471e6ab838c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -344,10 +350,5 @@
     <FxCompile Include="..\..\..\SR_REF11\Client\Bin\ShaderFiles\Shader_VtxCube.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\SR_REF11\Client\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
-      <Filter>97.ShaderFiles</Filter>
-    </None>
   </ItemGroup>
 </Project>

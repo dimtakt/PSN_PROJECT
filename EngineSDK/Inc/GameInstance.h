@@ -19,7 +19,7 @@ private:
 #pragma region ENGINE
 public:
 	HRESULT Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext);
-	void Update_Engine(_float fTimeDelta);
+	void Update_Engine(_float fTimeDelta);	
 	HRESULT Clear_Resources(_uint iClearLevelID);
 public:
 	void Render_Begin(const _float4* pClearColor);

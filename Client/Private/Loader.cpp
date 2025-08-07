@@ -164,6 +164,14 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 
 
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
+		return E_FAIL;
+
+
+
 	// 기존 모델 로드부분은, Enemy 가 모든 레벨에서 쓰일 예정이므로 Static (MainApp)으로 옮김.
 
 	// ksta : 나중에 이런 셰이더들도 Static으로 옮기는걸 고려해봐야 할 듯
@@ -266,6 +274,12 @@ HRESULT CLoader::Loading_For_Editor_Level()
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));

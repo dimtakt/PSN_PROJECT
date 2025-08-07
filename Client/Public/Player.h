@@ -3,6 +3,13 @@
 #include "Client_Defines.h"
 #include "ContainerObject.h"
 
+NS_BEGIN(Engine)
+
+class CNavigation;
+
+NS_END
+
+
 NS_BEGIN(Client)
 
 class CPlayer final : public CContainerObject
@@ -43,6 +50,9 @@ private:
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
+	CNavigation*	m_pNavigationCom = { nullptr };
+
+
 	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::PLAYER;
 	_int			m_iHp = {};
 

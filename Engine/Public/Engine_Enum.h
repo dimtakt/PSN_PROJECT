@@ -4,6 +4,11 @@
 namespace Engine
 {
 	enum class MODELTYPE { NONANIM, ANIM, UNDEFINED, END };
+
+	enum class COLLIDERTYPE { AABB, OBB, SPHERE, END };
+	enum class CELLPOINT { A, B, C, END };
+	enum class CELLLINE { AB, BC, CA, END };
+
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };

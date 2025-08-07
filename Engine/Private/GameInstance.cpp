@@ -79,18 +79,22 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+	// 시간 배율 조정을 위한 변수를 관리하는 매니저나 클래스 나중에 만들어두기
+	//_float fSpeedMultiply = CSpeedMultiplyManager->Get_CurMultiplay();
+	_float fSpeedMultiply = 1;
+	_float fCalcedTimeDelta = fTimeDelta * fSpeedMultiply;
+
 	m_pInput_Device->Update();
 
-	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
-	m_pObject_Manager->Priority_Update(fTimeDelta);
+	m_pObject_Manager->Priority_Update(fCalcedTimeDelta);
 
 	m_pPicking->Update();
 	m_pPipeLine->Update();
 
-	m_pObject_Manager->Update(fTimeDelta);
-	m_pObject_Manager->Late_Update(fTimeDelta);
+	m_pObject_Manager->Update(fCalcedTimeDelta);
+	m_pObject_Manager->Late_Update(fCalcedTimeDelta);
 
-	m_pLevel_Manager->Update(fTimeDelta);
+	m_pLevel_Manager->Update(fCalcedTimeDelta);
 }
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
