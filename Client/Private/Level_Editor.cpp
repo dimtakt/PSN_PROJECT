@@ -257,7 +257,7 @@ _bool CLevel_Editor::LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 	ofn.nMaxFile = sizeof(szFile);
 	ofn.lpstrFilter;
 	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 	
 	switch (eFileType)
 	{
@@ -302,7 +302,7 @@ _bool CLevel_Editor::SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 	ofn.nMaxFile = sizeof(szFile);
 	ofn.lpstrFilter;
 	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
 
 	switch (eFileType)
 	{
