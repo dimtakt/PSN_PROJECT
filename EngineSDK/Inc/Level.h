@@ -9,6 +9,18 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CLevel abstract : public CBase
 {
 protected:
+	typedef struct tLevelCustomObjDesc
+	{
+		_wstring strFilePathPrefix = {};		// 파일
+		// strFilePathSuffix 는 FileName 으로 받아옴.
+		_wstring strFileExt = {};
+
+		_wstring strModelPrototypePrefix = {};
+		_wstring strObjectPrototypePrefix = {};
+
+	}LVLCUSTOMOBJ_DESC;
+
+protected:
 	CLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel() = default;
 
@@ -24,20 +36,32 @@ protected:
 
 
 protected:
-	HRESULT Add_Prototype_Direct(
+	virtual HRESULT Add_Prototype_Direct(
 		_uint iPrototypeLevelIndex,
-		const _wstring& strPrototypeTag, 
-		CBase* pPrototype,
 		const _wstring& strFileName,
-		_matrix* PreTransformMatrix = nullptr
+		_matrix* PreTransformMatrix = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
 	);
 
-	HRESULT Add_GameObject_ToLayer_Direct(
+	HRESULT Add_Prototype_Direct_Model(
+		_uint iPrototypeLevelIndex,
+		const _wstring& strFileName,
+		_matrix* PreTransformMatrix,
+		LVLCUSTOMOBJ_DESC* pLvlArg
+	);
+	HRESULT Add_Prototype_Direct_GameObject(
+		_uint iPrototypeLevelIndex,
+		const _wstring& strFileName,
+		LVLCUSTOMOBJ_DESC* pLvlArg
+	);
+
+	virtual HRESULT Add_GameObject_ToLayer_Direct(
 		_uint iLayerLevelIndex,
 		const _wstring& strLayerTag,
 		_uint iPrototypeLevelIndex,
-		const _wstring& strPrototypeTag,
-		void* pArg
+		const _wstring& strPrototypeTagSuffix,
+		void* pObjArg = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
 	);
 
 public:	

@@ -368,7 +368,9 @@ HRESULT CLevel_Editor::Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strS
 
 HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 {
-	// 바이너리 파일로부터 로컬 함수로
+	// ==============================
+	// || 바이너리 파일로부터 로컬 함수로..
+	// ==============================
 
 	ifstream ifs(strLoadPath->c_str(), ios::binary);
 	if (!ifs.is_open())
@@ -421,13 +423,16 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 	ifs.close();
 
 
-	// 오브젝트 로드
+
+	// ==============================
+	// ||  오브젝트 로드.. 
+	// ==============================
 
 	m_eTargetLevel = static_cast<LEVEL>(m_tMapData.iMapLevel);
 
 	for (_uint i = 0; i < m_tMapData.iNumLoadedItems; i++)
 	{
-		// 프로토타입 생성..
+		// ===== !! 프로토타입 생성.. !! =====
 		
 		// 파일 경로 (상대경로)
 		_wstring strFilePathSuffix = m_tMapData.vecLoadedItems[i];					// 파일명
@@ -439,83 +444,34 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		if (iter != m_vLoadedItems.end())
 			continue;
 
-
-
-		_wstring strFilePath = strFilePathPrefix + strFilePathSuffix + strFileExt;
-		const _char* szFilePath = WStringToChar(strFilePath);
-		
-		// 프로토타입명
-		_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
-		_wstring strObjectPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
-		_wstring strModelPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
-		_wstring strObjectPrototypeTag = strObjectPrototypePrefix + strFilePathSuffix;
-
-		
 		// 좌표계 보정
 		_matrix		PreTransformMatrix = XMMatrixIdentity();
 		PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-
-		if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeTag,
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szFilePath, PreTransformMatrix))))
-			MSG_BOX(TEXT("Failed to Add Custom Model Prototype.\nLevel_Editor::ImGui_MainMenu() "));
-
-
-		CModel* pTargetModel = dynamic_cast<CModel*>(m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeTag));
-		MODELTYPE eTargetModelType = pTargetModel->Get_Modeltype();
-
-		// 타입에 따라 게임오브젝트 프로토타입 추가
-		if (eTargetModelType == MODELTYPE::NONANIM)
-		{
-			if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeTag,
-				CCustomObj_NonAnim::Create(m_pDevice, m_pContext))))
-				MSG_BOX(TEXT("Failed to Add Custom Object Prototype.\nLevel_Editor::ImGui_MainMenu()"));
-
-			//CCustomObj_NonAnim::CUSTOMOBJ_NA_DESC CustomObjDesc = {};
-			//CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-			//CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
-		}
-		else if (eTargetModelType == MODELTYPE::ANIM)
-		{
-			if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeTag,
-				CCustomObj_Anim::Create(m_pDevice, m_pContext))))
-				MSG_BOX(TEXT("Failed to Add Custom Object Prototype.\nLevel_Editor::ImGui_MainMenu()"));
-
-			//CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};
-			//CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-			//CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
-		}
-
+		// 생성
+		if (FAILED(Add_Prototype_Direct(ENUM_CLASS(LEVEL::EDITOR), strFilePathSuffix, &PreTransformMatrix)))
+			return E_FAIL;
 
 		// 로컬 변수
 		m_vLoadedItems.push_back(m_tMapData.vecLoadedItems[i]);
-
-
-		Safe_Delete(szFilePath);
 	}
 
 	for (_uint i = 0; i < m_tMapData.iNumGameObj; i++)
 	{
-		// 게임오브젝트 생성 및 삽입..
+		// ===== !! 게임오브젝트 생성 및 삽입.. !! =====
 		
 		// 프로토타입명 (모델 프로토타입은 Desc에 묶어서 인자로, 오브젝트 프로토타입은 인자로) 
 		LOADED_OBJ_DESC tDesc = m_tMapData.vecGameObj[i];
 
 		_wstring strFilePathSuffix = tDesc.strFileName;					// 파일명
-		_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
 		_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
 
-		_wstring strPrototypeTag = strPrototypePrefix + strFilePathSuffix;
-
-		CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+		CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 		CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 		CustomObjDesc.strModelComPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
 
-		_wstring strLayerTag = L"Layer_Editor_Object";
-
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), strLayerTag,
-			ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc)))
-			MSG_BOX(TEXT("Failed to Add Custom GameObject.\nLevel_Editor::ImGui_MainMenu()"));
+		if (FAILED(Add_GameObject_ToLayer_Direct(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object", ENUM_CLASS(LEVEL::EDITOR), strFilePathSuffix, &CustomObjDesc)))
+			return E_FAIL;
 
 		// 좌표반영
 		CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
@@ -523,15 +479,13 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 		pObjectTransformCom->Set_WorldMatrix(tDesc.matFinalTransform);
 
-
 		// 로컬 변수
 		m_pObject.push_back(pGameObject);
-
 	}
 
 	for (_uint i = 0; i < m_tMapData.iNumTerrains; i++)
 	{
-		// 터레인 생성 및 삽입..
+		// ===== !! 터레인 생성 및 삽입.. !! =====
 		_float4x4	matTerrainTransform = m_tMapData.vecTerrainTransform[i];
 
 		_wstring strLayerTag = L"Layer_Editor_Terrain";
@@ -547,7 +501,6 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		m_pTerrainObject.push_back(pTerrainObject);
 
 	}
-
 
 	return S_OK;
 }
@@ -732,34 +685,11 @@ void CLevel_Editor::ImGui_MainMenu()
 						_char		szExt[MAX_PATH] = {};
 						_char		szFileName[MAX_PATH] = {};
 						_splitpath_s(szLoadPath, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
+
+						_wstring	strFileName = ConvertCharToWString(szFileName);
 						
 						_matrix		PreTransformMatrix = XMMatrixIdentity();
 						PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-						_wstring	strModelPrototypeName = L"Prototype_Component_Model_Custom_";
-						_wstring	strObjectPrototypeName = L"Prototype_GameObject_Model_Custom_";
-						_int		len = MultiByteToWideChar(CP_ACP, 0, szFileName, -1, nullptr, 0);
-						_wstring	strFileName(len, 0);
-						MultiByteToWideChar(CP_ACP, 0, szFileName, -1, &strFileName[0], len);
-						strFileName.pop_back(); // null 문자 제거
-						strModelPrototypeName += strFileName;
-						strObjectPrototypeName += strFileName;
-
-
-						// ksta : 8/4 로드 테스트. 일단 화면에 띄워보기
-						//
-						// 모델로부터 AnimModel 인지 NonAnimModel 인지 정보를 받아와서
-						// 서로 다른 프로토타입 게임오브젝트를 사용하도록.
-						// 단, CustomObj 는 프로토타입으로 로드가 되어있어야 할 듯
-						// 근데 미리 만들어 둘 수가 없음. 프로토타입이 겹치면 문제생길 것 같은데..
-						// ㅇㅇ안됨이거 차라리 그때그때 추가해서 만들어야됨 그래야 프로토타입의 의미가있음
-						//
-						//m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-						//	ENUM_CLASS(LEVEL::EDITOR), strPrototypeName);	// 이거 게임오브젝트가 아님. 컴포넌트임. 이걸 쓰는 오브젝트를 새로 추가하던가 해야 함
-						//
-						// 1. 모델 프로토타입을 만듦			(위에서함)
-						// 2. 오브젝트 프로토타입을 만듦		(아래에서 해줘야함)
-						// 3. 그걸로 레이어에 넣음
 
 
 
@@ -768,35 +698,7 @@ void CLevel_Editor::ImGui_MainMenu()
 						if (iter == m_vLoadedItems.end())
 						{
 							// 모델 컴포넌트 프로토타입 삽입
-							if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName,
-								CModel::Create(m_pDevice, m_pContext, MODELTYPE::UNDEFINED, szLoadPath, PreTransformMatrix))))
-								MSG_BOX(TEXT("Failed to Add Custom Model Prototype.\nLevel_Editor::ImGui_MainMenu() "));
-
-							// 모델로부터 애니메이션 타입 여부 가져옴
-							CModel* pTargetModel = dynamic_cast<CModel*>(m_pGameInstance->Find_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeName));
-							MODELTYPE eTargetModelType = pTargetModel->Get_Modeltype();
-
-							// 타입에 따라 게임오브젝트 프로토타입 추가
-							if		(eTargetModelType == MODELTYPE::NONANIM)
-							{
-								if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName,
-									CCustomObj_NonAnim::Create(m_pDevice, m_pContext))))
-									MSG_BOX(TEXT("Failed to Add Custom Object Prototype.\nLevel_Editor::ImGui_MainMenu()"));
-
-								//CCustomObj_NonAnim::CUSTOMOBJ_NA_DESC CustomObjDesc = {};
-								//CustomObjDesc.strModelComPrototypeTag = strModelPrototypeName;
-								//CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
-							}
-							else if (eTargetModelType == MODELTYPE::ANIM)
-							{
-								if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strObjectPrototypeName,
-									CCustomObj_Anim::Create(m_pDevice, m_pContext))))
-									MSG_BOX(TEXT("Failed to Add Custom Object Prototype.\nLevel_Editor::ImGui_MainMenu()"));
-
-								//CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};
-								//CustomObjDesc.strModelComPrototypeTag = strModelPrototypeName;
-								//CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
-							}
+							Add_Prototype_Direct(ENUM_CLASS(LEVEL::EDITOR), strFileName, &PreTransformMatrix);
 
 							m_vLoadedItems.push_back(strFileName);
 						}
@@ -1065,59 +967,27 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
 		
 
-			//switch (iCurrentItem)
-			//{
-			//case 0:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-			//	break;
-			//}
-			//case 1:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
-			//	break;
-			//}
-			//case 2:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
-			//	break;
-			//}
-			//case 3:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
-			//	break;
-			//}
-			//case 4:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
-			//	break;
-			//}
-			//default:
-				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
-				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
-				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
+			// 추가 및 생성
+			_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
+			_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
+			_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
 
-				_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
-				_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
+			_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
+			_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
 
-				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
-				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-				CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
+			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
-			//	break;
-			//}
-			
+			_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+			Add_GameObject_ToLayer_Direct(iDestLevel, L"Layer_Editor_Object", iDestLevel, strPrototypeSuffix, &CustomObjDesc);
+
+			// 선택중 오브젝트 할당
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 			pGameObject->Set_FileName(m_vLoadedItems[iCurrentItem]);
 			m_pSelectedObject = pGameObject;
-
+			
+			// 트랜스폼 후처리 반영
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 				
 			_matrix matPosition = XMMatrixTranslationFromVector(XMLoadFloat3(&vManualDeployObjPos));
@@ -1129,8 +999,6 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			pObjectTransformCom->Set_WorldMatrix(matResult);
 
 			m_pObject.push_back(pGameObject);
-
-			//iObjIndex++; // 이거 안내려서 문제생긴듯
 
 		}
 
@@ -1154,90 +1022,34 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		if (pTerrain != nullptr &&
 			pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
 		{
-			//switch (iCurrentItem)
-			//{
-			//case 0:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"));
-			//	break;
-			//}
-			//case 1:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"));
-			//	break;
-			//}
-			//case 2:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"));
-			//	break;
-			//}
-			//case 3:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"));
-			//	break;
-			//}
-			//case 4:
-			//{
-			//	m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-			//		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"));
-			//	break;
-			//}
-			//default:
-				_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
-				_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
-				_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
+			// 추가 및 생성
+			_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
+			_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
+			_wstring strPrototypeSuffix = m_vLoadedItems[iCurrentItem];
 
-				_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
-				_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
+			_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
+			_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
 
-				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
-				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-				CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
+			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
-				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
-					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
-			//	break;
-			//}
+			_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+			Add_GameObject_ToLayer_Direct(iDestLevel, L"Layer_Editor_Object", iDestLevel, strPrototypeSuffix, &CustomObjDesc);
 
+			// 선택중 오브젝트 할당
 			CGameObject* pGameObject = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
 			pGameObject->Set_FileName(m_vLoadedItems[iCurrentItem]);
 			m_pSelectedObject = pGameObject;
 
+			// 트랜스폼 후처리 반영
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 			pObjectTransformCom->Scale(_float3{ 10, 10, 10 }); // 임시로 크기 키움
 			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
 
 			m_pObject.push_back(pGameObject);
-
-			//iObjIndex++; // 이거 안내려서 문제생긴듯
 		}
 	}
-
-
-
-
-	//ImGui::Separator();
-	//if (ImGui::Button("Undo"))
-	//	if (!m_pObject.empty())
-	//	{
-	//		m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-	//		m_pObject.pop_back();
-	//	}
-	//if (ImGui::CollapsingHeader("Danger Section"))
-	//{
-	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	//	if (ImGui::Button("All Reset"))
-	//	{
-	//		for (size_t i = 0; i < m_pObject.size(); i++)
-	//			m_pGameInstance->Remove_LastGameObject(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object");
-	//		m_pObject.clear();
-	//	}
-	//	ImGui::PopStyleColor();
-	//}
 
 	ImGui::EndGroup();
 

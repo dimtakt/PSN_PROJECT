@@ -71,7 +71,7 @@ HRESULT CCustomObj_NonAnim::Render()
 
 HRESULT CCustomObj_NonAnim::Ready_Components(void* pArg)
 {
-    CUSTOMOBJ_NA_DESC* pDesc = static_cast<CUSTOMOBJ_NA_DESC*>(pArg);
+    CUSTOMOBJ_DESC* pDesc = reinterpret_cast<CUSTOMOBJ_DESC*>(pArg);
 
     _wstring strPrototypeName = pDesc->strModelComPrototypeTag;
     m_iGameObjType = pDesc->iGameObjType;

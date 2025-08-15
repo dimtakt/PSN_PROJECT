@@ -72,6 +72,59 @@ private:	// 해당 클래스에서만 사용할 함수
 	
 	void LoadedItemsName();
 
+
+
+
+#pragma region Overrides Parent Functions..
+
+private:
+	virtual HRESULT Add_Prototype_Direct(
+		_uint iPrototypeLevelIndex,
+		const _wstring& strFileName,
+		_matrix* PreTransformMatrix = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
+	) override
+	{
+		LVLCUSTOMOBJ_DESC tDesc = {};
+		tDesc.strFilePathPrefix			= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt				= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+
+		return __super::Add_Prototype_Direct(
+			iPrototypeLevelIndex,
+			strFileName,
+			PreTransformMatrix,
+			&tDesc);
+	}
+
+	virtual HRESULT Add_GameObject_ToLayer_Direct(
+		_uint iLayerLevelIndex,
+		const _wstring& strLayerTag,
+		_uint iPrototypeLevelIndex,
+		const _wstring& strPrototypeTagSuffix,
+		void* pObjArg = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
+	) override
+	{
+		LVLCUSTOMOBJ_DESC tDesc = {};
+		tDesc.strFilePathPrefix			= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt				= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+
+		return __super::Add_GameObject_ToLayer_Direct(
+			iLayerLevelIndex,
+			strLayerTag,
+			iPrototypeLevelIndex,
+			strPrototypeTagSuffix,
+			pObjArg,
+			&tDesc);
+	}
+
+
+#pragma endregion
+
 private:
 	//bool show_demo_window = true;
 	//bool show_another_window = false;

@@ -14,11 +14,11 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CCustomObj_Anim final : public CGameObject
 {
 public:
-	typedef struct customObjectAnimDesc : public GAMEOBJECT_DESC
+	typedef struct customObjectDesc : public GAMEOBJECT_DESC
 	{
 		_wstring		strModelComPrototypeTag;
 
-	}CUSTOMOBJ_A_DESC;
+	}CUSTOMOBJ_DESC;
 
 private:
 	CCustomObj_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
