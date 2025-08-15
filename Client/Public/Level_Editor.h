@@ -95,7 +95,6 @@ private:
 	LEVEL					m_eTargetLevel = {};
 
 	vector<CGameObject*>	m_pObject = {};
-	vector<_wstring>		m_pObjectNames = {};
 	vector<CGameObject*>	m_pTerrainObject = {};
 
 	vector<_wstring>		m_vLoadedItems = {};				// 모델 요소 저장. 저장 시 FileName 으로 저장할 것.
@@ -103,6 +102,7 @@ private:
 	vector<const _char*>	m_vLoadedItemPtrs = {};
 
 	_bool					isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
+	_bool					isNavMesh_EditOn = false;			// !! 네비메쉬 편집모드 켜질 때 True.
 	CGameObject*			m_pSelectedObject = {};				// 현재 선택된 오브젝트. 임시 포인터 변수
 	CGameObject*			m_pPrevSelectedObject = {};			// 이전 선택된 오브젝트. 임시 포인터 변수
 	_bool					m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.

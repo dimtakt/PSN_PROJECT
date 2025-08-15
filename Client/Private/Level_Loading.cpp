@@ -15,6 +15,7 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;	 
+	Update_DestLevel(m_eNextLevelID);	// Level매니저에서 다음 레벨을 갱신. 프로토타입/객체 생성시에 해당 변수를 이용할 것.
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_GameObjects()))
@@ -70,6 +71,13 @@ HRESULT CLevel_Loading::Ready_LoadingThread()
 	m_pLoader = CLoader::Create(m_pDevice, m_pContext, m_eNextLevelID);
 	if (nullptr == m_pLoader)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Loading::Update_DestLevel(LEVEL eLevel)
+{
+	m_pGameInstance->Set_DestLevel(ENUM_CLASS(eLevel));
 
 	return S_OK;
 }

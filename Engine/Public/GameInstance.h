@@ -37,6 +37,8 @@ public:
 public:
 	HRESULT Open_Level(_uint iLevelID, class CLevel* pNewLevel);
 	_uint Get_CurLevel();
+	_uint Get_DestLevel();
+	void Set_DestLevel(_uint iDestLevelIndex);
 #pragma endregion
 
 	// ==============================

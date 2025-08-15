@@ -16,6 +16,7 @@ class ENGINE_DLL CGameObject abstract : public CBase
 public:
 	typedef struct tagGameObject : public CTransform::TRANSFORM_DESC
 	{
+		_uint			iGameObjType;
 
 	}GAMEOBJECT_DESC;
 protected:

@@ -33,10 +33,10 @@ private:
 	HRESULT		Bind_ShaderResources();
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
+	_uint			m_iGameObjType = { };
 
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
 
 public:
 	static CProps_Pot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

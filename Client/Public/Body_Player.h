@@ -36,6 +36,7 @@ public:
 	virtual HRESULT Render();
 
 private:
+	_uint			m_iGameObjType = { };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 

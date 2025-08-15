@@ -18,9 +18,27 @@ public:
 	virtual HRESULT Render();
 
 protected:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
-	class CGameInstance*	m_pGameInstance = { nullptr };
+	ID3D11Device*				m_pDevice = { nullptr };
+	ID3D11DeviceContext*		m_pContext = { nullptr };
+	class CGameInstance*		m_pGameInstance = { nullptr };
+
+
+protected:
+	HRESULT Add_Prototype_Direct(
+		_uint iPrototypeLevelIndex,
+		const _wstring& strPrototypeTag, 
+		CBase* pPrototype,
+		const _wstring& strFileName,
+		_matrix* PreTransformMatrix = nullptr
+	);
+
+	HRESULT Add_GameObject_ToLayer_Direct(
+		_uint iLayerLevelIndex,
+		const _wstring& strLayerTag,
+		_uint iPrototypeLevelIndex,
+		const _wstring& strPrototypeTag,
+		void* pArg
+	);
 
 public:	
 	virtual void Free();

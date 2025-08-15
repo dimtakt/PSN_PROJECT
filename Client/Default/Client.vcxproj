@@ -157,8 +157,6 @@
     <ClInclude Include="..\public\Camera_Editor.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
-    <ClInclude Include="..\public\CustomObj_Anim.h" />
-    <ClInclude Include="..\public\CustomObj_NonAnim.h" />
     <ClInclude Include="..\Public\Props_Fotel.h" />
     <ClInclude Include="..\Public\Props_Pot.h" />
     <ClInclude Include="..\public\Level_Editor.h" />
@@ -195,8 +193,6 @@
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
-    <ClCompile Include="..\private\CustomObj_Anim.cpp" />
-    <ClCompile Include="..\private\CustomObj_NonAnim.cpp" />
     <ClCompile Include="..\Private\Props_Fotel.cpp" />
     <ClCompile Include="..\Private\Props_Pot.cpp" />
     <ClCompile Include="..\private\Level_Editor.cpp" />

@@ -139,6 +139,9 @@
     <Filter Include="98.ExternalTool">
       <UniqueIdentifier>{08c34863-3f75-4207-80a7-2500666884f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.GameObject\_Types">
+      <UniqueIdentifier>{618bcb61-e16c-44dd-adac-3c84e203109b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -263,6 +266,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\DebugDraw.cpp">
       <Filter>98.ExternalTool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CustomObj_Anim.cpp">
+      <Filter>01.Utility\02.GameObject\_Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CustomObj_NonAnim.cpp">
+      <Filter>01.Utility\02.GameObject\_Types</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -406,6 +415,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugDraw.h">
       <Filter>98.ExternalTool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CustomObj_NonAnim.h">
+      <Filter>01.Utility\02.GameObject\_Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CustomObj_Anim.h">
+      <Filter>01.Utility\02.GameObject\_Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

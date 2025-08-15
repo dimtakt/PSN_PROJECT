@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Client_Defines.h"
 #include "GameObject.h"
 
 NS_BEGIN(Engine)
@@ -10,16 +9,15 @@ class CModel;
 
 NS_END
 
-NS_BEGIN(Client)
+NS_BEGIN(Engine)
 
-class CCustomObj_Anim final : public CGameObject
+class ENGINE_DLL CCustomObj_Anim final : public CGameObject
 {
 public:
 	typedef struct customObjectAnimDesc : public GAMEOBJECT_DESC
 	{
 		_wstring		strModelComPrototypeTag;
 
-		GAMEOBJ_TYPE	eGameObjType;
 	}CUSTOMOBJ_A_DESC;
 
 private:
@@ -41,10 +39,10 @@ private:
 	HRESULT		Bind_ShaderResources();
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS;
+	_uint			m_iGameObjType	= { };
 
-	CShader*		m_pShaderCom = { nullptr };
-	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom	= { nullptr };
+	CModel*			m_pModelCom		= { nullptr };
 
 public:
 	static CCustomObj_Anim*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "GameInstance.h"
 
 /* 기존레벨과 새로운 레벨을 교체해준다. */
 /* 현재 할당되어있는 레벨의 갱신과 렌더링을 담당한다. */
@@ -24,11 +25,14 @@ public:
 	HRESULT Render();
 
 	_uint Get_CurLevel() { return m_iCurrentLevelID; }
+	_uint Get_DestLevel() { return m_iDestLevelID; }
+	void Set_DestLevel(_uint iDestLevelIndex) { m_iDestLevelID = iDestLevelIndex; }
 
 private:
 	class CLevel*				m_pCurrentLevel = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
 	_uint						m_iCurrentLevelID = { };
+	_uint						m_iDestLevelID = { };
 
 private:
 	HRESULT Clear_Resources();

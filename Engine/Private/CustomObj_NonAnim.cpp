@@ -1,6 +1,7 @@
 #include "CustomObj_NonAnim.h"
 #include "Gameinstance.h"
 
+
 CCustomObj_NonAnim::CCustomObj_NonAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
@@ -73,20 +74,22 @@ HRESULT CCustomObj_NonAnim::Ready_Components(void* pArg)
     CUSTOMOBJ_NA_DESC* pDesc = static_cast<CUSTOMOBJ_NA_DESC*>(pArg);
 
     _wstring strPrototypeName = pDesc->strModelComPrototypeTag;
-    m_eGameObjType = pDesc->eGameObjType;
+    m_iGameObjType = pDesc->iGameObjType;
 
-    LEVEL eLevel;
-    // ksta : 임시조치. 에디터에선 에디터로, 아니면 게임플레이로. 추후 수정 필요.
-    if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::EDITOR))
-        eLevel = LEVEL::EDITOR;
-    else
-        eLevel = LEVEL::GAMEPLAY;
+    //LEVEL eLevel;
+    //// ksta : 임시조치. 에디터에선 에디터로, 아니면 게임플레이로. 추후 수정 필요.
+    //if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::EDITOR))
+    //    eLevel = LEVEL::EDITOR;
+    //else
+    //    eLevel = LEVEL::GAMEPLAY;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Shader_VtxMesh"),
+    _uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+
+    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::EDITOR), strPrototypeName,
+    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, strPrototypeName,
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
     Set_BufferRef(m_pModelCom);

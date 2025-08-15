@@ -173,6 +173,16 @@ _uint CGameInstance::Get_CurLevel()
 	return m_pLevel_Manager->Get_CurLevel();
 }
 
+_uint CGameInstance::Get_DestLevel()
+{
+	return m_pLevel_Manager->Get_DestLevel();
+}
+
+void CGameInstance::Set_DestLevel(_uint iDestLevelIndex)
+{
+	m_pLevel_Manager->Set_DestLevel(iDestLevelIndex);
+}
+
 #pragma endregion
 
 // ==============================

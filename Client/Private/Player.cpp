@@ -115,6 +115,8 @@ HRESULT CPlayer::Render()
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
+	_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+
 
 	return S_OK;
 }

@@ -31,6 +31,8 @@ private:
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
 
+	HRESULT Update_DestLevel(LEVEL eLevel);
+
 public:
 	static CLevel_Loading* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);
 	virtual void Free() override;

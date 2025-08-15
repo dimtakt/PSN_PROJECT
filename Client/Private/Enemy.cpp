@@ -94,14 +94,16 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
 	
-	LEVEL eLevel;
-	// ksta : 임시조치. 에디터에선 에디터로, 아니면 게임플레이로. 추후 수정 필요.
-	if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::EDITOR))
-		eLevel = LEVEL::EDITOR;
-	else
-		eLevel = LEVEL::GAMEPLAY;
+	//LEVEL eLevel;
+	//// ksta : 임시조치. 에디터에선 에디터로, 아니면 게임플레이로. 추후 수정 필요.
+	//if (m_pGameInstance->Get_CurLevel() == ENUM_CLASS(LEVEL::EDITOR))
+	//	eLevel = LEVEL::EDITOR;
+	//else
+	//	eLevel = LEVEL::GAMEPLAY;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(eLevel), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+	_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+
+	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
 		return E_FAIL;
 

@@ -440,6 +440,7 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 			continue;
 
 
+
 		_wstring strFilePath = strFilePathPrefix + strFilePathSuffix + strFileExt;
 		const _char* szFilePath = WStringToChar(strFilePath);
 		
@@ -453,13 +454,6 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		// 좌표계 보정
 		_matrix		PreTransformMatrix = XMMatrixIdentity();
 		PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-
-#ifdef _DEBUG
-		char cwd[512];
-		_getcwd(cwd, sizeof(cwd));
-#endif // DEBUG
-
 
 
 		if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), strModelPrototypeTag,
@@ -514,7 +508,7 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		_wstring strPrototypeTag = strPrototypePrefix + strFilePathSuffix;
 
 		CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
-		CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+		CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 		CustomObjDesc.strModelComPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
 
 		_wstring strLayerTag = L"Layer_Editor_Object";
@@ -1113,7 +1107,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-				CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+				CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
 				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);
@@ -1202,7 +1196,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 
 				CCustomObj_Anim::CUSTOMOBJ_A_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 				CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
-				CustomObjDesc.eGameObjType = GAMEOBJ_TYPE::STATIC_PROPS; // 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+				CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
 				m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object",
 					ENUM_CLASS(LEVEL::EDITOR), strPrototypeTag, &CustomObjDesc);

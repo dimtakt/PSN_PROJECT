@@ -53,7 +53,7 @@ private:
 	CNavigation*	m_pNavigationCom = { nullptr };
 
 
-	GAMEOBJ_TYPE	m_eGameObjType = GAMEOBJ_TYPE::PLAYER;
+	_uint			m_iGameObjType = { };
 	_int			m_iHp = {};
 
 	_uint			m_iState = { };

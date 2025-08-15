@@ -87,11 +87,13 @@ HRESULT CWeapon::Render()
 
 HRESULT CWeapon::Ready_Components()
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxMesh"),
+    _uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+
+    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_"/* // ksta : 이 부분 사용할 모델 부분으로 수정 필요 */),
+    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Model_"/* // ksta : 이 부분 사용할 모델 부분으로 수정 필요 */),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 
