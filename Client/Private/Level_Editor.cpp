@@ -157,6 +157,9 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
+	if (!isOn_NavMeshEditor)
+		ImGui_NavMeshEditor();		// 네비게이션메쉬 배치기
+
 	//if (isObject_Selected)
 		ImGui_Inspector();			// 오브젝트 선택 중에만 뜸 (오브젝트 미선택시 함수 내에서 즉시 return 시킴)
 
@@ -189,6 +192,9 @@ _bool CLevel_Editor::Check_ObjectPicking()
 	// 커서와 겹친 모든 오브젝트를 확인, 컨테이너에 담음.
 	// 단일 오브젝트만 겹쳤다면 즉시 할당 및 리턴
 	// 겹친 오브젝트가 없다면 즉시 nullptr, 리턴
+
+	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+	_vector vCamPosLoad = XMLoadFloat4(vCamPos);
 	vector<CGameObject*> pPickedObjects = {};
 
 	for (auto object : m_pObject)
@@ -210,13 +216,11 @@ _bool CLevel_Editor::Check_ObjectPicking()
 	// 두 번째로 가까운 오브젝트를 찾음
 	vector<_float> vecLengthOrigin = {};
 	vector<_float> vecLength = {};
-	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
 
 	for (auto object : pPickedObjects)
 	{
 		_vector vObjPos = dynamic_cast<CTransform*>(object->Get_Component(L"Com_Transform"))->Get_State(STATE::POSITION);
-		_vector vCamPosLoad = XMLoadFloat4(vCamPos);
-
+		
 		_float4 vDiff;
 		XMStoreFloat4(&vDiff, XMVector3LengthSq(vObjPos - vCamPosLoad));
 
@@ -592,6 +596,164 @@ HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
 
 
 	return S_OK;
+}
+
+
+_bool CLevel_Editor::Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
+{
+	if (pOut == nullptr)
+		return false;
+
+	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+	_vector vCamPosLoad = XMLoadFloat4(vCamPos);
+
+	_float3 vObjectPos = {};
+	_bool	isObjectPicked = Get_ObjectPickingPos(&vObjectPos, isIgnoreAnimMesh);
+	_float3 vTerrainPos = {};
+	_bool	isTerrainPicked = Get_TerrainPickingPos(&vTerrainPos);
+
+	_float3 vShortestPos = {};
+	
+	if (isObjectPicked && isTerrainPicked)
+	{
+		_float fObjDist, fTerrainDist;
+		XMStoreFloat(&fObjDist, XMVector3LengthSq(XMLoadFloat3(&vObjectPos) - vCamPosLoad));
+		XMStoreFloat(&fTerrainDist, XMVector3LengthSq(XMLoadFloat3(&vTerrainPos) - vCamPosLoad));
+
+		vShortestPos = (fObjDist < fTerrainDist) ? vObjectPos : vTerrainPos;
+	}
+	else if (isObjectPicked)
+		vShortestPos = vObjectPos;
+	else if (isTerrainPicked)
+		vShortestPos = vTerrainPos;
+	else
+	{
+		pOut = nullptr;
+		return false;
+	}
+
+	*pOut = vShortestPos;
+	return true;
+}
+
+_bool CLevel_Editor::Get_ObjectPickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
+{
+	if (pOut == nullptr)
+		return false;
+
+	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+	_vector vCamPosLoad = XMLoadFloat4(vCamPos);
+	vector<CGameObject*> pPickedObjects = {};
+
+	_bool isObjectPicked = false;
+
+
+	_float3			vPickedPos = {};
+	vector<_float3>	vecPickedPoses = {};
+
+	for (auto& object : m_pObject)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(object->Get_Component(L"Com_Model"));
+
+		if ((isIgnoreAnimMesh &&
+			pModel->Get_Modeltype() == MODELTYPE::ANIM) ||
+			pModel == nullptr)
+			continue;
+
+		if (object->isPicked(&vPickedPos))
+		{
+			pPickedObjects.push_back(object);
+			vecPickedPoses.push_back(vPickedPos);
+			isObjectPicked = true;
+		}
+	}
+
+	// 피킹 좌표 반환을 위함.
+	// 여러 좌표들 중 가장 가까운 것을 반환해야 함
+
+	_float3			vShortestPos = {};
+	_float			fShortestLength = {};
+
+	for (auto& pos : vecPickedPoses)
+	{
+		_vector vPosLoad = XMLoadFloat3(&pos);
+
+		_float fResultDiff = {};
+		XMStoreFloat(&fResultDiff, XMVector3LengthSq(vPosLoad - vCamPosLoad));
+
+		if (&pos == &vecPickedPoses.front())
+		{
+			vShortestPos = pos;
+			fShortestLength = fResultDiff;
+		}
+		else
+		{
+			if (fResultDiff < fShortestLength)
+			{
+				fShortestLength = fResultDiff;
+				vShortestPos = pos;
+			}
+		}
+	}
+
+	// 반환
+	*pOut = vShortestPos;
+	return isObjectPicked;
+}
+
+_bool CLevel_Editor::Get_TerrainPickingPos(_float3* pOut)
+{
+	if (pOut == nullptr)
+		return false;
+
+	const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+	_vector vCamPosLoad = XMLoadFloat4(vCamPos);
+	vector<CGameObject*> pPickedObjects = {};
+	_float3			vPickedPos = {};
+	vector<_float3>	vecPickedPoses = {};
+
+	_bool isTerrainPicked = false;
+
+
+	for (auto& object : m_pTerrainObject)
+		if (object->isPicked(&vPickedPos))
+		{
+			pPickedObjects.push_back(object);
+			vecPickedPoses.push_back(vPickedPos);
+			isTerrainPicked = true;
+		}
+
+	// 피킹 좌표 반환을 위함.
+	// 여러 좌표들 중 가장 가까운 것을 반환해야 함
+
+	_float3			vShortestPos = {};
+	_float			fShortestLength = {};
+
+	for (auto& pos : vecPickedPoses)
+	{
+		_vector vPosLoad = XMLoadFloat3(&pos);
+
+		_float fResultDiff = {};
+		XMStoreFloat(&fResultDiff, XMVector3LengthSq(vPosLoad - vCamPosLoad));
+
+		if (&pos == &vecPickedPoses.front())
+		{
+			vShortestPos = pos;
+			fShortestLength = fResultDiff;
+		}
+		else
+		{
+			if (fResultDiff < fShortestLength)
+			{
+				fShortestLength = fResultDiff;
+				vShortestPos = pos;
+			}
+		}
+	}
+
+	// 반환
+	*pOut = vShortestPos;
+	return isTerrainPicked;
 }
 
 void CLevel_Editor::LoadedItemsName()
@@ -1019,8 +1181,9 @@ void CLevel_Editor::ImGui_ModelDeployer()
 		if (!m_pTerrainObject.empty())
 			pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
 		
-		if (pTerrain != nullptr &&
-			pTerrain->isPicked(&vPickedPos)) // 이거 false 뜨면 생성 안되게
+		if (//pTerrain != nullptr &&
+			//pTerrain->isPicked(&vPickedPos)
+			Get_PickingPos(&vPickedPos)) // 이거 false 뜨면 생성 안되게
 		{
 			// 추가 및 생성
 			_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
@@ -1056,6 +1219,16 @@ void CLevel_Editor::ImGui_ModelDeployer()
 #pragma endregion
 
 	ImGui::End();
+}
+
+void CLevel_Editor::ImGui_NavMeshEditor()
+{
+	if (!isOn_NavMeshEditor)
+		return;
+
+
+
+
 }
 
 void CLevel_Editor::ImGui_Inspector()

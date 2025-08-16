@@ -257,6 +257,16 @@ namespace Engine
 #pragma endregion
 
 
+#pragma region Output Description [Binary NavMesh]
+	typedef struct tagNavigationMeshDesc {
+
+		unsigned int			iNumTris;
+		vector<XMFLOAT3[3]>		vecTris;
+
+	}NAVMESH_DESC;
+#pragma endregion
+
+
 
 }
 

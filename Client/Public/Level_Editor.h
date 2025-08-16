@@ -2,13 +2,6 @@
 
 #include "Level.h"
 #include "Client_Defines.h"
-#include <array>
-
-
-#include "MeshMaterial.h"
-#include "Mesh.h"
-#include "Animation.h"
-#include "Bone.h"
 
 //#include "Client_Struct.h"
 
@@ -45,20 +38,22 @@ private:
 	CImGui_Manager* m_pImGui_Manager = nullptr;
 
 private:	// Default Window + 변수 컨트롤
-	void ImGui_Render();
+	void	ImGui_Render();
 
-	void Check_NotUsingUI();		// UI에 커서를 사용중인지를 리턴
-	_bool Check_ObjectPicking();	// 컨테이너 내 obj 피킹여부 리턴, 선택중 Obj에 할당
+	void	Check_NotUsingUI();			// UI에 커서를 사용중인지를 리턴
+	_bool	Check_ObjectPicking();		// 컨테이너 내 obj 피킹여부 리턴, 선택중 Obj에 할당
 
+		
 private:	// Custom Window
-	void ImGui_MainMenu();			// 최상단 메뉴
+	void	ImGui_MainMenu();			// 최상단 메뉴
 
-	void ImGui_TerrainEditor();
-	void ImGui_ModelDeployer();
+	void	ImGui_TerrainEditor();
+	void	ImGui_ModelDeployer();
+	void	ImGui_NavMeshEditor();
 
-	void ImGui_Inspector();
+	void	ImGui_Inspector();
 
-	void ImGui_Descriptions();
+	void	ImGui_Descriptions();
 
 
 private:	// 해당 클래스에서만 사용할 함수
@@ -69,13 +64,17 @@ private:	// 해당 클래스에서만 사용할 함수
 	
 	HRESULT Load_BinaryMap(_wstring* strLoadPath);
 	HRESULT Save_BinaryMap(_wstring* strSavePath);
+
+	_bool Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh = true);			// 피킹 검사
+	_bool Get_ObjectPickingPos(_float3* pOut, _bool isIgnoreAnimMesh = true);	// ㄴ오브젝트와 피킹 검사, AnimObject 필터 기능도...
+	_bool Get_TerrainPickingPos(_float3* pOut);									// ㄴ터레인과 피킹 검사
 	
 	void LoadedItemsName();
 
 
 
 
-#pragma region Overrides Parent Functions..
+#pragma region ===== [Overrides Parent Functions..] =====
 
 private:
 	virtual HRESULT Add_Prototype_Direct(
@@ -133,16 +132,17 @@ private:
 	//bool m_bPicking = false;
 	
 	// Editor WIndows
-	_bool isOn_GUITerrainEditor = true;				// 터레인 에디터 창
-	_bool isOn_ModelDeployer = false;				// 모델 배치기 창
-	_bool isOn_DeployMode = false;					// ㄴ 모델 배치모드 전환
-	_bool isOn_Descriptions = false;				// 저장 전 맵 정보 기입창
+	_bool		isOn_GUITerrainEditor	= true;				// 터레인 에디터 창
+	_bool		isOn_ModelDeployer		= false;			// 모델 배치기 창
+	_bool		isOn_DeployMode			= false;			// ㄴ 모델 배치모드 전환
+	_bool		isOn_Descriptions		= false;			// 저장 전 맵 정보 기입창
+	_bool		isOn_NavMeshEditor		= false;			// !! 네비메쉬 편집창
 
 
 	// ===== Inspector Window
 	// Opens when "isObject_Selected" is True,
 	// Visibles when "pSelectedObject" has specific component.
-	_bool isOn_ComViewer_Transform = false;			// 현재 선택한 오브젝트의 Transform 제어창.
+	_bool		isOn_ComViewer_Transform = false;			// 현재 선택한 오브젝트의 Transform 제어창.
 
 	
 	LEVEL					m_eTargetLevel = {};
@@ -155,7 +155,6 @@ private:
 	vector<const _char*>	m_vLoadedItemPtrs = {};
 
 	_bool					isObject_Selected = false;			// 선택된 오브젝트가 존재할 때 True.
-	_bool					isNavMesh_EditOn = false;			// !! 네비메쉬 편집모드 켜질 때 True.
 	CGameObject*			m_pSelectedObject = {};				// 현재 선택된 오브젝트. 임시 포인터 변수
 	CGameObject*			m_pPrevSelectedObject = {};			// 이전 선택된 오브젝트. 임시 포인터 변수
 	_bool					m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
@@ -165,6 +164,7 @@ private:
 
 	MAPDATA_DESC			m_tMapData = {};
 
+	NAVMESH_DESC			m_tNavMeshData = {};
 
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
