@@ -90,6 +90,7 @@ private:
 		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
 		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
 		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		
 		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
 		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
 
@@ -115,6 +116,7 @@ private:
 		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
 		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
 		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		
 		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
 		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
 

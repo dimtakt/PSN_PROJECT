@@ -78,6 +78,10 @@ void CLevel_Editor::Update(_float fTimeDelta)
 HRESULT CLevel_Editor::Render()
 {
 	SetWindowText(g_hWnd, TEXT("Level : Editor"));
+
+	for (auto& cell : m_pCells)
+		cell->Render();
+
 	//m_pImgui_Manage->Render();
 	this->ImGui_Render();
 
@@ -93,8 +97,7 @@ HRESULT CLevel_Editor::Render()
 
 
 	
-	for (auto& cell : m_pCells)
-		cell->Render();
+
 
 	return S_OK;
 }
@@ -802,6 +805,9 @@ void CLevel_Editor::Free()
 		m_pImGui_Manager = nullptr;
 	}
 
+	for (auto& cell : m_pCells)
+		Safe_Release(cell);
+
 	__super::Free();
 }
 
@@ -1262,7 +1268,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	}
 	ImGui::Text("Tris : %d", m_tNavMeshData.vecTris.size());
 	
-	if (isOn_NavEditMode)	ImGui::Text("Cur Point Index : %d", m_pTempGuideObject);
+	if (isOn_NavEditMode)	ImGui::Text("Cur Point Index : %d", m_pTempGuideObject.size());
 	else					ImGui::Text("Edit Mode Disabled.");
 
 	ImGui::Separator();
@@ -1328,7 +1334,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 
 			// 레벨단계에서 게임오브젝트 생성시 올려보낼 경로 정보 수정
 			LVLCUSTOMOBJ_DESC LevelCustomObjDesc = {};
-			LevelCustomObjDesc.strFilePathPrefix = L"../Bin/Resources/_SUPERHOT/_BinaryModels/_EditorGuideModels/";
+			LevelCustomObjDesc.strFilePathPrefix = L"../Bin/Resources/_SUPERHOT/_EditorGuideModels/";
 			LevelCustomObjDesc.strFileExt = L".datmodel";
 			LevelCustomObjDesc.strModelPrototypePrefix = L"";
 			LevelCustomObjDesc.strObjectPrototypePrefix = L"";
@@ -1336,8 +1342,11 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 			LevelCustomObjDesc.strObjectCustomPrototypeTag = strPrototypeTag;
 
 			_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+			_matrix		PreTransformMatrix = XMMatrixIdentity();
+			PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-			Add_Prototype_Direct(iDestLevel, L"_EditorGuideSphere", nullptr, &LevelCustomObjDesc);
+			if (m_pGameInstance->Find_Prototype(iDestLevel, L"Prototype_GameObject_Model_EditorGuide") == nullptr)
+				Add_Prototype_Direct(iDestLevel, L"_EditorGuideSphere", &PreTransformMatrix, &LevelCustomObjDesc);
 
 			Add_GameObject_ToLayer_Direct(iDestLevel, L"Layer_Editor_Object_EditorGuide", iDestLevel, strPrototypeTag, &CustomObjDesc, &LevelCustomObjDesc);
 
@@ -1347,6 +1356,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 			// 트랜스폼 후처리 반영
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGuideObject->Get_Component(L"Com_Transform"));
 			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
+			pObjectTransformCom->Scale(_float3(1.f, 1.f, 1.f));
 
 			// 로컬 변수에 삽입
 			m_pTempGuideObject.push_back(pGuideObject);
