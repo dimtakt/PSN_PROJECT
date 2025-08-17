@@ -147,7 +147,8 @@ private:
 	_bool		isOn_Descriptions		= false;			// 저장 전 맵 정보 기입창
 	_bool		isOn_NavMeshEditor		= false;			// 네비메쉬 편집창
 	_bool		isOn_NavEditMode		= false;			// ㄴ 네비메쉬 편집모드 전환
-
+	_bool		isOn_NavSnap			= true;			// ㄴ 네비메쉬 포인트 스냅기능 전환
+	_float		fNavSnapRange			= 0.03f;			// ㄴ 네비메쉬 스냅 범위 (이보다 가까우면 스냅)
 
 
 	// ===== Inspector Window
@@ -164,16 +165,25 @@ private:
 	vector<CCell*>			m_pCells = {};
 	vector<CGameObject*>	m_pTempGuideObject = {};		// NavMesh UI 가이드용 임시 오브젝트
 															// ㄴ _EditorGuideModels/_EditorGuideSphere.datmodel 사용
+	CGameObject*			m_pSelectedGuide = {};			// 포인트 상세조절용
+	
 	NAVMESH_DESC			m_tNavMeshData = {};
 	_float3					m_tCellPoints[3] = {};
 
 
 	/** 
 	*	
+	*
+	*	typedef struct tagNavTriDesc {
+	*
+	*		_float3					vTriPoints[3];
+	*
+	*	}NAVTRI_DESC;
+	*
 	*	typedef struct tagNavigationMeshDesc {
 	*	
 	*		_uint					iNumTris;
-	*		vector<_float3[3]>		vecTris;
+	*		vector<NAVTRI_DESC>		vecTris;
 	*	
 	*	}NAVMESH_DESC;
 	* 

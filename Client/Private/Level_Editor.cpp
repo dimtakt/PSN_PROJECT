@@ -1251,6 +1251,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 #pragma region Navigation UI
 
 	ImGui::Text("Create Menu");
+
 	ImGui::Separator();
 
 	if (!isOn_NavEditMode) {
@@ -1270,6 +1271,19 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	
 	if (isOn_NavEditMode)	ImGui::Text("Cur Point Index : %d", m_pTempGuideObject.size());
 	else					ImGui::Text("Edit Mode Disabled.");
+	
+	ImGui::Separator();
+
+	ImGui::Text("Snap Toggle : ");
+	ImGui::SameLine();
+	ImGui::Checkbox("SnapToggle", &isOn_NavSnap);
+
+	if (isOn_NavSnap)
+	{
+		ImGui::Text("Snap Range : ");
+		ImGui::SameLine();
+		ImGui::DragFloat("SnapRange", &fNavSnapRange, 0.005f);
+	}
 
 	ImGui::Separator();
 
@@ -1281,6 +1295,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 
 
 		}
+		ImGui::SameLine();
 		if (ImGui::Button("Load"))
 		{
 			// Load..
@@ -1301,8 +1316,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 
 	// snap 기능도 필요.. vPickedPos 값과 현존하는 vecTris 값들 비교해서
 	// 일정 거리(변수화) 이하로 가까운 경우 붙도록 하는 게 좋을듯
-
-	// Cell도 만들어야.
+	// Undo 기능도 만들어야됨
 
 	if (isOn_NavEditMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
 	{
@@ -1354,13 +1368,43 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 			CGameObject* pGuideObject = m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Editor_Object_EditorGuide");
 
 			// 트랜스폼 후처리 반영
+			_float3 vFinalPos = vPickedPos;
+			if (isOn_NavSnap)	// 스냅이 켜져 있다면 가까운 점을 탐색
+			{
+				_float3 vNearistPoint = {};
+				_float	fNearistPointDist = D3D11_FLOAT32_MAX;
+
+				// 계산..
+				for (auto& tris : m_tNavMeshData.vecTris)
+				{
+					for (_uint i = 0; i < 3; i++)
+					{
+						_vector vLoadPickedPos = XMLoadFloat3(&vPickedPos);
+						_vector vLoadCompPos = XMLoadFloat3(&tris.vTriPoints[i]);
+
+						_vector	vDist = XMVector3LengthSq(vLoadPickedPos - vLoadCompPos);
+						_float	fDistX = XMVectorGetX(vDist);
+
+						if (fDistX < fNearistPointDist)
+						{
+							fNearistPointDist = fDistX;
+							vNearistPoint = tris.vTriPoints[i];
+						}
+					}
+				}
+
+				// Snap 거리보다 가까우면 해당 위치로 변경
+				if (fNearistPointDist < fNavSnapRange)
+					vFinalPos = vNearistPoint;
+			}
+
 			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGuideObject->Get_Component(L"Com_Transform"));
-			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
+			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vFinalPos.x, vFinalPos.y, vFinalPos.z, 1));
 			pObjectTransformCom->Scale(_float3(1.f, 1.f, 1.f));
 
 			// 로컬 변수에 삽입
 			m_pTempGuideObject.push_back(pGuideObject);
-			m_tCellPoints[iCellPointIndex] = vPickedPos;
+			m_tCellPoints[iCellPointIndex] = vFinalPos;
 
 
 
