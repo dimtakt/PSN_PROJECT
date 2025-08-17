@@ -22,6 +22,7 @@ namespace Engine
 		FBX,			// fbx 원본
 		DATMODEL,		// fbx 를 바이너리화 한 data
 		DATMAP,			// map data.
+		DATNAVMESH,		// map navigation mesh.
 
 		FILETYPE_END
 	};

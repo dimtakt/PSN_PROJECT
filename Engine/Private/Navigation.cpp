@@ -31,6 +31,9 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 	_ulong			dwByte = { };
 	HANDLE			hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
+	_uint iNumTris = 0;
+	ReadFile(hFile, &iNumTris, sizeof(_uint), &dwByte, nullptr);
+
 	while (true)
 	{
 		_float3		vPoints[3];

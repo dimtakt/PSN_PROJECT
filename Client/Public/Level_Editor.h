@@ -66,6 +66,9 @@ private:	// 해당 클래스에서만 사용할 함수
 	HRESULT Load_BinaryMap(_wstring* strLoadPath);
 	HRESULT Save_BinaryMap(_wstring* strSavePath);
 
+	HRESULT Load_NavMesh(_wstring* strLoadPath);
+	HRESULT Save_NavMesh(_wstring* strSavePath);
+
 	_bool Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh = true);			// 피킹 검사
 	_bool Get_ObjectPickingPos(_float3* pOut, _bool isIgnoreAnimMesh = true);	// ㄴ오브젝트와 피킹 검사, AnimObject 필터 기능도...
 	_bool Get_TerrainPickingPos(_float3* pOut);									// ㄴ터레인과 피킹 검사

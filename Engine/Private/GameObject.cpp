@@ -69,6 +69,37 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+_bool CGameObject::isPicked(_float3* pOut)
+{
+	_bool isPicked = false;
+	_float3 vOut = {};
+	float fClosestDistSq = FLT_MAX;
+
+	if (!m_pVIBufferVecRef.empty()) {
+		for (size_t i = 0; i < m_pVIBufferVecRef.size(); i++) {
+			_float3 vTempOut = {};
+			if (m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, &vTempOut)) {
+				// 카메라 위치 로드
+				const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+				_vector vCam = XMLoadFloat4(vCamPos);
+				_vector vHit = XMLoadFloat3(&vTempOut);
+
+				float fDistSq = XMVectorGetX(XMVector3LengthSq(vHit - vCam));
+
+				if (fDistSq < fClosestDistSq) {
+					fClosestDistSq = fDistSq;
+					vOut = vTempOut;
+					isPicked = true;
+				}
+			}
+		}
+	}
+
+	if (pOut != nullptr && isPicked)
+		*pOut = vOut;
+	return isPicked;
+}
+
 HRESULT CGameObject::Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg)
 {
 	if (nullptr != Get_Component(strComponentTag))

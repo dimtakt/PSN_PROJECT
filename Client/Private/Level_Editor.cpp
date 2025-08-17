@@ -285,6 +285,9 @@ _bool CLevel_Editor::LoadExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 	case FILETYPE::DATMAP:
 		ofn.lpstrFilter = L"Binary Map Files (*.datmap)\0*.datmap\0";
 		break;
+	case FILETYPE::DATNAVMESH:
+		ofn.lpstrFilter = L"Binary NavMesh Files (*.datnavmesh)\0*.datnavmesh\0";
+		break;
 
 	case FILETYPE::FILETYPE_END:
 	default:
@@ -329,6 +332,9 @@ _bool CLevel_Editor::SaveExternalFile(FILETYPE eFileType, _wstring* strPathOut)
 		break;
 	case FILETYPE::DATMAP:
 		ofn.lpstrFilter = L"Binary Map Files (*.datmap)\0*.datmap\0";
+		break;
+	case FILETYPE::DATNAVMESH:
+		ofn.lpstrFilter = L"Binary NavMesh Files (*.datnavmesh)\0*.datnavmesh\0";
 		break;
 
 	case FILETYPE::FILETYPE_END:
@@ -609,6 +615,70 @@ HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
 	return S_OK;
 }
 
+HRESULT CLevel_Editor::Load_NavMesh(_wstring* strLoadPath)
+{
+	// ===== !! Load.. !! =====
+
+	if (!strLoadPath || strLoadPath->empty())
+		return E_FAIL;
+
+	std::ifstream ifs(*strLoadPath, std::ios::binary);
+	if (!ifs.is_open())
+		return E_FAIL;
+
+	// 1) 삼각형 개수 읽기
+	_uint iNumTris = 0;
+	ifs.read(reinterpret_cast<char*>(&iNumTris), sizeof(_uint));
+
+	// 2) 벡터 크기 맞추고 데이터 읽기
+	m_tNavMeshData.iNumTris = iNumTris;
+	m_tNavMeshData.vecTris.resize(iNumTris);
+
+	if (iNumTris > 0)
+	{
+		ifs.read(reinterpret_cast<_char*>(m_tNavMeshData.vecTris.data()),
+			sizeof(NAVTRI_DESC) * iNumTris);
+	}
+
+	ifs.close();
+
+
+
+	// ===== !! Create Cells.. !! =====
+
+	for (auto& tris : m_tNavMeshData.vecTris)
+	{
+		CCell* pCell = CCell::Create(m_pDevice, m_pContext, tris.vTriPoints, m_pCells.size());
+		m_pCells.push_back(pCell);
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevel_Editor::Save_NavMesh(_wstring* strSavePath)
+{
+	// ===== !! Save.. !! =====
+
+	if (!strSavePath || strSavePath->empty())
+		return E_FAIL;
+
+	std::ofstream ofs(*strSavePath, std::ios::binary);
+	if (!ofs.is_open())
+		return E_FAIL;
+
+	// 1) 삼각형 개수 쓰기
+	ofs.write(reinterpret_cast<const _char*>(&m_tNavMeshData.iNumTris), sizeof(_uint));
+
+	// 2) 벡터 내부 데이터 쓰기
+	if (!m_tNavMeshData.vecTris.empty())
+	{
+		ofs.write(reinterpret_cast<const _char*>(m_tNavMeshData.vecTris.data()),
+			sizeof(NAVTRI_DESC) * m_tNavMeshData.vecTris.size());
+	}
+
+	ofs.close();
+	return S_OK;
+}
 
 _bool CLevel_Editor::Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
 {
@@ -1245,6 +1315,9 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	*/
 
 
+	static _uint iCellPointIndex = 0;
+
+
 
 	ImGui::Begin("Navigation Editor");
 
@@ -1263,7 +1336,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
 		if (ImGui::Button("Deactive Instant Edit Mode"))
-			if (m_pTempGuideObject.size() == 3)				// 설치중이던 Tri 를 완료했을 때만 끄기 가능
+			if (m_pTempGuideObject.size() == 0 || m_pTempGuideObject.size() == 3)				// 설치중이던 Tri 를 완료했을 때만 끄기 가능
 				isOn_NavEditMode = false;
 		ImGui::PopStyleColor(3);
 	}
@@ -1276,14 +1349,47 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 
 	ImGui::Text("Snap Toggle : ");
 	ImGui::SameLine();
-	ImGui::Checkbox("SnapToggle", &isOn_NavSnap);
+	ImGui::Checkbox("##SnapToggle", &isOn_NavSnap);
 
 	if (isOn_NavSnap)
 	{
 		ImGui::Text("Snap Range : ");
 		ImGui::SameLine();
-		ImGui::DragFloat("SnapRange", &fNavSnapRange, 0.005f);
+		ImGui::DragFloat("##SnapRange", &fNavSnapRange, 0.005f);
 	}
+
+	ImGui::Separator();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+	if (ImGui::Button("Undo Cell"))
+	{
+		// Undo..
+
+		// 만약) 설치중이던 Point가 존재하지 않지만 Cell 은 있는 경우
+		//		 마지막 Cell 제거
+		if ((iCellPointIndex == 0 || iCellPointIndex == 3) &&
+			!m_pCells.empty())
+		{
+			CCell* pCell = m_pCells.back();
+			Safe_Release(pCell);
+			m_pCells.pop_back();
+			m_tNavMeshData.vecTris.pop_back();
+		}
+
+		// 가이드 오브젝트 제거
+		iCellPointIndex = 0;
+
+		auto iter = m_pTempGuideObject.begin();
+		while (iter != m_pTempGuideObject.end())
+		{
+			m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object_EditorGuide", *iter);
+
+			iter = m_pTempGuideObject.erase(iter); // erase 후 iterator 반환
+		}
+	}
+	ImGui::PopStyleColor(3);
 
 	ImGui::Separator();
 
@@ -1293,14 +1399,32 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 		{
 			// Save..
 
+			wstring strSavePath = L"";
+			_bool isLoaded = false;
 
+			isLoaded = SaveExternalFile(FILETYPE::DATNAVMESH, &strSavePath);
+
+			if (isLoaded)
+				Save_NavMesh(&strSavePath);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load"))
 		{
 			// Load..
 
+			wstring strLoadPath = L"";
+			_bool isLoaded = false;
 
+			isLoaded = LoadExternalFile(FILETYPE::DATNAVMESH, &strLoadPath);
+
+			if (isLoaded)
+			{
+				m_tNavMeshData.iNumTris = 0;
+				m_tNavMeshData.vecTris.clear();
+
+				iCellPointIndex = 0;
+				Load_NavMesh(&strLoadPath);
+			}
 		}
 
 	}
@@ -1318,13 +1442,13 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	// 일정 거리(변수화) 이하로 가까운 경우 붙도록 하는 게 좋을듯
 	// Undo 기능도 만들어야됨
 
+	
 	if (isOn_NavEditMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
 	{
 		_float3 vPickedPos = {};
 
 		if (Get_PickingPos(&vPickedPos))
 		{
-			static _uint iCellPointIndex = 0;
 			if (iCellPointIndex == 3)
 			{
 				iCellPointIndex = 0;
@@ -1426,9 +1550,18 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 			}
 		}
 	}
+	else if (!isOn_NavEditMode)
+	{
+		iCellPointIndex = 0;
 
+		auto iter = m_pTempGuideObject.begin();
+		while (iter != m_pTempGuideObject.end())
+		{
+			m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object_EditorGuide", *iter);
 
-
+			iter = m_pTempGuideObject.erase(iter); // erase 후 iterator 반환
+		}
+	}
 
 
 #pragma endregion
