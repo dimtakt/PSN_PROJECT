@@ -4,7 +4,7 @@
 
 NS_BEGIN(Engine)
 
-class CCell final : public CBase
+class ENGINE_DLL CCell final : public CBase
 {
 private:
 	CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

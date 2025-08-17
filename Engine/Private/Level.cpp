@@ -5,11 +5,14 @@
 #include "CustomObj_NonAnim.h"
 #include "CustomObj_Anim.h"
 
+#include "DebugDraw.h"
+
 
 CLevel::CLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
 	, m_pGameInstance{ CGameInstance::GetInstance() }
+	, m_pPrimitiveBatch{ new PrimitiveBatch<VertexPositionColor>(m_pContext) }
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
@@ -66,7 +69,9 @@ HRESULT CLevel::Add_Prototype_Direct_Model(_uint iPrototypeLevelIndex, const _ws
 	const _char* szFilePath = WStringToChar(strFilePath);
 
 	_wstring strModelPrototypePrefix = pLvlArg->strModelPrototypePrefix;	// 모델 컴포넌트용
-	_wstring strModelPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
+	_wstring strModelPrototypeTag = (pLvlArg->strModelCustomPrototypeTag == L"")? 
+		strModelPrototypePrefix + strFilePathSuffix :
+		pLvlArg->strModelCustomPrototypeTag;
 
 
 	// ===== !! 모델 프로토타입 생성.. !! =====
@@ -95,8 +100,12 @@ HRESULT CLevel::Add_Prototype_Direct_GameObject(_uint iPrototypeLevelIndex, cons
 
 	_wstring strModelPrototypePrefix = pLvlArg->strModelPrototypePrefix;	// 모델 컴포넌트용
 	_wstring strObjectPrototypePrefix = pLvlArg->strObjectPrototypePrefix;	// 게임오브젝트용
-	_wstring strModelPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
-	_wstring strObjectPrototypeTag = strObjectPrototypePrefix + strFilePathSuffix;
+	_wstring strModelPrototypeTag = (pLvlArg->strModelCustomPrototypeTag == L"") ? 
+		strModelPrototypePrefix + strFilePathSuffix :
+		pLvlArg->strModelCustomPrototypeTag;
+	_wstring strObjectPrototypeTag = (pLvlArg->strObjectCustomPrototypeTag == L"") ? 
+		strObjectPrototypePrefix + strFilePathSuffix :
+		pLvlArg->strObjectCustomPrototypeTag;
 
 
 	// ===== !! 게임오브젝트 프로토타입 생성.. !! =====
@@ -141,7 +150,9 @@ HRESULT CLevel::Add_GameObject_ToLayer_Direct(
 	_wstring strObjectPrototypePrefix = pLvlArg->strObjectPrototypePrefix;
 	_wstring strObjectPrototypeSuffix = strPrototypeTagSuffix;
 
-	_wstring strPrototypeTag = strObjectPrototypePrefix + strObjectPrototypeSuffix;
+	_wstring strPrototypeTag = (pLvlArg->strObjectCustomPrototypeTag == L"")?
+		strObjectPrototypePrefix + strObjectPrototypeSuffix :
+		pLvlArg->strObjectCustomPrototypeTag;
 	
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iLayerLevelIndex, strLayerTag,
 		iPrototypeLevelIndex, strPrototypeTag, pArg)))
@@ -158,6 +169,8 @@ HRESULT CLevel::Add_GameObject_ToLayer_Direct(
 void CLevel::Free()
 {
 	__super::Free();
+
+	Safe_Delete(m_pPrimitiveBatch);
 
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pDevice);

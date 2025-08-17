@@ -18,6 +18,10 @@ protected:
 		_wstring strModelPrototypePrefix = {};
 		_wstring strObjectPrototypePrefix = {};
 
+
+		_wstring strModelCustomPrototypeTag = {};
+		_wstring strObjectCustomPrototypeTag = {};
+
 	}LVLCUSTOMOBJ_DESC;
 
 protected:
@@ -33,6 +37,8 @@ protected:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
+
+	PrimitiveBatch<VertexPositionColor>*	m_pPrimitiveBatch = { nullptr };
 
 
 protected:

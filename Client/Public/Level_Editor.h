@@ -10,6 +10,7 @@ class CGameInstance;
 class CGameObject;
 class CTexture;
 class CTransform;
+class CCell;
 NS_END
 
 NS_BEGIN(Client)
@@ -85,10 +86,13 @@ private:
 	) override
 	{
 		LVLCUSTOMOBJ_DESC tDesc = {};
-		tDesc.strFilePathPrefix			= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
-		tDesc.strFileExt				= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
-		tDesc.strModelPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
-		tDesc.strObjectPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		tDesc.strFilePathPrefix				= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
+		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
+
 
 		return __super::Add_Prototype_Direct(
 			iPrototypeLevelIndex,
@@ -107,10 +111,13 @@ private:
 	) override
 	{
 		LVLCUSTOMOBJ_DESC tDesc = {};
-		tDesc.strFilePathPrefix			= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
-		tDesc.strFileExt				= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
-		tDesc.strModelPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
-		tDesc.strObjectPrototypePrefix	= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		tDesc.strFilePathPrefix				= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
+		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
+
 
 		return __super::Add_GameObject_ToLayer_Direct(
 			iLayerLevelIndex,
@@ -136,7 +143,9 @@ private:
 	_bool		isOn_ModelDeployer		= false;			// 모델 배치기 창
 	_bool		isOn_DeployMode			= false;			// ㄴ 모델 배치모드 전환
 	_bool		isOn_Descriptions		= false;			// 저장 전 맵 정보 기입창
-	_bool		isOn_NavMeshEditor		= false;			// !! 네비메쉬 편집창
+	_bool		isOn_NavMeshEditor		= false;			// 네비메쉬 편집창
+	_bool		isOn_NavEditMode		= false;			// ㄴ 네비메쉬 편집모드 전환
+
 
 
 	// ===== Inspector Window
@@ -150,6 +159,30 @@ private:
 	vector<CGameObject*>	m_pObject = {};
 	vector<CGameObject*>	m_pTerrainObject = {};
 
+	vector<CCell*>			m_pCells = {};
+	vector<CGameObject*>	m_pTempGuideObject = {};		// NavMesh UI 가이드용 임시 오브젝트
+															// ㄴ _EditorGuideModels/_EditorGuideSphere.datmodel 사용
+	NAVMESH_DESC			m_tNavMeshData = {};
+	_float3					m_tCellPoints[3] = {};
+
+
+	/** 
+	*	
+	*	typedef struct tagNavigationMeshDesc {
+	*	
+	*		_uint					iNumTris;
+	*		vector<_float3[3]>		vecTris;
+	*	
+	*	}NAVMESH_DESC;
+	* 
+	*/
+	
+
+	
+	
+
+	
+
 	vector<_wstring>		m_vLoadedItems = {};				// 모델 요소 저장. 저장 시 FileName 으로 저장할 것.
 	vector<_string>			m_vLoadedItemsConv = {};			// 변환용
 	vector<const _char*>	m_vLoadedItemPtrs = {};
@@ -160,11 +193,11 @@ private:
 	_bool					m_isNotUsingUI = false;				// UI창이 사용중이 아닐 때 True.
 
 
+	
 
 
 	MAPDATA_DESC			m_tMapData = {};
 
-	NAVMESH_DESC			m_tNavMeshData = {};
 
 public:
 	static CLevel_Editor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

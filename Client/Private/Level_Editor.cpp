@@ -17,8 +17,11 @@
 #include "CustomObj_NonAnim.h"
 #include "CustomObj_Anim.h"
 
+#include "DebugDraw.h"
 
+#include "Cell.h"
 #include <fstream> 
+
 
 
 CLevel_Editor::CLevel_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -87,6 +90,11 @@ HRESULT CLevel_Editor::Render()
 	//	for (size_t i = 0; i < pSelectedObjMeshes.size(); i++)
 	//		pSelectedObjMeshes[i]->Render_DebugLine();
 	//}
+
+
+	
+	for (auto& cell : m_pCells)
+		cell->Render();
 
 	return S_OK;
 }
@@ -157,7 +165,7 @@ void CLevel_Editor::ImGui_Render()
 	if (isOn_ModelDeployer)
 		ImGui_ModelDeployer();		// 메쉬 배치기
 
-	if (!isOn_NavMeshEditor)
+	if (isOn_NavMeshEditor)
 		ImGui_NavMeshEditor();		// 네비게이션메쉬 배치기
 
 	//if (isObject_Selected)
@@ -925,6 +933,9 @@ void CLevel_Editor::ImGui_MainMenu()
 				isOn_GUITerrainEditor = !isOn_GUITerrainEditor;
 			if (ImGui::MenuItem("Model Deployer", nullptr))
 				isOn_ModelDeployer = !isOn_ModelDeployer;
+			if (ImGui::MenuItem("NavMesh Editor", nullptr))
+				isOn_NavMeshEditor = !isOn_NavMeshEditor;
+			ImGui::Separator();
 			if (ImGui::MenuItem("Saving Description", nullptr))
 				isOn_Descriptions = !isOn_Descriptions;
 
@@ -1176,14 +1187,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 	// 클릭하면 모델 설치
 	if (isOn_DeployMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
 	{
-		// ksta : 선택한 터레인에 생성되도록 변경? 아니면 터레인 갯수제한을 1로 두거나
-		CTerrain* pTerrain = nullptr;
-		if (!m_pTerrainObject.empty())
-			pTerrain = dynamic_cast<CTerrain*>(m_pTerrainObject.back());
-		
-		if (//pTerrain != nullptr &&
-			//pTerrain->isPicked(&vPickedPos)
-			Get_PickingPos(&vPickedPos)) // 이거 false 뜨면 생성 안되게
+		if (Get_PickingPos(&vPickedPos))
 		{
 			// 추가 및 생성
 			_wstring strPrototypePrefix = L"Prototype_GameObject_Model_Custom_";
@@ -1226,9 +1230,163 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	if (!isOn_NavMeshEditor)
 		return;
 
+	/**
+	*	1. 클릭을 통해 얻어온 좌표로 (Get_PickingPos 쓰면 됨) 점 생성, 3개가 모이면 삼각형 Cell 실시간 생성
+	*		ㄴ 마지막 수정중 or 선택중이던 Tri 강조기능
+	*	2. Cell 의 각각 Point 마다의 Position 을 수정 가능하여야 함. 
+	*	3. 시각적인 정보도 표현되면 훨씬 수정이 수월할 것
+	*	4. Export / Import 자유롭게 가능하여야 함
+	*/
 
 
 
+	ImGui::Begin("Navigation Editor");
+
+#pragma region Navigation UI
+
+	ImGui::Text("Create Menu");
+	ImGui::Separator();
+
+	if (!isOn_NavEditMode) {
+		if (ImGui::Button("Active Instant Edit Mode"))
+			isOn_NavEditMode = true;
+	}
+	else {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
+		if (ImGui::Button("Deactive Instant Edit Mode"))
+			if (m_pTempGuideObject.size() == 3)				// 설치중이던 Tri 를 완료했을 때만 끄기 가능
+				isOn_NavEditMode = false;
+		ImGui::PopStyleColor(3);
+	}
+	ImGui::Text("Tris : %d", m_tNavMeshData.vecTris.size());
+	
+	if (isOn_NavEditMode)	ImGui::Text("Cur Point Index : %d", m_pTempGuideObject);
+	else					ImGui::Text("Edit Mode Disabled.");
+
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader("Save / Load Menu"))
+	{
+		if (ImGui::Button("Save"))
+		{
+			// Save..
+
+
+		}
+		if (ImGui::Button("Load"))
+		{
+			// Load..
+
+
+		}
+
+	}
+
+#pragma endregion
+
+#pragma region Navigation Logic
+
+	// 클릭하면...
+	// ㅇㅋ 1. 시각적으로 확인 가능한 구체 생성
+	// ㅇㅋ 2. 로컬 변수(m_tNavMeshData)에 저장함
+	// ㅇㅋ 3. 3개면 push_back, 그 이후 생성 시도 시 임시저장 변수 비우고 다시 시작
+
+	// snap 기능도 필요.. vPickedPos 값과 현존하는 vecTris 값들 비교해서
+	// 일정 거리(변수화) 이하로 가까운 경우 붙도록 하는 게 좋을듯
+
+	// Cell도 만들어야.
+
+	if (isOn_NavEditMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
+	{
+		_float3 vPickedPos = {};
+
+		if (Get_PickingPos(&vPickedPos))
+		{
+			static _uint iCellPointIndex = 0;
+			if (iCellPointIndex == 3)
+			{
+				iCellPointIndex = 0;
+
+				auto iter = m_pTempGuideObject.begin();
+				while (iter != m_pTempGuideObject.end())
+				{
+					m_pGameInstance->Remove_GameObject_FromLayer(ENUM_CLASS(LEVEL::EDITOR), L"Layer_Editor_Object_EditorGuide", *iter);
+
+					iter = m_pTempGuideObject.erase(iter); // erase 후 iterator 반환
+				}
+			}
+
+			// 추가 및 생성
+			_wstring strPrototypeTag = L"Prototype_GameObject_Model_EditorGuide";
+			_wstring strModelPrototypeTag = L"Prototype_Component_Model_EditorGuide";
+
+			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
+			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
+
+			// 레벨단계에서 게임오브젝트 생성시 올려보낼 경로 정보 수정
+			LVLCUSTOMOBJ_DESC LevelCustomObjDesc = {};
+			LevelCustomObjDesc.strFilePathPrefix = L"../Bin/Resources/_SUPERHOT/_BinaryModels/_EditorGuideModels/";
+			LevelCustomObjDesc.strFileExt = L".datmodel";
+			LevelCustomObjDesc.strModelPrototypePrefix = L"";
+			LevelCustomObjDesc.strObjectPrototypePrefix = L"";
+			LevelCustomObjDesc.strModelCustomPrototypeTag = strModelPrototypeTag;
+			LevelCustomObjDesc.strObjectCustomPrototypeTag = strPrototypeTag;
+
+			_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+			Add_Prototype_Direct(iDestLevel, L"_EditorGuideSphere", nullptr, &LevelCustomObjDesc);
+
+			Add_GameObject_ToLayer_Direct(iDestLevel, L"Layer_Editor_Object_EditorGuide", iDestLevel, strPrototypeTag, &CustomObjDesc, &LevelCustomObjDesc);
+
+			// 선택중 오브젝트 할당
+			CGameObject* pGuideObject = m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Editor_Object_EditorGuide");
+
+			// 트랜스폼 후처리 반영
+			CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGuideObject->Get_Component(L"Com_Transform"));
+			pObjectTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPickedPos.x, vPickedPos.y, vPickedPos.z, 1));
+
+			// 로컬 변수에 삽입
+			m_pTempGuideObject.push_back(pGuideObject);
+			m_tCellPoints[iCellPointIndex] = vPickedPos;
+
+
+
+			// 포인트 3개가 다 채워지면, Cell 삽입
+			// 이후 포인트 생성 시도시, 포인트 스택 초기화
+			iCellPointIndex++;
+			if (iCellPointIndex == 3)
+			{
+				NAVTRI_DESC vTriPoints = {};
+				vTriPoints.vTriPoints[0] = m_tCellPoints[0];
+				vTriPoints.vTriPoints[1] = m_tCellPoints[1];
+				vTriPoints.vTriPoints[2] = m_tCellPoints[2];
+
+				m_tNavMeshData.vecTris.push_back(vTriPoints);
+				m_tNavMeshData.iNumTris = m_tNavMeshData.vecTris.size();
+
+				CCell* pCell = CCell::Create(m_pDevice, m_pContext, vTriPoints.vTriPoints, m_pCells.size());
+				m_pCells.push_back(pCell);
+			}
+		}
+	}
+
+
+
+
+
+#pragma endregion
+
+
+
+
+
+
+
+
+	ImGui::End();
 }
 
 void CLevel_Editor::ImGui_Inspector()
