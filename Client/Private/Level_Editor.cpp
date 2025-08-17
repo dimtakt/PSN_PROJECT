@@ -1355,7 +1355,9 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	{
 		ImGui::Text("Snap Range : ");
 		ImGui::SameLine();
+		ImGui::PushItemWidth(120);
 		ImGui::DragFloat("##SnapRange", &fNavSnapRange, 0.005f);
+		ImGui::PopItemWidth();
 	}
 
 	ImGui::Separator();
@@ -1392,6 +1394,100 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	ImGui::PopStyleColor(3);
 
 	ImGui::Separator();
+
+#pragma region Legacy
+
+	//if (ImGui::CollapsingHeader("Edit Point Position"))
+	//{
+	//	if (m_pSelectedGuide != nullptr)
+	//	{
+	//		_float3		vCurPointPos;
+
+	//		CTransform* pTransformCom = dynamic_cast<CTransform*>(m_pSelectedGuide->Get_Component(L"Com_Transform"));
+
+	//		_vector		vXMCurPointPos = pTransformCom->Get_State(STATE::POSITION);
+	//		_float3		vStoreCurPointPos = {};
+	//		XMStoreFloat3(&vStoreCurPointPos, vXMCurPointPos);;
+
+	//		vCurPointPos = vStoreCurPointPos;
+
+	//		// Position Ctrl
+	//		ImGui::Text("Position");
+
+	//		ImGui::PushItemWidth(60);
+
+	//		ImGui::DragFloat("X##pos", &vCurPointPos.x, 0.1f);
+	//		ImGui::SameLine();
+	//		ImGui::DragFloat("Y##pos", &vCurPointPos.y, 0.1f);
+	//		ImGui::SameLine();
+	//		ImGui::DragFloat("Z##pos", &vCurPointPos.z, 0.1f);
+
+	//		ImGui::PopItemWidth();
+	//	
+	//		if (ImGui::Button("Snap Manually"))
+	//		{
+	//			// snap..
+	//			_float3 vNearistPoint = {};
+	//			_float	fNearistPointDist = D3D11_FLOAT32_MAX;
+
+	//			_float3 vResultPos = vCurPointPos;
+
+	//			// 계산..
+	//			for (auto& tris : m_tNavMeshData.vecTris)
+	//			{
+	//				for (_uint i = 0; i < 3; i++)
+	//				{
+	//					_vector vLoadPickedPos = XMLoadFloat3(&vCurPointPos);
+	//					_vector vLoadCompPos = XMLoadFloat3(&tris.vTriPoints[i]);
+
+	//					_vector	vDist = XMVector3LengthSq(vLoadPickedPos - vLoadCompPos);
+	//					_float	fDistX = XMVectorGetX(vDist);
+
+	//					if (fDistX < fNearistPointDist)
+	//					{
+	//						fNearistPointDist = fDistX;
+	//						vNearistPoint = tris.vTriPoints[i];
+	//					}
+	//				}
+	//			}
+
+	//			// Snap 거리보다 가까우면 해당 위치로 변경
+	//			if (fNearistPointDist < fNavSnapRange)
+	//				vResultPos = vNearistPoint;
+
+	//			vCurPointPos = vResultPos;
+	//		}
+
+
+	//		// 가이드 오브젝트의 좌표에 반영
+	//		_vector vecXMEditPos = XMLoadFloat3(&vCurPointPos);
+	//		pTransformCom->Set_State(STATE::POSITION, vecXMEditPos);
+
+	//		// 실제 Point 좌표에 반영
+	//		if (iCellPointIndex == 0 || iCellPointIndex == 3)
+	//		{
+	//			m_tNavMeshData.vecTris.back().vTriPoints[2] = vCurPointPos;
+
+	//			// 마지막 셀 삭제 후 재생성 해줘야 할 듯
+	//			CCell* pCell = m_pCells.back();
+	//			Safe_Release(pCell);
+	//			m_pCells.pop_back();
+
+	//			CCell* pNewCell = CCell::Create(m_pDevice, m_pContext, m_tNavMeshData.vecTris.back().vTriPoints, m_pCells.size());
+	//			m_pCells.push_back(pNewCell);
+	//		}
+	//		else
+	//			m_tCellPoints[iCellPointIndex] = vCurPointPos;
+	//	}
+	//	else
+	//	{
+	//		ImGui::Text("Selected Point Doesn't Exist.\nPlace Point..");
+	//	}
+	//}
+
+	//ImGui::Separator();
+#pragma endregion
+
 
 	if (ImGui::CollapsingHeader("Save / Load Menu"))
 	{
@@ -1432,15 +1528,6 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 #pragma endregion
 
 #pragma region Navigation Logic
-
-	// 클릭하면...
-	// ㅇㅋ 1. 시각적으로 확인 가능한 구체 생성
-	// ㅇㅋ 2. 로컬 변수(m_tNavMeshData)에 저장함
-	// ㅇㅋ 3. 3개면 push_back, 그 이후 생성 시도 시 임시저장 변수 비우고 다시 시작
-
-	// snap 기능도 필요.. vPickedPos 값과 현존하는 vecTris 값들 비교해서
-	// 일정 거리(변수화) 이하로 가까운 경우 붙도록 하는 게 좋을듯
-	// Undo 기능도 만들어야됨
 
 	
 	if (isOn_NavEditMode && m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && m_isNotUsingUI)
@@ -1490,6 +1577,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 
 			// 선택중 오브젝트 할당
 			CGameObject* pGuideObject = m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Editor_Object_EditorGuide");
+			//m_pSelectedGuide = pGuideObject;
 
 			// 트랜스폼 후처리 반영
 			_float3 vFinalPos = vPickedPos;
@@ -1553,6 +1641,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 	else if (!isOn_NavEditMode)
 	{
 		iCellPointIndex = 0;
+		m_pSelectedGuide = nullptr;
 
 		auto iter = m_pTempGuideObject.begin();
 		while (iter != m_pTempGuideObject.end())
