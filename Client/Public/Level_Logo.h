@@ -27,9 +27,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	HRESULT Render_Focus_GamePlay();
-	HRESULT Render_Focus_Editor();
-	HRESULT Render_Focus_Quit();
+	HRESULT Render_LogoScreen();
 
 private:
 	HRESULT Ready_Layer_BackGround(const _wstring& strLayerTag);

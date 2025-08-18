@@ -27,7 +27,7 @@ HRESULT CBackGround::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&Desc)))
         return E_FAIL;
 
-    if (FAILED(Ready_Components()))
+    if (FAILED(Ready_Components(pArg)))
         return E_FAIL;
 
     return S_OK;
@@ -78,8 +78,15 @@ HRESULT CBackGround::Render()
     return S_OK;
 }
 
-HRESULT CBackGround::Ready_Components()
+HRESULT CBackGround::Ready_Components(void* pArg)
 {
+    UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
+
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+    if (pArg != nullptr && pDesc->iCustomLoadLevelIndex != UINT_MAX)
+        iDestLevel = pDesc->iCustomLoadLevelIndex;
+
+
     // 셰이더. 그리기 위해 기본적으로 필요.
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -95,7 +102,8 @@ HRESULT CBackGround::Ready_Components()
     //    return E_FAIL;
 
     // 텍스쳐.
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Black"),
+    
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_Black"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 

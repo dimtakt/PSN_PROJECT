@@ -32,7 +32,7 @@ private:
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
 
 private:
-	HRESULT Ready_Components();
+	HRESULT Ready_Components(void* pArg = nullptr);
 
 public:
 	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

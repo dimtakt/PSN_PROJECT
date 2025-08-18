@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "Mesh.h"
 
+
 /* 게임오브젝트들의 부모가 되는 클래스. */
 
 NS_BEGIN(Engine)
@@ -16,6 +17,8 @@ class ENGINE_DLL CGameObject abstract : public CBase
 public:
 	typedef struct tagGameObject : public CTransform::TRANSFORM_DESC
 	{
+		_uint			iCustomLoadLevelIndex = UINT_MAX;
+
 		_uint			iGameObjType;
 
 	}GAMEOBJECT_DESC;
