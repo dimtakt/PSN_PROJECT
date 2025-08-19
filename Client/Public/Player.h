@@ -14,12 +14,6 @@ NS_BEGIN(Client)
 
 class CPlayer final : public CContainerObject
 {
-public:
-	enum STATE { 
-		IDLE	= (1 << 0),
-		RUN		= (1 << 1),
-		ATTACK	= (1 << 2)
-	};
 
 public:
 	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
@@ -46,12 +40,18 @@ public:
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
+	HRESULT		Bind_ShaderResources();
 	HRESULT		Ready_PartObjects();
+
+	void		Update_AnimationState();
+	void		Update_AnimationIndex();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	CNavigation*	m_pNavigationCom = { nullptr };
 
+	CShader*		m_pShaderCom = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
 
 	_uint			m_iGameObjType = { };
 	_int			m_iHp = {};

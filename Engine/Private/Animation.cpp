@@ -7,7 +7,8 @@ CAnimation::CAnimation()
 }
 
 CAnimation::CAnimation(const CAnimation& Prototype)
-    : m_fDuration(Prototype.m_fDuration)
+    : m_strAnimName(Prototype.m_strAnimName)
+    , m_fDuration(Prototype.m_fDuration)
     , m_fTickPerSecond(Prototype.m_fTickPerSecond)
     , m_fCurrentTrackPosition(Prototype.m_fCurrentTrackPosition)
     , m_iNumChannels(Prototype.m_iNumChannels)
@@ -51,6 +52,8 @@ HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<cla
 
 HRESULT CAnimation::Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones)
 {
+    m_strAnimName = ConvertCharToWString(tAnimDesc.szAnimName.C_Str());
+
     m_fDuration = tAnimDesc.fDuration;
     m_fTickPerSecond = tAnimDesc.fTicksPerSecond;
 

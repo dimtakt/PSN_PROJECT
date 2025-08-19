@@ -391,6 +391,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 		// 버텍스에 할당된 weight (Bone을 따라오는 정도) 합 1로 정규화.
 		// 이렇게 해야만 메쉬가 애매하게 덜 따라오는 현상 없어짐.
 		_float weightTotal = pVertices[i].vBlendWeight.x + pVertices[i].vBlendWeight.y + pVertices[i].vBlendWeight.z + pVertices[i].vBlendWeight.w;
+
 		_float4 weightCalced = _float4{ 
 			pVertices[i].vBlendWeight.x / weightTotal, 
 			pVertices[i].vBlendWeight.y / weightTotal,
@@ -399,6 +400,8 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(const MESH_DESC tMeshDesc, const v
 		};
 
 		pVertices[i].vBlendWeight = weightCalced;
+
+
 
 	}
 

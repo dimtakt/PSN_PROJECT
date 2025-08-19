@@ -47,15 +47,15 @@ void CBody_Player::Priority_Update(_float fTimeDelta)
 
 void CBody_Player::Update(_float fTimeDelta)
 {
-    if (*m_pParentState & CPlayer::RUN)
-    {
-        m_pModelCom->Set_Animation(4, true);
-    }
+    //if (*m_pParentState & CPlayer::RUN)
+    //{
+    //    m_pModelCom->Set_Animation(4, true);
+    //}
 
-    if (*m_pParentState & CPlayer::IDLE)
-    {
-        m_pModelCom->Set_Animation(3, true);
-    }
+    //if (*m_pParentState & CPlayer::IDLE)
+    //{
+    //    m_pModelCom->Set_Animation(3, true);
+    //}
 
     m_pModelCom->Play_Animation(fTimeDelta);
 

@@ -18,6 +18,9 @@ public:
 	HRESULT Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones);
 	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
 
+public:
+	_wstring Get_AnimName() { return m_strAnimName; };
+
 private:
 
 	/* 애니메이션의 전체 재생 길이 */

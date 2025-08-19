@@ -1857,10 +1857,14 @@ void CLevel_Editor::ImGui_Inspector()
 					iSelectedAnim++;
 			}
 
+			_wstring strCurAnimName = pTargetModel->Get_CurAnimName();
+			char* szCurAnimName = WStringToChar(strCurAnimName);
+
+			ImGui::Text(szCurAnimName);
+
 			pTargetModel->Set_Animation(iSelectedAnim, true);
 
-			//const char* szAnimName = pTargetModel->
-			//ImGui::Text("");
+			Safe_Delete(szCurAnimName);
 		}
 	}
 	

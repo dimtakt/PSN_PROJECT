@@ -309,6 +309,9 @@ HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
         ofs.close();
     }
 
+
+
+
     return S_OK;
 }
 
@@ -468,6 +471,8 @@ HRESULT CModel::Import_FromBinary(const _char* pModelFilePath, _fmatrix PreTrans
             }
         }
     }
+
+
 
     ifs.close();
     return S_OK;
