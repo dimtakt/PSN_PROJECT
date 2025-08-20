@@ -21,8 +21,8 @@ HRESULT CUI_Crosshair::Initialize(void* pArg)
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
     Desc.fY = g_iWinSizeY >> 1;
-    Desc.fSizeX = 100;
-    Desc.fSizeY = 100;
+    Desc.fSizeX = 50;
+    Desc.fSizeY = 50;
 
     if (FAILED(__super::Initialize(&Desc)))
         return E_FAIL;
@@ -64,7 +64,9 @@ HRESULT CUI_Crosshair::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+
+    // 조건에 따라 바뀌도록 할 것
+    if (FAILED(m_pTextureCom_Gun->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
     m_pShaderCom->Begin(0);
@@ -94,9 +96,30 @@ HRESULT CUI_Crosshair::Ready_Components()
 
     // 텍스쳐.
     // ksta : 크로스헤어 이미지로 변경할 것
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Black"),
-    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-    //    return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_BasicHand"),
+        TEXT("Com_Texture_BasicHand"), reinterpret_cast<CComponent**>(&m_pTextureCom_BasicHand), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_BasicDot"),
+        TEXT("Com_Texture_BasicDot"), reinterpret_cast<CComponent**>(&m_pTextureCom_BasicDot), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_BasicPunch"),
+        TEXT("Com_Texture_BasicPunch"), reinterpret_cast<CComponent**>(&m_pTextureCom_BasicPunch), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_Gun"),
+        TEXT("Com_Texture_Gun"), reinterpret_cast<CComponent**>(&m_pTextureCom_Gun), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_Katana"),
+        TEXT("Com_Texture_Katana"), reinterpret_cast<CComponent**>(&m_pTextureCom_Katana), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_HotswitchHover"),
+        TEXT("Com_Texture_HotswitchHover"), reinterpret_cast<CComponent**>(&m_pTextureCom_HotswitchHover), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_HotswitchIdle"),
+        TEXT("Com_Texture_HotswitchIdle"), reinterpret_cast<CComponent**>(&m_pTextureCom_HotswitchIdle), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_HotswitchWait"),
+        TEXT("Com_Texture_HotswitchWait"), reinterpret_cast<CComponent**>(&m_pTextureCom_HotswitchWait), nullptr)))
+        return E_FAIL;
 
 
 
@@ -134,6 +157,15 @@ void CUI_Crosshair::Free()
     __super::Free();
 
     Safe_Release(m_pVIBufferCom);
-    Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
+
+    Safe_Release(m_pTextureCom_BasicHand);
+    Safe_Release(m_pTextureCom_BasicDot);
+    Safe_Release(m_pTextureCom_BasicPunch);
+    Safe_Release(m_pTextureCom_Gun);
+    Safe_Release(m_pTextureCom_Katana);
+    Safe_Release(m_pTextureCom_HotswitchHover);
+    Safe_Release(m_pTextureCom_HotswitchIdle);
+    Safe_Release(m_pTextureCom_HotswitchWait);
+
 }

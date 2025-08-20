@@ -28,8 +28,21 @@ public:
 
 private:
 	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+
+	CTexture* m_pTextureCom_BasicHand = { nullptr };
+	CTexture* m_pTextureCom_BasicDot = { nullptr };
+	CTexture* m_pTextureCom_BasicPunch = { nullptr };
+	CTexture* m_pTextureCom_Gun = { nullptr };
+	CTexture* m_pTextureCom_Katana = { nullptr };
+	CTexture* m_pTextureCom_HotswitchHover = { nullptr };
+	CTexture* m_pTextureCom_HotswitchIdle = { nullptr };
+	CTexture* m_pTextureCom_HotswitchWait = { nullptr };
+
+private:
+	CTexture* m_pCurTextureCom = { nullptr };
+
+
 
 private:
 	HRESULT Ready_Components();

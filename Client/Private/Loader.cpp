@@ -2,7 +2,10 @@
 
 #include "GameInstance.h"
 
+// UI Textures..
 #include "BackGround.h"
+#include "UI_Crosshair.h"
+
 #include "Terrain.h"
 //#include "Monster.h"
 #include "Enemy.h"
@@ -212,6 +215,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Skybox"),
 		CSkybox::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
 
 
 	/* Prototype_GameObject_Player */

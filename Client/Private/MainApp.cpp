@@ -6,13 +6,16 @@
 #include "Level_Loading.h"
 
 // Static Models
-
 #include "Player.h"
+
 #include "Enemy.h"
 #include "Props_Pot.h"
 #include "Props_Fotel.h"
 #include "Props_ServerRack1.h"
 #include "Props_ServerRack2.h"
+
+// UI
+#include "UI_Crosshair.h"
 
 
 CMainApp::CMainApp()
@@ -111,6 +114,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
 		return E_FAIL;
 
+
+
+
 	/* Prototype_Component_Model_NonAnim Things */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Pot"),
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/pot/pot.fbx", PreTransformMatrix))))
@@ -156,6 +162,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 
+
+	/* Prototype_GameObject_UI_Crosshair */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_Crosshair"),
+		CUI_Crosshair::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Transform"),
 	//	CTransform::Create(m_pDevice, m_pContext))))
