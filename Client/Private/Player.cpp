@@ -204,55 +204,55 @@ HRESULT CPlayer::Ready_PartObjects()
 
 void CPlayer::Update_AnimationState()
 {
-	// 상태 추가 (켜기) → |
-	// 상태 제거 (끄기) → & ~
+	// 상태 추가 (켜기) → |=
+	// 상태 제거 (끄기) → &= ~
 	// 
-	// 상태 토글 (반전) → ^
+	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 
 	if (m_pGameInstance->Get_IsKeyDown(DIK_DOWN))
 	{
-		m_iState = HUMANOID_STATE::RUN_BWD;
+		m_iState = ENEMY_STATE::RUN_B;
 	}
 
 
 	if (m_pGameInstance->Get_IsKeyDown(DIK_LEFT))
 	{
-		m_iState = HUMANOID_STATE::RUN_L;
+		m_iState = ENEMY_STATE::RUN_L;
 	}
 
 
 	if (m_pGameInstance->Get_IsKeyDown(DIK_RIGHT))
 	{
-		m_iState = HUMANOID_STATE::RUN_R;
+		m_iState = ENEMY_STATE::RUN_R;
 	}
 
 
 	if (m_pGameInstance->Get_IsKeyDown(DIK_UP))
 	{
-		m_iState = HUMANOID_STATE::RUN_FWD;
+		m_iState = ENEMY_STATE::RUN_F;
 	}
 }
 
 void CPlayer::Update_AnimationIndex()
 {
-	if (m_iState & HUMANOID_STATE::IDLE)
+	if (m_iState & ENEMY_STATE::IDLE)
 	{
 
 	}
-	if (m_iState & HUMANOID_STATE::RUN_FWD)
+	if (m_iState & ENEMY_STATE::RUN_F)
 	{
 		m_pModelCom->Set_Animation(ANIM_RUN_F, true);
 	}
-	if (m_iState & HUMANOID_STATE::RUN_BWD)
+	if (m_iState & ENEMY_STATE::RUN_B)
 	{
 		m_pModelCom->Set_Animation(ANIM_RUN_B, true);
 	}
-	if (m_iState & HUMANOID_STATE::RUN_L)
+	if (m_iState & ENEMY_STATE::RUN_L)
 	{
 		m_pModelCom->Set_Animation(ANIM_RUN_L, true);
 	}
-	if (m_iState & HUMANOID_STATE::RUN_R)
+	if (m_iState & ENEMY_STATE::RUN_R)
 	{
 		m_pModelCom->Set_Animation(ANIM_RUN_R, true);
 	}

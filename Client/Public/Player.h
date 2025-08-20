@@ -43,8 +43,8 @@ private:
 	HRESULT		Bind_ShaderResources();
 	HRESULT		Ready_PartObjects();
 
-	void		Update_AnimationState();
-	void		Update_AnimationIndex();
+	void		Update_AnimationState();	// 조작 등에 의한 "상태" 제어
+	void		Update_AnimationIndex();	// 상태에 의한 "애니메이션" 제어
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
@@ -53,6 +53,8 @@ private:
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
 
+
+private:
 	_uint			m_iGameObjType = { };
 	_int			m_iHp = {};
 

@@ -9,12 +9,12 @@ namespace Client
 	const unsigned int			g_iWinSizeX = 1280;
 	const unsigned int			g_iWinSizeY = 720;
 
-	enum HUMANOID_STATE { 
+	enum ENEMY_STATE { 
 		IDLE		= (1 << 0),
 		
 		// Run State
-		RUN_FWD		= (1 << 1),
-		RUN_BWD		= (1 << 2),
+		RUN_F		= (1 << 1),
+		RUN_B		= (1 << 2),
 		RUN_L		= (1 << 3),
 		RUN_R		= (1 << 4),
 

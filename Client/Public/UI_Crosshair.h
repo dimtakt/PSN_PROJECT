@@ -40,7 +40,7 @@ private:
 	CTexture* m_pTextureCom_HotswitchWait = { nullptr };
 
 private:
-	CTexture* m_pCurTextureCom = { nullptr };
+	CTexture* m_pCurTextureCom = { nullptr };	// 조건에 따라 할당해주도록 나중에 수정
 
 
 

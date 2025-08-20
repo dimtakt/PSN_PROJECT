@@ -51,10 +51,8 @@ void CUI_Crosshair::Late_Update(_float fTimeDelta)
 
 HRESULT CUI_Crosshair::Render()
 {
-    /*
-    m_pShaderCom->Bind_Texture();*/
-
     __super::Begin();
+
 
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
