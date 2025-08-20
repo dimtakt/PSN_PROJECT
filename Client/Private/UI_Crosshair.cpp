@@ -18,11 +18,13 @@ HRESULT CUI_Crosshair::Initialize_Prototype()
 
 HRESULT CUI_Crosshair::Initialize(void* pArg)
 {
+    _float fSize = 50.f;
+
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
     Desc.fY = g_iWinSizeY >> 1;
-    Desc.fSizeX = 50;
-    Desc.fSizeY = 50;
+    Desc.fSizeX = fSize;
+    Desc.fSizeY = fSize;
 
     if (FAILED(__super::Initialize(&Desc)))
         return E_FAIL;
@@ -67,7 +69,7 @@ HRESULT CUI_Crosshair::Render()
     if (FAILED(m_pTextureCom_Gun->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);
+    m_pShaderCom->Begin(1);
 
     m_pVIBufferCom->Bind_Resources();
 
