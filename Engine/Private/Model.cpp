@@ -166,10 +166,79 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     m_isFinished = false;
 
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
-    m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta);
+    
+#pragma region logic comment
+
+    // 여기서 시간 경과에 따른 fTranslationTime 의 비율을 계산한 뒤
+    // 인자로 넘겨주어 갱신되도록
+
+    // 언제 블렌드가 이루어져야 하는가
+    // 1. 애니메이션 변경 직후
+    // 2. 변경된 지 0.2s 이내동안
+
+    // fTimeDelta 에 기반하여 남은 시간 이용, 비율 계산 
 
 
-    /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달돼야할 CombindTransformationMatrix를 만들어준다. */
+
+
+    // if ( 애니메이션이 막 변경됐다면 )
+    //   { 경과 시간 계산 시작. 즉, 타이머 진행중을 뜻하는 변수의 On }
+
+    // 매 업데이트마다
+    // 
+    // 1. fDeltaTime 을 이용하여 경과 시간 계속 더함
+    // 
+    // 2. 남은시간 대비 경과시간에 비례해서 애닌메이션 블렌딩 << 인자로 비율 넘겨주어 내부에서 블렌딩되도록
+    // >> 블렌딩 방식? 시간 경과량만큼 기존 뼈대 위치 : 적용 뼈대 위치 비율 산정하여 적용
+    // >> 예시) 1초 중 0.1초만 지났다면       Anim : Existing =   1/10    : 9/10,
+    //          거기서 0.2초가 더 지났다면                        2/9     : 7/9,
+    //          거기서 0.5초가 더 지났다면                        5/7     : 2/7   ...
+    // >> 왜 이렇게 하느냐? 프레임 저하 상황에서도 시간 기반 변수로 일정하게 작동시키기 위함
+
+    // if ( 만약 경과시간이 최대시간을 넘겼다면 )
+    //   { 경과 시간 계산 종료. }
+
+#pragma endregion
+
+
+
+    // 필요 지역변수
+    _float fAnimBlendRatio = 1.f;
+    _float fBlendLeftTime = {};
+
+    // 시작 조건
+    if (m_isAnimChanged && !m_isDoingTransition)
+        m_isDoingTransition = true;
+
+    // 경과시간 갱신 및 ratio 계산
+    if (m_isDoingTransition)
+    {
+        m_fAnimElapsedTime += fTimeDelta;
+        fBlendLeftTime = m_fTranslationTime - m_fAnimElapsedTime;
+
+        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치
+        fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치
+        
+        // clamping
+        if      (fAnimBlendRatio > 1)       fAnimBlendRatio = 1;
+        else if (fAnimBlendRatio < 0)       fAnimBlendRatio = 0;
+        
+        // 종료 조건
+        if (fBlendLeftTime <= 0)
+        {
+            m_isDoingTransition = false;
+            m_fAnimElapsedTime = 0.f;
+        }
+    }
+
+    m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
+
+
+
+
+
+
+    /* 바꿔야할 뼈들의 Transformation행렬이 갱신되었다면, 정점들에게 직접 전달돼야할 CombindTransformationMatrix를 만들어준다. */
     for (auto& pBone : m_Bones)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
@@ -490,12 +559,15 @@ HRESULT CModel::Render(_uint iMeshIndex)
     return S_OK;
 }
 
-void CModel::Set_Animation(_uint iIndex, _bool isLoop)
+void CModel::Set_Animation(_uint iIndex, _bool isLoop, _float fTransitionTime)
 {
     if (iIndex >= m_iNumAnimations)
         return;
 
+    m_fTranslationTime = fTransitionTime;
     m_isLoop = isLoop;
+
+    m_isAnimChanged = (m_iCurrentAnimIndex != iIndex);
     m_iCurrentAnimIndex = iIndex;
 }
 

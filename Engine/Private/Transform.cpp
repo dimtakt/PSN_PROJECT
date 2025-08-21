@@ -47,6 +47,9 @@ void CTransform::Scaling(_float3 vScale)	// 상대적
 	Set_State(STATE::LOOK, Get_State(STATE::LOOK) * vScale.z);
 }
 
+// 아예 네비게이션에 의해 y축 좌표가 변경되는 함수를 따로 제작
+// x, z 축 변경되는 함수 재구성해야할듯
+
 void CTransform::Go_Straight(_float fTimeDelta)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);

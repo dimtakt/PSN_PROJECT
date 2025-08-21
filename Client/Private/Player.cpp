@@ -59,7 +59,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 
 	// 애니메이션 분기 테스트용
-	// 애니메이션 목록 확인 : https://puu.sh/Kzk7z/bad5f5726a.png
+	// 애니메이션 목록 확인 : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h 에도 있음
 
 	_float fTmpSpeed = 0.4f * fTimeDelta;
 

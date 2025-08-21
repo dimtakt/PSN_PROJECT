@@ -75,7 +75,7 @@ HRESULT CChannel::Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector
     return S_OK;
 }
 
-void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex)
+void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex, _float fBlendRatio)
 {
     if (fCurrentTrackPosition == 0.f)
         *pCurrentKeyFrameIndex = 0;
@@ -83,8 +83,11 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
     /* 선택된 애니메이션이 이용하고 있는 이 뼈(Channel)의 현재 재생된 위치(fCurrrentTrackPosition)에 맞는 상태행렬을 만들어 준다. */
     _vector         vScale, vRotation, vTranslation;
 
-    /* 마지막 키프레임상태를 취하낟. */
+    /* 마지막 키프레임상태. */
     KEYFRAME        LastKeyFrame = m_KeyFrames.back();
+
+    /* Transform 을 반영시킬 본의 정보 */
+    CBone* pTargetBone = Bones[m_iBoneIndex];
 
     if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
     {
@@ -113,17 +116,36 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
 
         _float      fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition) / (m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition);
 
-        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
+        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);  
         vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
         vTranslation = XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f);
-
-
     }
+
+
+
+    /* 애니메이션이 반영 및 계산된 최종 Transform 정보를, 인자로 받아온 Blend 가중치에 따라 재계산 (애니메이션 전환 시 블렌딩 효과) */
+    if (fBlendRatio != 1)
+    {
+        _float fAnimBlendRatio = fBlendRatio;               // [이쪽이 새로 반영될 Transform] 의 반영 비율
+        _float fExistBlendRatio = 1.f - fAnimBlendRatio;    // [이쪽이 기존의 뼈대 Transform] 의 반영 비율
+
+
+        // 기존 뼈대의 Translation, Rotation, Scale 정보를 받아와서
+        // Blend 수치에 맞게 반영하여 lerp 한 뒤 재반영시켜주어야 할 듯 함
+        _vector vExistTranslation = {}, vExistRotation = {}, vExistScale = {};
+        XMMatrixDecompose(&vExistScale, &vExistRotation, &vExistTranslation, pTargetBone->Get_TransformationMatrix());
+
+        vScale = XMVectorLerp(vExistScale, vScale, fAnimBlendRatio);
+        vRotation = XMQuaternionSlerp(vExistRotation, vRotation, fAnimBlendRatio);
+        vTranslation = XMVectorSetW(XMVectorLerp(vExistTranslation, vTranslation, fAnimBlendRatio), 1.f);
+    }
+
+
 
     /*_matrix         TransformationMatrix = XMMatrixScaling() * XMMatrixRotationQuaternion() * XMMatrixTranslation();*/
     _matrix         TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
 
-    Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+    pTargetBone->Set_TransformationMatrix(TransformationMatrix);
 }
 
 CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones)

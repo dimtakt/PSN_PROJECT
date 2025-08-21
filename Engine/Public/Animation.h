@@ -16,7 +16,7 @@ private:
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones);
-	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
+	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio);
 
 public:
 	_wstring Get_AnimName() { return m_strAnimName; };

@@ -49,7 +49,7 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Set_Animation(_uint iIndex, _bool isLoop = false);
+	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.2f);
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
@@ -90,6 +90,17 @@ private:
 	_uint							m_iCurrentAnimIndex = { 0 };
 	_bool							m_isLoop = {};
 	_bool							m_isFinished = {};
+
+
+
+	// 애니메이션 변경 시 이전 과정과 블렌드 처리를 위함
+	// 가능하다면 조건을 애니메이션 최초 프레임 시작 시로 해도 좋을 듯
+	_bool							m_isAnimChanged = false;
+	
+	_bool							m_isDoingTransition = false;
+	_float							m_fTranslationTime = {};
+	_float							m_fAnimElapsedTime = {};
+
 
 
 	FILETYPE						m_eFileType = {};

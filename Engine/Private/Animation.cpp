@@ -73,7 +73,7 @@ HRESULT CAnimation::Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<
     return S_OK;
 }
 
-void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
 
@@ -93,7 +93,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 
     for (_uint i = 0; i < m_iNumChannels; ++i)
     {
-        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
+        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i], fBlendRatio);
     }
 }
 

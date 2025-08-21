@@ -29,9 +29,18 @@ public:
 	_float4x4* Get_CombinedTransformationMatrixPtr() {
 		return &m_CombinedTransformationMatrix;
 	}
+	
 	void Set_TransformationMatrix(_fmatrix Matrix) {
 		XMStoreFloat4x4(&m_TransformationMatrix, Matrix);
 	}
+	_matrix Get_TransformationMatrix() const {
+		return XMLoadFloat4x4(&m_TransformationMatrix);
+	}
+	_float4x4* Get_TransformationMatrixPtr() {
+		return &m_TransformationMatrix;
+	}
+
+
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);
