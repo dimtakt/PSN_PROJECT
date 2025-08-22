@@ -20,6 +20,7 @@ public:
 
 public:
 	_wstring Get_AnimName() { return m_strAnimName; };
+	_bool	Get_isFinishedLoop() { return m_isFinishedLoop; };
 
 private:
 
@@ -37,6 +38,8 @@ private:
 	_uint						m_iNumChannels = {};
 	vector<class CChannel*>		m_Channels;
 	vector<_uint>				m_CurrentKeyFrameIndices;
+
+	_bool						m_isFinishedLoop = false;
 
 public:
 	static CAnimation* Create(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);

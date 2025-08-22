@@ -76,9 +76,11 @@ HRESULT CAnimation::Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<
 void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+    m_isFinishedLoop = false;
 
     if (m_fCurrentTrackPosition >= m_fDuration)
     {
+
         if (false == isLoop)
         {
             *pFinished = true;
@@ -86,7 +88,10 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
             return;
         }
         else
+        {
+            m_isFinishedLoop = true;
             m_fCurrentTrackPosition = 0.f;
+        }
 
     }
 

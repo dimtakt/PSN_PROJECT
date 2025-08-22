@@ -205,6 +205,7 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     // 필요 지역변수
     _float fAnimBlendRatio = 1.f;
     _float fBlendLeftTime = {};
+    m_isAnimChanged = (m_isAnimChanged)? true : m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop();
 
     // 시작 조건
     if (m_isAnimChanged && !m_isDoingTransition)
