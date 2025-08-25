@@ -8,6 +8,14 @@ NS_BEGIN(Engine)
 
 class CChannel final : public CBase
 {
+public:
+	typedef struct tChannelUpdateDesc
+	{
+		_float	fTransitionTime;
+		_float	fAnimDuration;
+		_float	fTickPerSecond;
+	}CHANNEL_UPD_DESC;
+
 private:
 	CChannel();
 	virtual ~CChannel() = default;
@@ -15,7 +23,7 @@ private:
 public:
 	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
 	HRESULT Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector<class CBone*>& Bones);
-	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex, _float fBlendRatio = 1.f);
+	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex, _float fBlendRatio = 1.f, _bool isSameAnim = false, void* pArg = nullptr);
 
 public:
 	_uint Get_UsingBoneIndex() { return m_iBoneIndex;  }

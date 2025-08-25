@@ -16,7 +16,7 @@ NS_BEGIN(Engine)
 class CBone;
 class CMesh;
 class CMeshMaterial;
-
+class CChannel;
 class CAnimation;
 
 class ENGINE_DLL CModel final : public CComponent
@@ -24,7 +24,6 @@ class ENGINE_DLL CModel final : public CComponent
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CModel(const CModel& Prototype);
-class CChannel;
 	virtual ~CModel() = default;
 
 public:
@@ -49,7 +48,7 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.2f);
+	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.4f);
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);

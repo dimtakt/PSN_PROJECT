@@ -73,18 +73,27 @@ HRESULT CAnimation::Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<
     return S_OK;
 }
 
-void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio, _bool isSameAnim, void* pArg)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
     m_isFinishedLoop = false;
 
-    if (m_fCurrentTrackPosition >= m_fDuration)
+  
+    CChannel::CHANNEL_UPD_DESC* pDesc = static_cast<CChannel::CHANNEL_UPD_DESC*>(pArg);
+    _float fTranslationTime = 0; 
+    if (isSameAnim && pDesc != nullptr)
+        fTranslationTime = pDesc->fTransitionTime;
+
+
+    _float fFixedDuration = (isSameAnim) ? m_fDuration - pDesc->fTransitionTime : m_fDuration;
+
+    if (m_fCurrentTrackPosition >= fFixedDuration)
     {
 
         if (false == isLoop)
         {
             *pFinished = true;
-            m_fCurrentTrackPosition = m_fDuration;
+            m_fCurrentTrackPosition = fFixedDuration;
             return;
         }
         else
@@ -98,7 +107,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 
     for (_uint i = 0; i < m_iNumChannels; ++i)
     {
-        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i], fBlendRatio);
+        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i], fBlendRatio, isSameAnim, pArg);
     }
 }
 

@@ -4,6 +4,7 @@
 #include "Bone.h"
 #include "MeshMaterial.h"
 #include "Animation.h"
+#include "Channel.h"
 
 #include <fstream>
 
@@ -212,6 +213,8 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     _float fBlendLeftTime = {};
     m_isAnimChanged = (m_isAnimChanged)? true : m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop();
 
+    _bool isSameAnim = m_iCurrentAnimIndex == m_iPrevAnimIndex;
+
     // 블렌딩 트랜지션 시작 조건. 애니메이션이 바뀌었고, 블렌딩 진행중이 아닐 때 활성화
     if (m_isAnimChanged && !m_isDoingTransition)
         m_isDoingTransition = true;
@@ -222,11 +225,10 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         m_fAnimElapsedTime += fTimeDelta;
         fBlendLeftTime = m_fTranslationTime - m_fAnimElapsedTime;
 
-        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치
-
-        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 7:54)
+        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;            // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 8/25 7:54)
         fAnimBlendRatio = m_fAnimElapsedTime / m_fTranslationTime;  // 이게 적용돼야 할 신규 Anim 가중치
-        
+
+
         // clamping
         if      (fAnimBlendRatio > 1)       fAnimBlendRatio = 1;
         else if (fAnimBlendRatio < 0)       fAnimBlendRatio = 0;
@@ -239,10 +241,16 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         }
     }
 
+
     //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
 
+    CChannel::CHANNEL_UPD_DESC pDesc = {};
+    pDesc.fAnimDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
+    pDesc.fTransitionTime = m_fTranslationTime;
+    pDesc.fTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+
     // 애니메이션 업데이트
-    if (m_isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트
+    if (m_isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
     {
 
         // 문제..?
@@ -256,19 +264,23 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         // 이전 건 1.f 로 주고
         // 그럼 뼈 반영됐을테니까 그거 기반으로 그냥 뒤에꺼 fAnimBlendRatio 로 두면 되는 것 아닌지?
 
-        // 지금 그냥 2배로 동작하는 중이라 그런 듯. 같은 애니메이션일때는
-        if (m_iPrevAnimIndex != UINT_MAX)
-            m_Animations[m_iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);  // 이전 애니메이션은 full weight로
-        
-        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio); // 새 애니메이션은 fAnimBlendRatio만큼
+        if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
+        {
+            if (m_iPrevAnimIndex != UINT_MAX)
+                m_Animations[m_iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
 
-        std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
+            m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
+        }
+        else                    // 전환 간 애니메이션이 같을 때
+        {
+            m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+        }
+        //std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
     }
     else                        // 전환 중이 아니면 현재 애니메이션만
     {
-        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);
-
-        std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
+        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+        //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
     }
 
 
@@ -614,6 +626,8 @@ void CModel::Set_Animation(_uint iIndex, _bool isLoop, _float fTransitionTime)
         m_iPrevAnimIndex = m_iCurrentAnimIndex;
 
     m_iCurrentAnimIndex = iIndex;
+    if (m_iPrevAnimIndex == UINT_MAX)
+        m_iPrevAnimIndex = iIndex;
 }
 
 HRESULT CModel::Ready_Meshes()

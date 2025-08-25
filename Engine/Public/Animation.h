@@ -16,11 +16,14 @@ private:
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize_Binary(const AIANIM_DESC tAnimDesc, const vector<class CBone*>& Bones);
-	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio);
+	void Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta, _float fBlendRatio, _bool isSameAnim = false, void* pArg = nullptr);
 
 public:
-	_wstring Get_AnimName() { return m_strAnimName; };
-	_bool	Get_isFinishedLoop() { return m_isFinishedLoop; };
+	_wstring	Get_AnimName()				{ return m_strAnimName; };
+	_float		Get_CurrentTrackPosition()	{ return m_fCurrentTrackPosition; };
+	_float		Get_Duration()				{ return m_fDuration; };
+	_float		Get_TickPerSecond()			{ return m_fTickPerSecond; };
+	_bool		Get_isFinishedLoop()		{ return m_isFinishedLoop; };
 
 private:
 
