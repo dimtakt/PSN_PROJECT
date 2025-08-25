@@ -44,6 +44,8 @@ public:
 
 	_wstring Get_FileName() { return m_strModelName; }
 	void Set_FileName(_wstring filename) { m_strModelName = filename; }
+	_uint Get_ObjType() { return m_iGameObjType; }
+	void Set_ObjType(_uint iObjType) { m_iGameObjType = iObjType; }
 
 protected:
 	// 이를 부모로 갖는 자식 오브젝트 생성시, 버퍼 정보가 있다면 반드시 할당해야 함.
@@ -73,6 +75,8 @@ protected:
 	_int			m_iMaxHp		=	{};
 
 	_wstring		m_strModelName	=	{};
+
+	_uint			m_iGameObjType = { };
 	
 	
 protected:

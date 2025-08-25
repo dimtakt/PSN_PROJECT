@@ -416,6 +416,8 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 
 	ifs.read(reinterpret_cast<char*>(&m_tMapData.iNumGameObj), sizeof(m_tMapData.iNumGameObj));
 	m_tMapData.vecGameObj.clear();
+	//m_tMapData.vecGameObj.reserve(m_tMapData.iNumGameObj);
+	
 	for (unsigned int i = 0; i < m_tMapData.iNumGameObj; ++i)
 	{
 		LOADED_OBJ_DESC desc;
@@ -429,12 +431,14 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		ifs.read(reinterpret_cast<char*>(&str[0]), len * sizeof(wchar_t));
 		desc.strFileName = str;
 
+		ifs.read(reinterpret_cast<char*>(&desc.iObjType), sizeof(_uint));
+
 		m_tMapData.vecGameObj.push_back(desc);
 	}
 
 	ifs.read(reinterpret_cast<char*>(&m_tMapData.iNumTerrains), sizeof(m_tMapData.iNumTerrains));
 	m_tMapData.vecTerrainTransform.clear();
-	for (unsigned int i = 0; i < m_tMapData.iNumTerrains; ++i)
+	for (unsigned int i = 0; i < m_tMapData.iNumTerrains; ++i) // 여기서 루프 돔
 	{
 		XMFLOAT4X4 mat;
 		ifs.read(reinterpret_cast<char*>(&mat), sizeof(XMFLOAT4X4));
@@ -500,6 +504,8 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		CTransform* pObjectTransformCom = dynamic_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 		pObjectTransformCom->Set_WorldMatrix(tDesc.matFinalTransform);
 
+		pGameObject->Set_ObjType(m_tMapData.vecGameObj[i].iObjType);
+
 		// 로컬 변수
 		m_pObject.push_back(pGameObject);
 	}
@@ -528,6 +534,10 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 
 HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
 {
+	m_tMapData.vecGameObj.clear();
+	m_tMapData.vecTerrainTransform.clear();
+	m_tMapData.vecLoadedItems.clear();
+
 	// 변환용 로컬함수에 저장
 	
 	m_tMapData.iMapLevel = ENUM_CLASS(m_eTargetLevel);
@@ -556,6 +566,7 @@ HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
 		_splitpath_s(szFilePath, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, nullptr, 0);
 
 		tLoadObjDesc.strFileName = m_pObject[i]->Get_FileName();
+		tLoadObjDesc.iObjType = m_pObject[i]->Get_ObjType();
 
 		// push_back
 		m_tMapData.vecGameObj.push_back(tLoadObjDesc);
@@ -601,6 +612,7 @@ HRESULT CLevel_Editor::Save_BinaryMap(_wstring* strSavePath)
 		unsigned int len = static_cast<unsigned int>(obj.strFileName.size());
 		ofs.write(reinterpret_cast<const char*>(&len), sizeof(unsigned int));
 		ofs.write(reinterpret_cast<const char*>(obj.strFileName.c_str()), len * sizeof(wchar_t));
+		ofs.write(reinterpret_cast<const char*>(&obj.iObjType), sizeof(_uint));
 	}
 
 	ofs.write(reinterpret_cast<const char*>(&m_tMapData.iNumTerrains), sizeof(m_tMapData.iNumTerrains));
@@ -1828,8 +1840,44 @@ void CLevel_Editor::ImGui_Inspector()
 	
 #pragma endregion
 
+#pragma region Inspector : Object Desc Edit UI
 
-#pragma region Inspector : Transform UI
+	if (ImGui::CollapsingHeader("Object Desc Edit##ObjDescEdit"))
+	{
+		if (m_pSelectedObject)
+		{
+			// 현재 선택된 오브젝트 타입
+			_uint currentType = m_pSelectedObject->Get_ObjType();
+
+			// enum 이름 배열 (ImGui에 표시할 용도)
+			static const char* typeNames[] = {
+				"PLAYER",
+				"ENEMY",
+				"WEAPON_RANGED_PISTOL",
+				"WEAPON_RANGED_RIFLE",
+				"WEAPON_RANGED_SHOTGUN",
+				"WEAPON_MELEE_KATANA",
+				"WEAPON_MELEE_BAT",
+				"WEAPON_MELEE_KNIFE",
+				"WEAPON_MELEE_GOLFCLUB",
+				"WEAPON_PROPS",
+				"PLAYERBULLET",
+				"ENEMYBULLET",
+				"STATIC_PROPS"
+			};
+
+			// 콤보 박스 UI
+			int typeIndex = static_cast<int>(currentType);
+			if (ImGui::Combo("Object Type", &typeIndex, typeNames, IM_ARRAYSIZE(typeNames)))
+			{
+				// 타입 변경 적용
+				m_pSelectedObject->Set_ObjType(static_cast<_uint>(typeIndex));
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region Inspector : AnimViewer UI
 	if (m_pSelectedObject != nullptr &&
 		dynamic_cast<CModel*>(m_pSelectedObject->Get_Component(L"Com_Model"))->Get_Modeltype() == MODELTYPE::ANIM)
 	{
@@ -1869,6 +1917,9 @@ void CLevel_Editor::ImGui_Inspector()
 	}
 	
 #pragma endregion
+
+
+
 
 	ImGui::End();
 }

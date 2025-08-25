@@ -235,6 +235,7 @@ namespace Engine
 
 		XMFLOAT4X4				matFinalTransform;	// 최종 계산된 오브젝트의 좌표가 담김
 		wstring					strFileName;		// 파일 이름
+		unsigned int			iObjType;			// 오브젝트 타입 (무기냐, 정적 물체냐 등)
 
 	}LOADED_OBJ_DESC;
 

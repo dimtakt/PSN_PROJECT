@@ -63,7 +63,7 @@ private:	// 해당 클래스에서만 사용할 함수
 		
 	HRESULT Convert_FBXToBinary(_wstring* strLoadPath, _wstring* strSavePath, MODELTYPE eAnimType);
 	
-	HRESULT Load_BinaryMap(_wstring* strLoadPath);
+	HRESULT Load_BinaryMap(_wstring* strLoadPath) override;
 	HRESULT Save_BinaryMap(_wstring* strSavePath);
 
 	HRESULT Load_NavMesh(_wstring* strLoadPath);
@@ -173,24 +173,6 @@ private:
 	NAVMESH_DESC			m_tNavMeshData = {};
 	_float3					m_tCellPoints[3] = {};
 
-
-	/** 
-	*	
-	*
-	*	typedef struct tagNavTriDesc {
-	*
-	*		_float3					vTriPoints[3];
-	*
-	*	}NAVTRI_DESC;
-	*
-	*	typedef struct tagNavigationMeshDesc {
-	*	
-	*		_uint					iNumTris;
-	*		vector<NAVTRI_DESC>		vecTris;
-	*	
-	*	}NAVMESH_DESC;
-	* 
-	*/
 	
 
 	

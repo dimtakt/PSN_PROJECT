@@ -34,6 +34,11 @@ HRESULT CLevel::Render()
 	return S_OK;
 }
 
+HRESULT CLevel::Load_BinaryMap(_wstring* strLoadPath)
+{
+	return S_OK;
+}
+
 // 게임 실행중에 실시간으로 커스텀 프로토타입을 추가하기 위함.
 // 필요 정보? : 모델 파일의 저장 경로
 // 바이너리화(datmodel) 된 파일을, 특정 경로에서만 로드한다고 가정 (../Bin/Resources/_SUPERHOT/_BinaryModels/)
