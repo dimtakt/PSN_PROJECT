@@ -49,7 +49,7 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.13f);
+	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.2f);
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
@@ -88,6 +88,7 @@ private:
 	vector<class CAnimation*>		m_Animations;
 
 	_uint							m_iCurrentAnimIndex = { 0 };
+	_uint							m_iPrevAnimIndex = { UINT_MAX };
 	_bool							m_isLoop = {};
 	_bool							m_isFinished = {};
 

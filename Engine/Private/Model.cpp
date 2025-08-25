@@ -167,7 +167,7 @@ _bool CModel::Play_Animation(_float fTimeDelta)
 
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
     
-#pragma region logic comment
+#pragma region logic comment (animChange transition blending)
 
     // 여기서 시간 경과에 따른 fTranslationTime 의 비율을 계산한 뒤
     // 인자로 넘겨주어 갱신되도록
@@ -200,6 +200,11 @@ _bool CModel::Play_Animation(_float fTimeDelta)
 
 #pragma endregion
 
+#pragma region logic comment (loop blending)
+
+    // 단, 애니메이션의 전/후가 같다면 blending 시점을 반 앞으로 당겨서 앞뒤 연결이 자연스럽게 되어야 함
+
+#pragma endregion
 
 
     // 필요 지역변수
@@ -207,18 +212,20 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     _float fBlendLeftTime = {};
     m_isAnimChanged = (m_isAnimChanged)? true : m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop();
 
-    // 시작 조건
+    // 블렌딩 트랜지션 시작 조건. 애니메이션이 바뀌었고, 블렌딩 진행중이 아닐 때 활성화
     if (m_isAnimChanged && !m_isDoingTransition)
         m_isDoingTransition = true;
 
-    // 경과시간 갱신 및 ratio 계산
+    // 경과시간 갱신 및 블렌딩 ratio 계산
     if (m_isDoingTransition)
     {
         m_fAnimElapsedTime += fTimeDelta;
         fBlendLeftTime = m_fTranslationTime - m_fAnimElapsedTime;
 
         //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치
-        fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치
+
+        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;  // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 7:54)
+        fAnimBlendRatio = m_fAnimElapsedTime / m_fTranslationTime;  // 이게 적용돼야 할 신규 Anim 가중치
         
         // clamping
         if      (fAnimBlendRatio > 1)       fAnimBlendRatio = 1;
@@ -232,10 +239,37 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         }
     }
 
-    m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
+    //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
 
+    // 애니메이션 업데이트
+    if (m_isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트
+    {
 
+        // 문제..?
+        // 위쪽 함수가 잠깐 실행되어 본 값을 이전 애니메이션으로 변경
+        // 뒤쪽 함수가 그 뒤 실행되어 본 값을 blend를 통해 이전 애니메이션으로부터 변환되듯이 변경
+        // 이게 매 loop마다 반복..
+        //
+        // 이전 애니메이션과 이후 애니메이션이 독립적으로 진행되는데
+        // 이를 blend시킬 방법을 찾아야 함
+        //
+        // 이전 건 1.f 로 주고
+        // 그럼 뼈 반영됐을테니까 그거 기반으로 그냥 뒤에꺼 fAnimBlendRatio 로 두면 되는 것 아닌지?
 
+        // 지금 그냥 2배로 동작하는 중이라 그런 듯. 같은 애니메이션일때는
+        if (m_iPrevAnimIndex != UINT_MAX)
+            m_Animations[m_iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);  // 이전 애니메이션은 full weight로
+        
+        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio); // 새 애니메이션은 fAnimBlendRatio만큼
+
+        std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
+    }
+    else                        // 전환 중이 아니면 현재 애니메이션만
+    {
+        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);
+
+        std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
+    }
 
 
 
@@ -244,6 +278,12 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
     }
+
+
+    // 이전의 애니메이션이 남아있어, 신규 애니메이션 loop 시 영향을 받는 것을 막기 위함
+    if (m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop())
+        m_iPrevAnimIndex = m_iCurrentAnimIndex;
+
 
     return m_isFinished;
 }
@@ -569,6 +609,10 @@ void CModel::Set_Animation(_uint iIndex, _bool isLoop, _float fTransitionTime)
     m_isLoop = isLoop;
 
     m_isAnimChanged = (m_iCurrentAnimIndex != iIndex);
+
+    if (m_isAnimChanged)
+        m_iPrevAnimIndex = m_iCurrentAnimIndex;
+
     m_iCurrentAnimIndex = iIndex;
 }
 

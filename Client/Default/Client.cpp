@@ -33,13 +33,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #ifdef _DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    //AllocConsole();  // 콘솔창 생성
-    //FILE* fp;
-
-    //// 표준 출력(stdout)을 콘솔창에 연결
-    //freopen_s(&fp, "CONOUT$", "w", stdout);
-    //// 표준 입력(stdin)도 연결하고 싶다면
-    //freopen_s(&fp, "CONIN$", "r", stdin);
+    AllocConsole();  // 콘솔창 생성
+    FILE* fp;
+    // 표준 출력(stdout)을 콘솔창에 연결
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    // 표준 입력(stdin)도 연결하고 싶다면
+    freopen_s(&fp, "CONIN$", "r", stdin);
 #endif
 
     UNREFERENCED_PARAMETER(hPrevInstance);
