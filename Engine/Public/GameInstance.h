@@ -171,8 +171,6 @@ public:
 	void Req_EditTimeSpeed(_float fEditValue);
 	_float Get_TimeSpeed();
 
-	void Set_LerpTransitionTime(_float fTransValue);
-
 #pragma endregion
 
 	// ==============================

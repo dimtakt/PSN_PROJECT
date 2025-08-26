@@ -520,11 +520,6 @@ _float CGameInstance::Get_TimeSpeed()
 	return m_pTimeSpeed_Manager->Get_TimeSpeed();
 }
 
-void CGameInstance::Set_LerpTransitionTime(_float fTransValue)
-{
-	m_pTimeSpeed_Manager->Set_LerpTransitionTime(fTransValue);
-}
-
 #pragma endregion
 
 // ==============================

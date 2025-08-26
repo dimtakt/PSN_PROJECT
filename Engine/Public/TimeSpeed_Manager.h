@@ -17,40 +17,23 @@ private:
 public:
     void Update_TimeSpeed(_float fRawTimeDelta)
     {
-        // 요청을 받은 시점부터 보간 진행
-        if (fTimeSpeed_Multiplier != fTimeSpeed_ReqTarget)
-        {
-            _float fLeftTime = fTimeSpeed_LerpTransition - fElapsedTime_forLerp;
-            _float fLerpRatio = fRawTimeDelta / fLeftTime;
-            if (fLerpRatio > 1) fLerpRatio = 1;
+        _float followSpeed = 8.0f; // 클수록 더 빨리 목표에 붙음
+        _float factor = 1.0f - expf(-followSpeed * fRawTimeDelta);
 
-            fTimeSpeed_Multiplier = (fTimeSpeed_Multiplier * (1 - fLerpRatio)) + (fTimeSpeed_ReqTarget * fLerpRatio);
-            if (fTimeSpeed_Multiplier < fTimeSpeed_Min) fTimeSpeed_Multiplier = fTimeSpeed_Min;
-            if (fTimeSpeed_Multiplier > fTimeSpeed_Max) fTimeSpeed_Multiplier = fTimeSpeed_Max;
+        fTimeSpeed_Multiplier = fTimeSpeed_Multiplier * (1.0f - factor)
+            + fTimeSpeed_ReqTarget * factor;
 
-            fElapsedTime_forLerp += fRawTimeDelta;
-        }
-        else
-        {
-            fElapsedTime_forLerp = 0.f;
-        }
+        if (fTimeSpeed_Multiplier < fTimeSpeed_Min) fTimeSpeed_Multiplier = fTimeSpeed_Min;
+        if (fTimeSpeed_Multiplier > fTimeSpeed_Max) fTimeSpeed_Multiplier = fTimeSpeed_Max;
     };
 
     void Req_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue;  };
     void Set_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_Multiplier = fEditValue; };
     _float Get_TimeSpeed()                              {   return fTimeSpeed_Multiplier;   }
 
-
-    void Set_LerpTransitionTime(_float fTransValue)     {   fTimeSpeed_LerpTransition = fTransValue;    }
-    _float Get_LerpTransitionTime()                     {   return fTimeSpeed_LerpTransition;   }
-
-
 private:
     _float fTimeSpeed_Multiplier = 1.f;
     _float fTimeSpeed_ReqTarget = 1.f;
-
-    _float fTimeSpeed_LerpTransition = 0.2f;
-    _float fElapsedTime_forLerp = 0.f;
 
     _float fTimeSpeed_Min = 0.1f;
     _float fTimeSpeed_Max = 1.f;
