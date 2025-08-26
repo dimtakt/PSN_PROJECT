@@ -11,8 +11,7 @@
 #include "PipeLine.h"
 #include "Light_Manager.h"
 #include "Picking.h"
-
-
+#include "TimeSpeed_Manager.h"
 
 
 
@@ -76,17 +75,21 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
 
-
+	m_pTimeSpeed_Manager = CTimeSpeed_Manager::Create();
+	if (nullptr == m_pTimeSpeed_Manager)
+		return E_FAIL;
 
 	return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
-	// 시간 배율 조정을 위한 변수를 관리하는 매니저나 클래스 나중에 만들어두기
-	//_float fSpeedMultiply = CSpeedMultiplyManager->Get_CurMultiplay();
-	_float fSpeedMultiply = 1;
+	// 시간 조절 기믹용 매니저
+	m_pTimeSpeed_Manager->Update_TimeSpeed(fTimeDelta);
+
+	_float fSpeedMultiply = m_pTimeSpeed_Manager->Get_TimeSpeed();
 	_float fCalcedTimeDelta = fTimeDelta * fSpeedMultiply;
+
 
 	m_pInput_Device->Update();
 
@@ -505,8 +508,26 @@ _bool CGameInstance::Picking_InLocal(_float3& vPickedPos, const _float3& vPointA
 
 // ==============================
 
+#pragma region TIMESPEED_MANAGER
 
+void CGameInstance::Req_EditTimeSpeed(_float fEditValue)
+{
+	m_pTimeSpeed_Manager->Req_EditTimeSpeed(fEditValue);
+}
 
+_float CGameInstance::Get_TimeSpeed()
+{
+	return m_pTimeSpeed_Manager->Get_TimeSpeed();
+}
+
+void CGameInstance::Set_LerpTransitionTime(_float fTransValue)
+{
+	m_pTimeSpeed_Manager->Set_LerpTransitionTime(fTransValue);
+}
+
+#pragma endregion
+
+// ==============================
 
 void CGameInstance::Release_Engine()
 {

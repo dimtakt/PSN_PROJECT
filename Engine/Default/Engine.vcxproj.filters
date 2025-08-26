@@ -145,6 +145,12 @@
     <Filter Include="01.Utility\02.GameObject\_Types\CustomObj">
       <UniqueIdentifier>{81f4a5d3-1235-4f0a-8fa3-d312f4882f21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\_GValueManager">
+      <UniqueIdentifier>{2570f8ec-9830-4b29-8f21-409013617c74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\_GValueManager\TimeSpeed">
+      <UniqueIdentifier>{615ea55f-f342-4d84-a65f-7d643b028084}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -430,6 +436,9 @@
     </ClInclude>
     <ClInclude Include="..\public\CustomObj.h">
       <Filter>01.Utility\02.GameObject\_Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TimeSpeed_Manager.h">
+      <Filter>01.Utility\_GValueManager\TimeSpeed</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

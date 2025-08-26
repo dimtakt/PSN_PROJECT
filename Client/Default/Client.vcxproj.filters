@@ -103,12 +103,6 @@
     <Filter Include="01.Levels\Chapter\Normal">
       <UniqueIdentifier>{421358cb-819b-43d7-bb45-13561a00dbb5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GValueManager">
-      <UniqueIdentifier>{3a7ed239-b862-423b-a496-8e7a623bf9d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GValueManager\SpeedMultiplyManager">
-      <UniqueIdentifier>{1a4f387c-0019-4b36-ade4-e471e6ab838c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Stage">
       <UniqueIdentifier>{133169bd-5d15-42ea-bf92-89fc9e2285fc}</UniqueIdentifier>
     </Filter>

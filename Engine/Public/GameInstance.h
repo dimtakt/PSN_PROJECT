@@ -153,17 +153,25 @@ public:
 
 #pragma endregion
 
+	// ==============================	
 
+#pragma region PICKING : DX9 Legacy
 
-#pragma region DX9 Legacy
+	void Transform_Picking_ToLocalSpace(CTransform* pTransformCom);
+	_bool Picking_InWorld(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
+	_bool Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
 
-	
-	#pragma region PICKING 
-		void Transform_Picking_ToLocalSpace(CTransform* pTransformCom);
-		_bool Picking_InWorld(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
-		_bool Picking_InLocal(_float3& vPickedPos, const _float3& vPointA, const _float3& vPointB, const _float3& vPointC);
-	#pragma endregion
+#pragma endregion
 
+	// ==============================
+
+#pragma region TIMESPEED_MANAGER
+
+public:
+	void Req_EditTimeSpeed(_float fEditValue);
+	_float Get_TimeSpeed();
+
+	void Set_LerpTransitionTime(_float fTransValue);
 
 #pragma endregion
 
@@ -183,6 +191,7 @@ private:
 	class CPipeLine*			m_pPipeLine = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
+	class CTimeSpeed_Manager*	m_pTimeSpeed_Manager = { nullptr };
 
 public:
 	void Release_Engine();
