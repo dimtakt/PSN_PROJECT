@@ -61,7 +61,7 @@ void CPlayer::Update(_float fTimeDelta)
 	// 애니메이션 분기 테스트용
 	// 애니메이션 목록 확인 : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h 에도 있음
 
-	_float fTmpSpeed = 0.4f * fTimeDelta;
+	_float fTmpSpeed = 2.f * fTimeDelta;
 
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_DOWN))
@@ -152,6 +152,8 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	// 컴포넌트 준비
 	_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
 
+	m_pTransformCom->Scale(_float3{5.f, 5.f, 5.f});
+
 	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
 		return E_FAIL;
@@ -161,13 +163,22 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	CNavigation::NAVIGATION_DESC        NaviDesc{};
-	NaviDesc.iCurrentCellIndex = 0;
+
+	// 레벨이 추가될 때 마다 추가.. 추후 이걸 define쪽에 옮기는 것도 고려..
+	switch (iDestLevelIndex)
+	{
+	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25; break;
+
+	default:								NaviDesc.iCurrentCellIndex = 0; break;
+	}
+	
 
 	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
 		return E_FAIL;
 
 	Set_BufferRef(m_pModelCom);
+
 
 	return S_OK;
 }
