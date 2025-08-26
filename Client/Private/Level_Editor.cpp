@@ -702,8 +702,13 @@ _bool CLevel_Editor::Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
 	_float3 vTerrainPos = {};
 	_bool	isTerrainPicked = Get_TerrainPickingPos(&vTerrainPos);
 
-	_float3 vShortestPos = {};
 	
+	if (!isObjectPicked && !isTerrainPicked)
+		return false;
+
+	// 카메라에서 가장 가까운 점 선택
+	_float3 vShortestPos = vObjectPos;
+
 	if (isObjectPicked && isTerrainPicked)
 	{
 		_float fObjDist, fTerrainDist;
@@ -712,15 +717,8 @@ _bool CLevel_Editor::Get_PickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
 
 		vShortestPos = (fObjDist < fTerrainDist) ? vObjectPos : vTerrainPos;
 	}
-	else if (isObjectPicked)
-		vShortestPos = vObjectPos;
 	else if (isTerrainPicked)
 		vShortestPos = vTerrainPos;
-	else
-	{
-		pOut = nullptr;
-		return false;
-	}
 
 	*pOut = vShortestPos;
 	return true;
@@ -750,44 +748,41 @@ _bool CLevel_Editor::Get_ObjectPickingPos(_float3* pOut, _bool isIgnoreAnimMesh)
 			pModel == nullptr)
 			continue;
 
-		if (object->isPicked(&vPickedPos))
+		vector<_float3> vecObjectPickedPoses;
+
+		if (object->isPicked(nullptr, true, &vecObjectPickedPoses)) // bReturnAll=true
 		{
 			pPickedObjects.push_back(object);
-			vecPickedPoses.push_back(vPickedPos);
+			vecPickedPoses.insert(vecPickedPoses.end(), vecObjectPickedPoses.begin(), vecObjectPickedPoses.end());
 			isObjectPicked = true;
 		}
+
 	}
 
 	// 피킹 좌표 반환을 위함.
 	// 여러 좌표들 중 가장 가까운 것을 반환해야 함
 
-	_float3			vShortestPos = {};
-	_float			fShortestLength = {};
-
-	for (auto& pos : vecPickedPoses)
+	if (!vecPickedPoses.empty())
 	{
-		_vector vPosLoad = XMLoadFloat3(&pos);
+		vPickedPos = vecPickedPoses[0];
+		_float fShortestLength = 0.0f;
+		XMStoreFloat(&fShortestLength, XMVector3LengthSq(XMLoadFloat3(&vPickedPos) - vCamPosLoad));
 
-		_float fResultDiff = {};
-		XMStoreFloat(&fResultDiff, XMVector3LengthSq(vPosLoad - vCamPosLoad));
+		for (size_t i = 1; i < vecPickedPoses.size(); ++i)
+		{
+			_float fResultDiff = 0.0f;
+			XMStoreFloat(&fResultDiff, XMVector3LengthSq(XMLoadFloat3(&vecPickedPoses[i]) - vCamPosLoad));
 
-		if (&pos == &vecPickedPoses.front())
-		{
-			vShortestPos = pos;
-			fShortestLength = fResultDiff;
-		}
-		else
-		{
 			if (fResultDiff < fShortestLength)
 			{
 				fShortestLength = fResultDiff;
-				vShortestPos = pos;
+				vPickedPos = vecPickedPoses[i];
 			}
 		}
 	}
 
 	// 반환
-	*pOut = vShortestPos;
+	*pOut = vPickedPos;
 	return isObjectPicked;
 }
 

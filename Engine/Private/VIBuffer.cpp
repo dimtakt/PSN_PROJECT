@@ -106,6 +106,51 @@ _bool CVIBuffer::isPicked(CTransform* pTransform, _float3* pOut)
 	return isPicked;
 }
 
+
+_bool CVIBuffer::isPicked(CTransform* pTransform, _float3* pOut, std::vector<_float3>* vecOut)
+{
+	_bool isPickedAny = false;
+	_float3 vLocalPickPos = pOut ? *pOut : _float3{ 0,0,0 };
+
+	if (D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST != m_ePrimitiveType)
+		return false;
+
+	m_pGameInstance->Transform_Picking_ToLocalSpace(pTransform);
+
+	_matrix worldMatrix = pTransform->Get_WorldMatrix();
+
+	for (size_t i = 0; i < (m_iNumIndices / 3); i++)
+	{
+		_uint iIndices[3] = { m_pIndices[i * 3 + 0], m_pIndices[i * 3 + 1], m_pIndices[i * 3 + 2] };
+
+		_bool isPicked = m_pGameInstance->Picking_InLocal(
+			vLocalPickPos,
+			m_pVertexPositions[iIndices[0]],
+			m_pVertexPositions[iIndices[1]],
+			m_pVertexPositions[iIndices[2]]
+		);
+
+		if (isPicked)
+		{
+			_vector vWorldPos = XMVector3TransformCoord(XMLoadFloat3(&vLocalPickPos), worldMatrix);
+			_float3 vOutWorld;
+			XMStoreFloat3(&vOutWorld, vWorldPos);
+
+			if (vecOut) vecOut->push_back(vOutWorld); // 모든 점 수집
+			if (pOut) *pOut = vOutWorld;             // 단일 점도 갱신
+
+			isPickedAny = true;
+
+			// bReturnAll 모드가 아니면 첫 점에서 break
+			if (!vecOut)
+				break;
+		}
+	}
+
+	return isPickedAny;
+}
+
+
 void CVIBuffer::Free()
 {
 	__super::Free();

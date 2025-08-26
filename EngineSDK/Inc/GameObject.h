@@ -40,7 +40,11 @@ public:
 
 public:
 	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요
-	virtual _bool isPicked(_float3* pOut = nullptr);
+	_bool isPicked(
+		_float3* pOut = nullptr,
+		_bool bReturnAll = false,
+		std::vector<_float3>* vecOut = nullptr
+	);
 
 	_wstring Get_FileName() { return m_strModelName; }
 	void Set_FileName(_wstring filename) { m_strModelName = filename; }

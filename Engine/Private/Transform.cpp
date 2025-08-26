@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "Shader.h"
+#include "Navigation.h"
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -50,44 +51,52 @@ void CTransform::Scaling(_float3 vScale)	// 상대적
 // 아예 네비게이션에 의해 y축 좌표가 변경되는 함수를 따로 제작
 // x, z 축 변경되는 함수 재구성해야할듯
 
-void CTransform::Go_Straight(_float fTimeDelta)
+void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);
 	_vector		vLook = Get_State(STATE::LOOK);
 
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 
-	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(vPosition))
+		Set_State(STATE::POSITION, vPosition);
 }
 
-void CTransform::Go_Left(_float fTimeDelta)
+void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);
 	_vector		vRight = Get_State(STATE::RIGHT);
 
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(vPosition))
+		Set_State(STATE::POSITION, vPosition);
 }
 
-void CTransform::Go_Right(_float fTimeDelta)
+void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);
 	_vector		vRight = Get_State(STATE::RIGHT);
 
 	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(vPosition))
+		Set_State(STATE::POSITION, vPosition);
 }
 
-void CTransform::Go_Backward(_float fTimeDelta)
+void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);
 	_vector		vLook = Get_State(STATE::LOOK);
 
 	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 
-	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(vPosition))
+		Set_State(STATE::POSITION, vPosition);
 }
 
 void CTransform::Go_Above(_float fTimeDelta)

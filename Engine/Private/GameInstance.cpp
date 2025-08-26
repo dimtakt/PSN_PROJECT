@@ -528,6 +528,7 @@ void CGameInstance::Release_Engine()
 {
 	Release();
 
+	Safe_Release(m_pTimeSpeed_Manager);
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pLight_Manager);

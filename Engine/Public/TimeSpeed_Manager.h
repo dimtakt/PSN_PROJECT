@@ -39,7 +39,7 @@ private:
     _float fTimeSpeed_Max = 1.f;
 
 public:
-    static CTimeSpeed_Manager* Create()                  { return new CTimeSpeed_Manager(); }
+    static CTimeSpeed_Manager* Create()                 { return new CTimeSpeed_Manager(); }
     virtual void Free() override                        { __super::Free(); }
 };
 

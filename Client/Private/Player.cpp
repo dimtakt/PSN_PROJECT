@@ -66,21 +66,21 @@ void CPlayer::Update(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_DOWN))
 	{
-		m_pTransformCom->Go_Backward(fTmpSpeed);
+		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_LEFT))
 	{
 		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
-		m_pTransformCom->Go_Left(fTmpSpeed);
+		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_RIGHT))
 	{
 		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 1.f);
-		m_pTransformCom->Go_Right(fTmpSpeed);
+		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_UP))
 	{
-		m_pTransformCom->Go_Straight(fTmpSpeed);
+		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
 	}
 
 
@@ -97,10 +97,13 @@ void CPlayer::Update(_float fTimeDelta)
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
+	m_pTransformCom->Set_State(Engine::STATE::POSITION,
+		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(Engine::STATE::POSITION)));
 
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CPlayer::Render()
@@ -156,6 +159,14 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
 		return E_FAIL;
+
+	CNavigation::NAVIGATION_DESC        NaviDesc{};
+	NaviDesc.iCurrentCellIndex = 0;
+
+	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Navigation"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+		return E_FAIL;
+
 	Set_BufferRef(m_pModelCom);
 
 	return S_OK;

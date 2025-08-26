@@ -280,7 +280,8 @@ HRESULT CLoader::Loading_For_Editor_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/black.bmp")))))
+		//CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
@@ -344,7 +345,8 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 
 	/* Prototype_Component_Texture_Sky */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/WhiteSkybox.dds"), 4))))
+		//CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 		return E_FAIL;
 
 
@@ -352,7 +354,8 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/black.bmp")))))
+		//CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
 		return E_FAIL;
 
 	/* Prototype_Component_VIBuffer_Cube */

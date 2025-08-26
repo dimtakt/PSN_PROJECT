@@ -69,34 +69,45 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
-_bool CGameObject::isPicked(_float3* pOut)
+_bool CGameObject::isPicked(_float3* pOut, _bool bReturnAll, std::vector<_float3>* vecOut)
 {
 	_bool isPicked = false;
-	_float3 vOut = {};
-	float fClosestDistSq = FLT_MAX;
+	_float3 vClosest = {};
+	_float fClosestDistSq = FLT_MAX;
 
 	if (!m_pVIBufferVecRef.empty()) {
 		for (size_t i = 0; i < m_pVIBufferVecRef.size(); i++) {
-			_float3 vTempOut = {};
-			if (m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, &vTempOut)) {
-				// 카메라 위치 로드
-				const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
-				_vector vCam = XMLoadFloat4(vCamPos);
-				_vector vHit = XMLoadFloat3(&vTempOut);
+			if (!bReturnAll) // 단일 점 모드
+			{
+				_float3 vTempOut = {};
+				if (m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, &vTempOut, nullptr))
+				{
+					const _float4* vCamPos = m_pGameInstance->Get_CamPosition();
+					_vector vCam = XMLoadFloat4(vCamPos);
+					_vector vHit = XMLoadFloat3(&vTempOut);
 
-				float fDistSq = XMVectorGetX(XMVector3LengthSq(vHit - vCam));
+					float fDistSq = XMVectorGetX(XMVector3LengthSq(vHit - vCam));
 
-				if (fDistSq < fClosestDistSq) {
-					fClosestDistSq = fDistSq;
-					vOut = vTempOut;
-					isPicked = true;
+					if (fDistSq < fClosestDistSq)
+					{
+						fClosestDistSq = fDistSq;
+						vClosest = vTempOut;
+						isPicked = true;
+					}
 				}
+			}
+			else if (vecOut) // 여러 점 모드
+			{
+				m_pVIBufferVecRef[i]->isPicked(m_pTransformCom, nullptr, vecOut);
+				if (!vecOut->empty())
+					isPicked = true;
 			}
 		}
 	}
 
-	if (pOut != nullptr && isPicked)
-		*pOut = vOut;
+	if (!bReturnAll && pOut != nullptr && isPicked)
+		*pOut = vClosest;
+
 	return isPicked;
 }
 

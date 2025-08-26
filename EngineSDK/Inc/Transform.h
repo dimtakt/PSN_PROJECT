@@ -4,6 +4,8 @@
 
 NS_BEGIN(Engine)
 
+class CNavigation;
+
 class ENGINE_DLL CTransform final : public CComponent
 {
 public:
@@ -64,10 +66,10 @@ public:
 public:
 	void Scale(_float3 vScale);						// 스케일 (절대적, 해당 수치 변경)
 	void Scaling(_float3 vScale);					// 상대적 (상대적, 현재 대비 변경)
-	void Go_Straight(_float fTimeDelta);			// 앞으로
-	void Go_Left(_float fTimeDelta);				// 왼쪽으로
-	void Go_Right(_float fTimeDelta);				// 오른쪽으로
-	void Go_Backward(_float fTimeDelta);			// 뒤로
+	void Go_Straight(_float fTimeDelta, CNavigation* pNavigation = nullptr);			// 앞으로
+	void Go_Left(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 왼쪽으로
+	void Go_Right(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 오른쪽으로
+	void Go_Backward(_float fTimeDelta, CNavigation* pNavigation = nullptr);			// 뒤로
 	void Go_Above(_float fTimeDelta);				// 위로
 	void Go_Below(_float fTimeDelta);				// 아래로
 	void Rotation(_fvector vAxis, _float fRadian);	// 회전 (절대적, 해당 수치 변경)
