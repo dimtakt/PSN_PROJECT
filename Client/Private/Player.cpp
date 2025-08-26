@@ -64,24 +64,29 @@ void CPlayer::Update(_float fTimeDelta)
 	_float fTmpSpeed = 2.f * fTimeDelta;
 
 
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_DOWN))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 	{
 		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);
 	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_LEFT))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 	{
 		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
 		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
 	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_RIGHT))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 	{
 		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 1.f);
 		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
 	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_UP))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
 		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
 	}
+
+	_int iMouseMove;
+	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+
 
 
 	Update_AnimationState();
@@ -232,25 +237,25 @@ void CPlayer::Update_AnimationState()
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_DOWN))
+	if (m_pGameInstance->Get_IsKeyDown(DIK_S))
 	{
 		m_iState = ENEMY_STATE::RUN_B;
 	}
 
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_LEFT))
+	if (m_pGameInstance->Get_IsKeyDown(DIK_A))
 	{
 		m_iState = ENEMY_STATE::RUN_L;
 	}
 
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_RIGHT))
+	if (m_pGameInstance->Get_IsKeyDown(DIK_D))
 	{
 		m_iState = ENEMY_STATE::RUN_R;
 	}
 
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_UP))
+	if (m_pGameInstance->Get_IsKeyDown(DIK_W))
 	{
 		m_iState = ENEMY_STATE::RUN_F;
 	}

@@ -11,6 +11,7 @@
 #include "Enemy.h"
 #include "Camera_Free.h"
 #include "Camera_Editor.h"
+#include "Camera_Player.h"
 
 #include "Player.h"
 #include "Body_Player.h"
@@ -404,8 +405,8 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 		return E_FAIL;
 
 	/* Prototype_GameObject_Camera_Free */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Free"),
-		CCamera_Free::Create(m_pDevice, m_pContext))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Player"),
+		CCamera_Player::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_Skybox */

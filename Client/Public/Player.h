@@ -60,6 +60,10 @@ private:
 
 	_uint			m_iState = { };
 
+	_float			m_fMouseSensor = { .1f };
+
+
+
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGameObject*	Clone(void* pArg)				override;

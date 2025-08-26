@@ -1,7 +1,43 @@
 #pragma once
+
+#include "Client_Defines.h"
+//#include "../../Engine/Public/Camera.h"
 #include "Camera.h"
-class CCamera_Player :
-    public CCamera
+
+NS_BEGIN(Client)
+
+class CCamera_Player final : public CCamera
 {
+public:
+	typedef struct tagCameraFreeDesc : public CCamera::CAMERA_DESC
+	{
+		_float			fMouseSensor;
+	}Camera_Player_DESC;
+
+private:
+	CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCamera_Player(const CCamera_Player& Prototype);
+	virtual ~CCamera_Player() = default;
+
+public:
+	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual void Priority_Update(_float fTimeDelta) override;
+	virtual void Update(_float fTimeDelta) override;
+	virtual void Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
+
+private:
+	_float			m_fMouseSensor = { };
+
+	_bool			m_isFreeMode = false;
+	CTransform*		m_pPlayerTransformCom = { nullptr };
+
+public:
+	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject* Clone(void* pArg)override;
+	virtual void Free() override;
+
 };
 
+NS_END
