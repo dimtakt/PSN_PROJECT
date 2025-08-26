@@ -142,6 +142,9 @@
     <Filter Include="01.Utility\02.GameObject\_Types">
       <UniqueIdentifier>{618bcb61-e16c-44dd-adac-3c84e203109b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.GameObject\_Types\CustomObj">
+      <UniqueIdentifier>{81f4a5d3-1235-4f0a-8fa3-d312f4882f21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -268,9 +271,12 @@
       <Filter>98.ExternalTool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CustomObj_Anim.cpp">
-      <Filter>01.Utility\02.GameObject\_Types</Filter>
+      <Filter>01.Utility\02.GameObject\_Types\CustomObj</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CustomObj_NonAnim.cpp">
+      <Filter>01.Utility\02.GameObject\_Types\CustomObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomObj.cpp">
       <Filter>01.Utility\02.GameObject\_Types</Filter>
     </ClCompile>
   </ItemGroup>
@@ -417,9 +423,12 @@
       <Filter>98.ExternalTool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CustomObj_NonAnim.h">
-      <Filter>01.Utility\02.GameObject\_Types</Filter>
+      <Filter>01.Utility\02.GameObject\_Types\CustomObj</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CustomObj_Anim.h">
+      <Filter>01.Utility\02.GameObject\_Types\CustomObj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CustomObj.h">
       <Filter>01.Utility\02.GameObject\_Types</Filter>
     </ClInclude>
   </ItemGroup>

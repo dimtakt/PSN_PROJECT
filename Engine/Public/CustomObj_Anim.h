@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject.h"
+#include "CustomObj.h"
 
 NS_BEGIN(Engine)
 
@@ -11,15 +11,8 @@ NS_END
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL CCustomObj_Anim final : public CGameObject
+class ENGINE_DLL CCustomObj_Anim final : public CCustomObj
 {
-public:
-	typedef struct customObjectDesc : public GAMEOBJECT_DESC
-	{
-		_wstring		strModelComPrototypeTag;
-
-	}CUSTOMOBJ_DESC;
-
 private:
 	CCustomObj_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCustomObj_Anim(const CGameObject& Prototype);

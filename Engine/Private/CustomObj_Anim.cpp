@@ -3,12 +3,12 @@
 
 
 CCustomObj_Anim::CCustomObj_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject(pDevice, pContext)
+    : CCustomObj(pDevice, pContext)
 {
 }
 
 CCustomObj_Anim::CCustomObj_Anim(const CGameObject& Prototype)
-    : CGameObject(Prototype)
+    : CCustomObj(Prototype)
 {
 }
 
