@@ -7,6 +7,8 @@
 #include "Level_Editor.h"
 #include "Level_GamePlay.h"
 
+#include "Stage_Test1.h"
+
 
 #include "BackGround.h"
 
@@ -49,6 +51,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 		case LEVEL::GAMEPLAY:
 			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 			break;
+
+		case LEVEL::TEST_EXTRA1:
+			pNewLevel = CStage_Test1::Create(m_pDevice, m_pContext);
 		}
 
 		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(m_eNextLevelID), pNewLevel)))

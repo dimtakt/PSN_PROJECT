@@ -8,7 +8,6 @@ NS_BEGIN(Engine)
 
 class CGameObject;
 
-
 NS_END
 
 
@@ -16,7 +15,7 @@ NS_BEGIN(Client)
 
 class CLevel_Stage abstract : public CLevel
 {
-private:
+protected:
 	CLevel_Stage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel_Stage() = default;
 
@@ -27,6 +26,64 @@ public:
 
 protected:
 	virtual HRESULT Load_BinaryMap(_wstring* strLoadPath) override;
+
+#pragma region ===== [Overrides Parent Functions..] =====
+
+protected:
+	virtual HRESULT Add_Prototype_Direct(
+		_uint iPrototypeLevelIndex,
+		const _wstring& strFileName,
+		_matrix* PreTransformMatrix = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
+	) override
+	{
+		LVLCUSTOMOBJ_DESC tDesc = {};
+		tDesc.strFilePathPrefix				= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		
+		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
+		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
+
+
+		return __super::Add_Prototype_Direct(
+			iPrototypeLevelIndex,
+			strFileName,
+			PreTransformMatrix,
+			&tDesc);
+	}
+
+	virtual HRESULT Add_GameObject_ToLayer_Direct(
+		_uint iLayerLevelIndex,
+		const _wstring& strLayerTag,
+		_uint iPrototypeLevelIndex,
+		const _wstring& strPrototypeTagSuffix,
+		void* pObjArg = nullptr,
+		LVLCUSTOMOBJ_DESC* pLvlArg = nullptr
+	) override
+	{
+		LVLCUSTOMOBJ_DESC tDesc = {};
+		tDesc.strFilePathPrefix				= (pLvlArg != nullptr)? pLvlArg->strFilePathPrefix			: L"../Bin/Resources/_SUPERHOT/_BinaryModels/";
+		tDesc.strFileExt					= (pLvlArg != nullptr)? pLvlArg->strFileExt					: L".datmodel";
+		tDesc.strModelPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strModelPrototypePrefix	: L"Prototype_Component_Model_Custom_";
+		tDesc.strObjectPrototypePrefix		= (pLvlArg != nullptr)? pLvlArg->strObjectPrototypePrefix	: L"Prototype_GameObject_Model_Custom_";
+		
+		tDesc.strModelCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strModelCustomPrototypeTag	: L"";
+		tDesc.strObjectCustomPrototypeTag	= (pLvlArg != nullptr)? pLvlArg->strObjectCustomPrototypeTag: L"";
+
+
+		return __super::Add_GameObject_ToLayer_Direct(
+			iLayerLevelIndex,
+			strLayerTag,
+			iPrototypeLevelIndex,
+			strPrototypeTagSuffix,
+			pObjArg,
+			&tDesc);
+	}
+
+
+#pragma endregion
 
 protected:
 	// 맵 로드시 필요한 정보들..

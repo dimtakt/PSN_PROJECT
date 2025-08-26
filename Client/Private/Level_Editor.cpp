@@ -14,13 +14,10 @@
 
 #include "Level_Loading.h"
 
-#include "CustomObj_NonAnim.h"
-#include "CustomObj_Anim.h"
-
+#include "CustomObj.h"
 #include "DebugDraw.h"
 
 #include "Cell.h"
-#include <fstream> 
 
 
 
@@ -491,7 +488,7 @@ HRESULT CLevel_Editor::Load_BinaryMap(_wstring* strLoadPath)
 		_wstring strFilePathSuffix = tDesc.strFileName;					// 파일명
 		_wstring strModelPrototypePrefix = L"Prototype_Component_Model_Custom_";
 
-		CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+		CCustomObj::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 		CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 		CustomObjDesc.strModelComPrototypeTag = strModelPrototypePrefix + strFilePathSuffix;
 
@@ -1236,7 +1233,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
 			_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
 
-			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CCustomObj::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
 			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
@@ -1285,7 +1282,7 @@ void CLevel_Editor::ImGui_ModelDeployer()
 			_wstring strPrototypeTag = strPrototypePrefix + strPrototypeSuffix;
 			_wstring strModelPrototypeTag = strModelPrototypePrefix + strPrototypeSuffix;
 
-			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CCustomObj::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
 			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
@@ -1565,7 +1562,7 @@ void CLevel_Editor::ImGui_NavMeshEditor()
 			_wstring strPrototypeTag = L"Prototype_GameObject_Model_EditorGuide";
 			_wstring strModelPrototypeTag = L"Prototype_Component_Model_EditorGuide";
 
-			CCustomObj_Anim::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
+			CCustomObj::CUSTOMOBJ_DESC CustomObjDesc = {};	// 일단 Description은 이걸로, 어차피 형식은 같음
 			CustomObjDesc.strModelComPrototypeTag = strModelPrototypeTag;
 			CustomObjDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::STATIC_PROPS); // ksta : 이것도 나중에 파일 불러올 때에 안에서 정하도록..
 
@@ -1953,7 +1950,12 @@ void CLevel_Editor::ImGui_Descriptions()
 
 		"CHSP_BREAKIN",		"CHSP_BRIDGE",		"CHSP_HALL",		"CHSP_LAB18",
 		"CHSP_LOBBY",		"CHSP_OFFICE",		"CHSP_PWRPLANT",	"CHSP_STAIRS",
-		"CHSP_WAREHAUS"
+		"CHSP_WAREHAUS",
+
+
+		"TEST_EXTRA1",
+		"TEST_EXTRA2",
+		"TEST_EXTRA3",
 	};
 
 	ImGui::Text("LEVEL");

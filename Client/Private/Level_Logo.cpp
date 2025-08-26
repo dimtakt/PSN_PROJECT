@@ -24,37 +24,86 @@ HRESULT CLevel_Logo::Initialize()
 
 void CLevel_Logo::Update(_float fTimeDelta)
 {
-
-	if		(m_pGameInstance->Get_IsKeyDown(DIK_S))
+	switch (m_iMenuFocusingPath)
 	{
-		if (m_iMenuFocusingIndex < ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_END) - 1)
-			m_iMenuFocusingIndex++;
-	}
-	else if (m_pGameInstance->Get_IsKeyDown(DIK_W))
+		// 최상위 경로
+	case ENUM_CLASS(LOGO_PATH_MAIN::PATH_ABSOLUTE):
 	{
-		if (m_iMenuFocusingIndex > 0)
-			m_iMenuFocusingIndex--;
-	}
-	else if (m_pGameInstance->Get_IsKeyDown(DIK_RETURN))
-	{
-		switch (m_iMenuFocusingIndex)
+		if (m_pGameInstance->Get_IsKeyDown(DIK_S))
 		{
-		case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_GAMEPLAY):
-			if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
-				return;
-			break;
-		case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_EDITOR):
-			if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::EDITOR))))
-				return;
-			break;
-		case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_QUIT):
-			PostQuitMessage(0);
-			break;
-		default:
-			break;
+			if (m_iMenuFocusingIndex < ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_END) - 1)
+				m_iMenuFocusingIndex++;
+		}
+		else if (m_pGameInstance->Get_IsKeyDown(DIK_W))
+		{
+			if (m_iMenuFocusingIndex > 0)
+				m_iMenuFocusingIndex--;
+		}
+		else if (m_pGameInstance->Get_IsKeyDown(DIK_RETURN) || m_pGameInstance->Get_IsKeyDown(DIK_SPACE))
+		{
+			switch (m_iMenuFocusingIndex)
+			{
+			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_F_LEVELS):
+				m_iMenuFocusingPath = ENUM_CLASS(LOGO_PATH_MAIN::PATH_LEVEL);
+				m_iMenuFocusingIndex = 0;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_GAMEPLAY):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+					return;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_EDITOR):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::EDITOR))))
+					return;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_QUIT):
+				PostQuitMessage(0);
+				break;
+			default:
+				break;
+			}
 		}
 	}
-
+		break;
+		// LEVEL 폴더 경로
+	case ENUM_CLASS(LOGO_PATH_MAIN::PATH_LEVEL):
+	{
+		if (m_pGameInstance->Get_IsKeyDown(DIK_S))
+		{
+			if (m_iMenuFocusingIndex < ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_END) - 1)
+				m_iMenuFocusingIndex++;
+		}
+		else if (m_pGameInstance->Get_IsKeyDown(DIK_W))
+		{
+			if (m_iMenuFocusingIndex > 0)
+				m_iMenuFocusingIndex--;
+		}
+		else if (m_pGameInstance->Get_IsKeyDown(DIK_RETURN) || m_pGameInstance->Get_IsKeyDown(DIK_SPACE))
+		{
+			switch (m_iMenuFocusingIndex)
+			{
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_FOLDERUP):
+				m_iMenuFocusingPath = ENUM_CLASS(LOGO_PATH_MAIN::PATH_ABSOLUTE);
+				m_iMenuFocusingIndex = ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_F_LEVELS);
+				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST1):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST_EXTRA1))))
+					return;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST2):
+				//if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+				//	return;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST3):
+				//if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::EDITOR))))
+				//	return;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+		break;
+	}
 
 
 
@@ -65,7 +114,15 @@ HRESULT CLevel_Logo::Render()
 {
 	SetWindowText(g_hWnd, TEXT("Level : Logo"));
 
-	Render_LogoScreen();
+	switch (m_iMenuFocusingPath)
+	{
+	case ENUM_CLASS(LOGO_PATH_MAIN::PATH_ABSOLUTE):
+		Render_LogoScreen();
+		break;
+	case ENUM_CLASS(LOGO_PATH_MAIN::PATH_LEVEL):
+		Render_Folder_Level();
+		break;
+	}
 	
 	return S_OK;
 }
@@ -113,6 +170,9 @@ HRESULT CLevel_Logo::Render_LogoScreen()
 	_wstring strDescText = {};
 	switch (m_iMenuFocusingIndex)
 	{
+	case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_F_LEVELS):
+		strDescText = L"                       directory:LEVELS       │>FOLDER<";
+		break;
 	case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_GAMEPLAY):
 		strDescText = L"                       app: superhot.exe  │--FILE-> 313";
 		break;
@@ -141,12 +201,21 @@ HRESULT CLevel_Logo::Render_LogoScreen()
 	m_pGameInstance->Render_Font(strFontTag, strDescText.c_str(), _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (2)), vLoadUnFocusedColor);
 
 
+	_uint iFileNamePosY = 2;
+	m_pGameInstance->Render_Font(strFontTag, L" LEVELS       >FOLDER<", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" superhot.exe --FILE->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" editor.exe   --FILE->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" quit.exe     --FILE->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" ------------ --------", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+
+
+
 	/* Text UI */
 	m_pGameInstance->Render_Font(strFontTag, L"┌────────────┬────────┬──────────────────────────     ──┐", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L"│superhot.exe│--FILE->│                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L"│editor.exe  │--FILE->│                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L"│quit.exe    │--FILE->│                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L"│------------│--------│                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 
 	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
@@ -170,6 +239,118 @@ HRESULT CLevel_Logo::Render_LogoScreen()
 	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L"├────────────┴────────┴─────────────────────────────────┤", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L"│C:\\                                                    │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"└────────────────────────────────────Omni─piOS-v2.1.01p─┘", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+
+
+
+	m_pGameInstance->Render_Font_End(strFontTag);
+
+	return S_OK;
+}
+
+HRESULT CLevel_Logo::Render_Folder_Level()
+{
+	_wstring strFontTag = L"Font_DOS";
+	_uint iRenderStartX = 100.f;
+	_uint iRenderStartY = 25.f;
+	_uint iRenderSpaceY = 25.f;
+
+	_vector vLoadColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector vLoadFocusedColor = XMVectorSet(.7f, 0.f, 0.f, 1.f);
+	_vector vLoadUnFocusedColor = XMVectorSet(.6, .6, .6, 1.f);
+
+	static _uint iStackedFrame = 0;
+	static _uint iTimeFlick = 0;
+	iStackedFrame++;
+
+	if (iStackedFrame >= 30)
+	{
+		iStackedFrame = 0;
+		iTimeFlick = ++iTimeFlick % 2;
+	}
+
+
+
+
+	m_pGameInstance->Render_Font_Begin(strFontTag);
+
+	/* Selected Point*/
+	m_pGameInstance->Render_Font(strFontTag, L" █████████████████████", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (2 + m_iMenuFocusingIndex)), vLoadFocusedColor);
+
+
+	/* Desc Text (app: superhot.exe 이부분) */
+	_wstring strDescText = {};
+	switch (m_iMenuFocusingIndex)
+	{
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_FOLDERUP):
+		strDescText = L"                       directory: GO UP";
+		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST1):
+		strDescText = L"                       TEST1..";
+		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST2):
+		strDescText = L"                       TEST2.. (unavailable)";
+		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST3):
+		strDescText = L"                       TEST3.. (unavailable)";
+		break;
+
+	default:
+		break;
+	}
+
+	/* Time */
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	_tchar szTime[58];
+	if (iTimeFlick == 0)	swprintf_s(szTime, L"                                                 %02d:%02d", st.wHour, st.wMinute);
+	else					swprintf_s(szTime, L"                                                 %02d %02d", st.wHour, st.wMinute);
+
+	m_pGameInstance->Render_Font(strFontTag, szTime, _float2(iRenderStartX, iRenderStartY + iRenderSpaceY), vLoadColor);
+
+
+	m_pGameInstance->Render_Font(strFontTag, strDescText.c_str(), _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (2)), vLoadUnFocusedColor);
+
+
+	_uint iFileNamePosY = 2;
+	m_pGameInstance->Render_Font(strFontTag, L" /..          <UP_DIR>", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL1.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL2.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL3.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" ------------ --------", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+
+
+
+	/* Text UI */
+	m_pGameInstance->Render_Font(strFontTag, L"┌────────────┬────────┬──────────────────────────     ──┐", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│            │        │                                 │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"├────────────┴────────┴─────────────────────────────────┤", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L"│C:\\LEVELS\\                                             │", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L"└────────────────────────────────────Omni─piOS-v2.1.01p─┘", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vLoadColor);
 
 

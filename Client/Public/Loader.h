@@ -49,6 +49,8 @@ private:
 	HRESULT Loading_For_GamePlay_Level();
 	HRESULT Loading_For_Editor_Level();
 
+	HRESULT Loading_For_Test_Extra1_Level();
+
 
 
 public:
