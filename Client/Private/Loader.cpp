@@ -332,6 +332,7 @@ HRESULT CLoader::Loading_For_Editor_Level()
 HRESULT CLoader::Loading_For_Test_Extra1_Level()
 {
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
 	/* Prototype_Component_Texture_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 2))))
@@ -346,7 +347,9 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 		return E_FAIL;
 
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
+
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
@@ -357,13 +360,18 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
 	/* Prototype_Component_Navigation */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_Test1.datnavmesh")))))
+		//CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
 		return E_FAIL;
 
+
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));
+
 	/* Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -383,6 +391,8 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxCube"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
+
+
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
 
 	/* Prototype_GameObject_Terrain*/

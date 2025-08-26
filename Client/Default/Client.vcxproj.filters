@@ -118,6 +118,9 @@
     <Filter Include="01.Levels\Stage\Stages_Test">
       <UniqueIdentifier>{3d51f365-9f87-465e-ad48-cb916780d57f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Camera\Player">
+      <UniqueIdentifier>{105f46b6-7a00-4ef7-9a43-ac7c5389e923}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -231,6 +234,9 @@
     <ClInclude Include="..\public\Stage_Test1.h">
       <Filter>01.Levels\Stage\Stages_Test</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Player.h">
+      <Filter>02.GameObject\Camera\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -341,6 +347,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage_Test1.cpp">
       <Filter>01.Levels\Stage\Stages_Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Player.cpp">
+      <Filter>02.GameObject\Camera\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
