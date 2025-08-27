@@ -316,8 +316,8 @@ HRESULT CLevel_Logo::Render_Folder_Level()
 	_uint iFileNamePosY = 2;
 	m_pGameInstance->Render_Font(strFontTag, L" /..          <UP_DIR>", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL1.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL2.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL3.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL2.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
+	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL3.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
 	m_pGameInstance->Render_Font(strFontTag, L" ------------ --------", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 
 

@@ -236,28 +236,37 @@ void CPlayer::Update_AnimationState()
 	// 
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
+	
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_S))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 	{
 		m_iState = ENEMY_STATE::RUN_B;
 	}
+	
 
-
-	if (m_pGameInstance->Get_IsKeyDown(DIK_A))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 	{
 		m_iState = ENEMY_STATE::RUN_L;
 	}
 
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_D))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 	{
 		m_iState = ENEMY_STATE::RUN_R;
 	}
 
 
-	if (m_pGameInstance->Get_IsKeyDown(DIK_W))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
 		m_iState = ENEMY_STATE::RUN_F;
+	}
+
+	if (!m_pGameInstance->Get_IsKeyPressing(DIK_S) &&
+		!m_pGameInstance->Get_IsKeyPressing(DIK_A) &&
+		!m_pGameInstance->Get_IsKeyPressing(DIK_D) &&
+		!m_pGameInstance->Get_IsKeyPressing(DIK_W))
+	{
+		m_iState = ENEMY_STATE::IDLE;
 	}
 }
 
@@ -265,7 +274,7 @@ void CPlayer::Update_AnimationIndex()
 {
 	if (m_iState & ENEMY_STATE::IDLE)
 	{
-
+		//m_pModelCom->Set_Animation(ANIM_WALK_F_DREPTANIE, true);
 	}
 	if (m_iState & ENEMY_STATE::RUN_F)
 	{
@@ -283,6 +292,26 @@ void CPlayer::Update_AnimationIndex()
 	{
 		m_pModelCom->Set_Animation(ANIM_RUN_R, true);
 	}
+
+	//if (m_iState & ENEMY_STATE::IDLE)
+	//{
+	//}
+	//if (m_iState & ENEMY_STATE::RUN_F)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_WALK_F, true);
+	//}
+	//if (m_iState & ENEMY_STATE::RUN_B)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_WALK_B, true);
+	//}
+	//if (m_iState & ENEMY_STATE::RUN_L)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_WALK_L, true);
+	//}
+	//if (m_iState & ENEMY_STATE::RUN_R)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_WALK_R, true);
+	//}
 
 }
 

@@ -19,9 +19,6 @@
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{3b48192d-e33f-4d1d-b0c2-1a87fd3b50f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Loading\Loader">
       <UniqueIdentifier>{2791bcc1-bc3d-498f-8eca-63a1bae0259d}</UniqueIdentifier>
     </Filter>
@@ -39,9 +36,6 @@
     </Filter>
     <Filter Include="02.GameObject\Bullet">
       <UniqueIdentifier>{9eac51e1-e6de-443c-a7a5-fbe9bb6c2c92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Chapter">
-      <UniqueIdentifier>{fea45dd9-ef53-4634-9af8-25e0eb434b59}</UniqueIdentifier>
     </Filter>
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{a99b3610-4e82-4f02-9a89-1281f5579e61}</UniqueIdentifier>
@@ -100,9 +94,6 @@
     <Filter Include="02.GameObject\Skybox">
       <UniqueIdentifier>{9987aa43-9f3f-4257-94b2-6c3973a945bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Chapter\Normal">
-      <UniqueIdentifier>{421358cb-819b-43d7-bb45-13561a00dbb5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Stage">
       <UniqueIdentifier>{133169bd-5d15-42ea-bf92-89fc9e2285fc}</UniqueIdentifier>
     </Filter>
@@ -114,6 +105,9 @@
     </Filter>
     <Filter Include="02.GameObject\Camera\Player">
       <UniqueIdentifier>{105f46b6-7a00-4ef7-9a43-ac7c5389e923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\GamePlay %28Temp%29">
+      <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -136,7 +130,7 @@
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\GamePlay %28Temp%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01.Levels\Loading</Filter>
@@ -253,7 +247,7 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\GamePlay %28Temp%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01.Levels\Loading</Filter>
