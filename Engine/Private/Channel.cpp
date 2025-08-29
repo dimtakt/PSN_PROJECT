@@ -67,6 +67,9 @@ HRESULT CChannel::Initialize_Binary(const AICHANNEL_DESC tChanDesc, const vector
     // initialize에서 만들어진 것 꺼내와서 저장한 뒤 나중에 불러오면 되는거 아님?
     // 그냥 애님에ㅣㅅ션에서 넣는 넙ㅂ 잇으러ㄱ같은데
     
+    strncpy_s(m_szName, tChanDesc.szChannelName.C_Str(), MAX_PATH - 1);
+    m_szName[MAX_PATH - 1] = '\0';  // 널 종료 보장
+
     m_iBoneIndex = tChanDesc.iBoneIndex;
 
     m_iNumKeyFrames = tChanDesc.vecKeyFrame.size();
@@ -93,8 +96,13 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
     /* Transform 을 반영시킬 본의 정보 */
     CBone* pTargetBone = Bones[m_iBoneIndex];
 
-
-    if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
+    if (m_KeyFrames.size() == 1)
+    {
+        vScale = XMLoadFloat3(&m_KeyFrames[0].vScale);
+        vRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
+        vTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[0].vTranslation), 1.f);
+    }
+    else if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
     {
         vScale = XMLoadFloat3(&LastKeyFrame.vScale);
         vRotation = XMLoadFloat4(&LastKeyFrame.vRotation);
@@ -105,6 +113,7 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
     {
         while (fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition)
             ++*pCurrentKeyFrameIndex;
+
 
         _uint iDestKeyFrameIndex = *pCurrentKeyFrameIndex + 1;
 
@@ -241,15 +250,25 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
 
 
     }
-    else
-    {
-        int i = 1;
-    }
-
 
 
     /*_matrix         TransformationMatrix = XMMatrixScaling() * XMMatrixRotationQuaternion() * XMMatrixTranslation();*/
-    _matrix         TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
+
+    _matrix         TransformationMatrix;
+
+
+    // 루트 Position 이동 적용 안되도록 (애니메이션 단계에서 자체 Position이 변화하는 것 방지)
+    if (strcmp(m_szName, "Hips") == 0)
+    {
+        _float4 vStoreTranslation;
+        XMStoreFloat4(&vStoreTranslation, vTranslation);
+        _vector vLoadFixedTranslation = XMVectorSet(0/*vStoreTranslation.x*/, 0/*vStoreTranslation.y*/, vStoreTranslation.z, vStoreTranslation.w);
+
+        TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vLoadFixedTranslation);
+    }
+    else
+        TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
+
 
     pTargetBone->Set_TransformationMatrix(TransformationMatrix);
 }

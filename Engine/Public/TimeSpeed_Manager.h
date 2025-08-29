@@ -35,7 +35,7 @@ private:
     _float fTimeSpeed_Multiplier = 1.f;
     _float fTimeSpeed_ReqTarget = 1.f;
 
-    _float fTimeSpeed_Min = 0.1f;
+    _float fTimeSpeed_Min = 0.025f;
     _float fTimeSpeed_Max = 1.f;
 
 public:

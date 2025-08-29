@@ -70,12 +70,10 @@ void CPlayer::Update(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 	{
-		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
 		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 	{
-		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 1.f);
 		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
@@ -89,13 +87,13 @@ void CPlayer::Update(_float fTimeDelta)
 
 
 
-	Update_AnimationState();
+	//Update_AnimationState();
 
-	Update_AnimationIndex();
+	//Update_AnimationIndex();
 
 
 
-	m_pModelCom->Play_Animation(fTimeDelta);
+	//m_pModelCom->Play_Animation(fTimeDelta);
 
 	__super::Update(fTimeDelta);
 }

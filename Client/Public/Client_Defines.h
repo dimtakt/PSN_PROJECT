@@ -26,6 +26,10 @@ namespace Client
 	};
 
 	enum ENEMY_ANIMINDEX {
+		// 싹다 다시 밀어야함
+
+
+
 		ANIM_STAND0_L            = 0,  // root|zeta_rig_standing-0-dreptanie-left
 		ANIM_STAND0_R            = 1,  // root|zeta_rig_standing-0-dreptanie-right
 		ANIM_STAND1_L            = 2,  // root|zeta_rig_standing-1-dreptanie-left
