@@ -21,6 +21,26 @@ class CAnimation;
 
 class ENGINE_DLL CModel final : public CComponent
 {
+public:
+	typedef struct tModelSingleAnimDesc
+	{
+		// 현재 실행중인(했던) 애니메이션의 index
+		_uint	iCurAnimIndex;
+		_uint	iPrevAnimIndex = UINT_MAX;
+
+		// 루트하는지, 루프가 아니라면 끝났는지를 저장
+		_bool	isLoop;
+		_bool	isFinished = false;
+
+		// 애니메이션 블렌딩을 위한 조건 변수들
+		_bool	isAnimChanged = false;
+		_bool	isDoingTransition = false;
+
+		// 애니메이션 블렌딩 시간관리 변수들
+		_float	fTranslationTime = {};	// Set_Animation 에서 0.4f 로 초기화됨
+		_float	fAnimElapsedTime = {};	// 직접 수정 불가능
+	} MODEL_ANIM_DESC;
+
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CModel(const CModel& Prototype);
@@ -39,8 +59,16 @@ public:
 
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
 	MODELTYPE Get_Modeltype() { return m_eModelType; }
-	_wstring Get_CurAnimName() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimName(); };
+	vector<_wstring> Get_CurAnimNames() 
+	{ 
+		vector<_wstring> vecAnimNames = {};
+		for (auto& animDesc : m_PlayingAnimDescs)
+		{
+			vecAnimNames.push_back(m_Animations[animDesc.iCurAnimIndex]->Get_AnimName());
+		}
 
+		return vecAnimNames;
+	};
 
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
@@ -48,12 +76,22 @@ public:
 	virtual HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Set_Animation(_uint iIndex, _bool isLoop = false, _float fTransitionTime = 0.4f);
+	void Add_Animation(MODEL_ANIM_DESC tAnimDesc)	{	m_PlayingAnimDescs.push_back(tAnimDesc);			};
+	void Add_Animation()							{ 	m_PlayingAnimDescs.push_back(MODEL_ANIM_DESC{});	};
+
+	_uint Get_NumPlayingAnims()						{	return m_PlayingAnimDescs.size(); };
+
+	void Remove_Animation(_uint iCurAnimDescIndex = UINT_MAX)		
+	{	
+		if (iCurAnimDescIndex == UINT_MAX)	m_PlayingAnimDescs.pop_back();
+		else								m_PlayingAnimDescs.erase(m_PlayingAnimDescs.begin() + iCurAnimDescIndex);
+	};
+	void Set_Animation(_uint iIndex, _uint iTargetCurAnimIndex = 0, _bool isLoop = false, _float fTransitionTime = 0.4f);
 
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	_bool Play_Animation(_float fTimeDelta);
+	_bool Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex = 0);
 
 public:
 	HRESULT Export_ToBinary(_wstring* strSavePath);
@@ -86,21 +124,9 @@ private:
 	_uint							m_iNumAnimations = { 0 };
 	vector<class CAnimation*>		m_Animations;
 
-	_uint							m_iCurrentAnimIndex = { 0 };
-	_uint							m_iPrevAnimIndex = { UINT_MAX };
-	_bool							m_isLoop = {};
-	_bool							m_isFinished = {};
 
-
-
-	// 애니메이션 변경 시 이전 과정과 블렌드 처리를 위함
-	// 가능하다면 조건을 애니메이션 최초 프레임 시작 시로 해도 좋을 듯
-	_bool							m_isAnimChanged = false;
-	
-	_bool							m_isDoingTransition = false;
-	_float							m_fTranslationTime = {};
-	_float							m_fAnimElapsedTime = {};
-
+	// 다중 애니메이션 재생, 관리를 위해 통합함
+	vector<MODEL_ANIM_DESC>			m_PlayingAnimDescs = {};
 
 
 	FILETYPE						m_eFileType = {};

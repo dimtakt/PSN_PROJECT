@@ -13,10 +13,10 @@ namespace Client
 		IDLE		= (1 << 0),
 		
 		// Run State
-		RUN_F		= (1 << 1),
-		RUN_B		= (1 << 2),
-		RUN_L		= (1 << 3),
-		RUN_R		= (1 << 4),
+		MOVE_F		= (1 << 1),
+		MOVE_B		= (1 << 2),
+		MOVE_L		= (1 << 3),
+		MOVE_R		= (1 << 4),
 
 		// Attack State
 
@@ -25,64 +25,58 @@ namespace Client
 
 	};
 
+	enum ANIM_PARTINDEX {
+		PART_UPPER = 0,
+		PART_LOWER = 1,
+
+		PART_END
+	};
+
 	enum ENEMY_ANIMINDEX {
-		// 싹다 다시 밀어야함
 
+		DMGD_L_BIG_STOMACH_HIT		= 0,  // [DMGD][Lower]Big Stomach Hit
+		DMGD_L_HEAD_HIT				= 1,  // [DMGD][Lower]Head Hit
+		DMGD_U_BIG_STOMACH_HIT		= 2,  // [DMGD][Upper]Big Stomach Hit
+		DMGD_U_HEAD_HIT				= 3,  // [DMGD][Upper]Head Hit
 
+		GUN_L_DISARMED				= 4,  // [GUN][Lower]Disarmed
+		GUN_L_RIFLE_AIM_IDLE		= 5,  // [GUN][Lower]Rifle Aiming Idle
+		GUN_U_DISARMED				= 6,  // [GUN][Upper]Disarmed
+		GUN_U_RIFLE_AIM_IDLE		= 7,  // [GUN][Upper]Rifle Aiming Idle
 
-		ANIM_STAND0_L            = 0,  // root|zeta_rig_standing-0-dreptanie-left
-		ANIM_STAND0_R            = 1,  // root|zeta_rig_standing-0-dreptanie-right
-		ANIM_STAND1_L            = 2,  // root|zeta_rig_standing-1-dreptanie-left
-		ANIM_STAND1_R            = 3,  // root|zeta_rig_standing-1-dreptanie-right
-		ANIM_STAND2_L            = 4,  // root|zeta_rig_standing-2-dreptanie-left
-		ANIM_STAND2_R            = 5,  // root|zeta_rig_standing-2-dreptanie-right
-		ANIM_STAND3_L            = 6,  // root|zeta_rig_standing-3-dreptanie-left
-		ANIM_STAND3_R            = 7,  // root|zeta_rig_standing-3-dreptanie-right
-		ANIM_STAND4_L            = 8,  // root|zeta_rig_standing-4-dreptanie-left
-		ANIM_STAND4_R            = 9,  // root|zeta_rig_standing-4-dreptanie-right
-		ANIM_STAND5_L            = 10, // root|zeta_rig_standing-5-dreptanie-left
-		ANIM_STAND5_R            = 11, // root|zeta_rig_standing-5-dreptanie-right
-		ANIM_STAND6_L            = 12, // root|zeta_rig_standing-6-dreptanie-left
-		ANIM_STAND6_R            = 13, // root|zeta_rig_standing-6-dreptanie-right
+		MELEE_U_BASEBALL_HIT		= 8,  // [MELEE][Upper]baseball-hit
+		MELEE_U_FIST_01				= 9,  // [MELEE][Upper]fist-01
+		MELEE_U_FIST_02				= 10, // [MELEE][Upper]fist-02
+		MELEE_U_FIST_03				= 11, // [MELEE][Upper]fist-03
+		MELEE_U_FIST_04				= 12, // [MELEE][Upper]fist-04
 
-		ANIM_STRAFE_L            = 14, // root|zeta_rig_strafing-left
-		ANIM_STRAFE_R            = 15, // root|zeta_rig_strafing-right
+		MOVE_L_IDLE					= 13, // [MOVE][Lower]idle
+		MOVE_L_JUMP					= 14, // [MOVE][Lower]jump
+		MOVE_L_LEFT_STRAFE			= 15, // [MOVE][Lower]left strafe
+		MOVE_L_LEFT_STRAFE_WALK		= 16, // [MOVE][Lower]left strafe walking
+		MOVE_L_LEFT_TURN			= 17, // [MOVE][Lower]left turn
+		MOVE_L_LEFT_TURN_90			= 18, // [MOVE][Lower]left turn 90
+		MOVE_L_RIGHT_STRAFE			= 19, // [MOVE][Lower]right strafe
+		MOVE_L_RIGHT_STRAFE_WALK	= 20, // [MOVE][Lower]right strafe walking
+		MOVE_L_RIGHT_TURN			= 21, // [MOVE][Lower]right turn
+		MOVE_L_RIGHT_TURN_90		= 22, // [MOVE][Lower]right turn 90
+		MOVE_L_RUNNING				= 23, // [MOVE][Lower]running
+		MOVE_L_WALKING				= 24, // [MOVE][Lower]walking
 
-		ANIM_WALK_F_DREPTANIE    = 16, // root|zeta_rig_walking-dreptanie-forward
-		ANIM_CROUCH_END          = 17, // root|zeta_rig_crouching-end
-		ANIM_GUARD_00            = 18, // root|zeta_rig_garda-00
-		ANIM_GUARD_01            = 19, // root|zeta_rig_garda-01
-		ANIM_KNEEL               = 20, // root|zeta_rig_kneeing
+		MOVE_U_IDLE					= 25, // [MOVE][Upper]idle
+		MOVE_U_JUMP					= 26, // [MOVE][Upper]jump
+		MOVE_U_LEFT_STRAFE			= 27, // [MOVE][Upper]left strafe
+		MOVE_U_LEFT_STRAFE_WALK		= 28, // [MOVE][Upper]left strafe walking
+		MOVE_U_LEFT_TURN			= 29, // [MOVE][Upper]left turn
+		MOVE_U_LEFT_TURN_90			= 30, // [MOVE][Upper]left turn 90
+		MOVE_U_RIGHT_STRAFE			= 31, // [MOVE][Upper]right strafe
+		MOVE_U_RIGHT_STRAFE_WALK	= 32, // [MOVE][Upper]right strafe walking
+		MOVE_U_RIGHT_TURN			= 33, // [MOVE][Upper]right turn
+		MOVE_U_RIGHT_TURN_90		= 34, // [MOVE][Upper]right turn 90
+		MOVE_U_RUNNING				= 35, // [MOVE][Upper]running
+		MOVE_U_WALKING				= 36, // [MOVE][Upper]walking
 
-		ANIM_MAIN_PISTOL_SHOT    = 21, // root|zeta_rig_main-pistol-strzal-epsilon
-		ANIM_MAIN_SHOTGUN_SHOT   = 22, // root|zeta_rig_main-strzelba-strzal-epsilon
-
-		ANIM_MELEE_BASEBALL_HIT  = 23, // root|zeta_rig_melee-baseball-hit
-		ANIM_MELEE_FIST_01       = 24, // root|zeta_rig_melee-fist-01-epsilon
-		ANIM_MELEE_FIST_02       = 25, // root|zeta_rig_melee-fist-02-epsilon
-		ANIM_MELEE_FIST_03       = 26, // root|zeta_rig_melee-fist-03-epsilon
-		ANIM_MELEE_FIST_04       = 27, // root|zeta_rig_melee-fist-04-epsilon
-		ANIM_MELEE_MINI_BASEBALL = 28, // root|zeta_rig_melee-minibaseball-hit
-
-		ANIM_RUN_B               = 29, // root|zeta_rig_running-backwards
-		ANIM_RUN_BL              = 30, // root|zeta_rig_running-backwards-left
-		ANIM_RUN_BL_2            = 31, // root|zeta_rig_running-backwards-left-left
-		ANIM_RUN_BR              = 32, // root|zeta_rig_running-backwards-right
-		ANIM_RUN_BR_2            = 33, // root|zeta_rig_running-backwards-right-right
-		ANIM_RUN_F               = 34, // root|zeta_rig_running-forward
-		ANIM_RUN_FL              = 35, // root|zeta_rig_running-forward-left
-		ANIM_RUN_FR              = 36, // root|zeta_rig_running-forward-right
-		ANIM_RUN_L               = 37, // root|zeta_rig_running-left
-		ANIM_RUN_R               = 38, // root|zeta_rig_running-right
-
-		ANIM_STAND_STUN_0        = 39, // root|zeta_rig_standing-stun-0-epsilon
-		ANIM_STAND_STUN_1        = 40, // root|zeta_rig_standing-stun-1-epsilon
-		ANIM_STAND_STUN_BRUCH_0  = 41, // root|zeta_rig_standing-stun-bruch-0-epsilon
-
-		ANIM_WALK_B              = 42, // root|zeta_rig_walking-backwards
-		ANIM_WALK_F              = 43, // root|zeta_rig_walking-forward
-		ANIM_WALK_L              = 44, // root|zeta_rig_walking-left
-		ANIM_WALK_R              = 45  // root|zeta_rig_walking-right
+		ANIM_END
 	};
 
 

@@ -32,7 +32,11 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
 
-	//m_pModelCom->Set_Animation(30, true);
+	m_pModelCom->Add_Animation();
+	m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
+
+	m_pModelCom->Add_Animation();
+	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 
 	//if (FAILED(Ready_PartObjects()))
 	//	return E_FAIL;
@@ -238,25 +242,25 @@ void CPlayer::Update_AnimationState()
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 	{
-		m_iState = ENEMY_STATE::RUN_B;
+		m_iState = ENEMY_STATE::MOVE_B;
 	}
 	
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 	{
-		m_iState = ENEMY_STATE::RUN_L;
+		m_iState = ENEMY_STATE::MOVE_L;
 	}
 
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 	{
-		m_iState = ENEMY_STATE::RUN_R;
+		m_iState = ENEMY_STATE::MOVE_R;
 	}
 
 
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
-		m_iState = ENEMY_STATE::RUN_F;
+		m_iState = ENEMY_STATE::MOVE_F;
 	}
 
 	if (!m_pGameInstance->Get_IsKeyPressing(DIK_S) &&
@@ -272,24 +276,29 @@ void CPlayer::Update_AnimationIndex()
 {
 	if (m_iState & ENEMY_STATE::IDLE)
 	{
-		//m_pModelCom->Set_Animation(ANIM_WALK_F_DREPTANIE, true);
+		m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
+		m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 	}
-	if (m_iState & ENEMY_STATE::RUN_F)
-	{
-		m_pModelCom->Set_Animation(ANIM_RUN_F, true);
-	}
-	if (m_iState & ENEMY_STATE::RUN_B)
-	{
-		m_pModelCom->Set_Animation(ANIM_RUN_B, true);
-	}
-	if (m_iState & ENEMY_STATE::RUN_L)
-	{
-		m_pModelCom->Set_Animation(ANIM_RUN_L, true);
-	}
-	if (m_iState & ENEMY_STATE::RUN_R)
-	{
-		m_pModelCom->Set_Animation(ANIM_RUN_R, true);
-	}
+	//if (m_iState & ENEMY_STATE::MOVE_F)
+	//{
+	//	m_pModelCom->Set_Animation(MOVE_U_WALKING, true);
+	//	m_pModelCom->Set_Animation(ANIM_RUN_F, true);
+	//}
+	//if (m_iState & ENEMY_STATE::MOVE_B)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_RUN_B, true);
+	//	m_pModelCom->Set_Animation(ANIM_RUN_B, true);
+	//}
+	//if (m_iState & ENEMY_STATE::MOVE_L)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_RUN_L, true);
+	//	m_pModelCom->Set_Animation(ANIM_RUN_L, true);
+	//}
+	//if (m_iState & ENEMY_STATE::MOVE_R)
+	//{
+	//	m_pModelCom->Set_Animation(ANIM_RUN_R, true);
+	//	m_pModelCom->Set_Animation(ANIM_RUN_R, true);
+	//}
 
 	//if (m_iState & ENEMY_STATE::IDLE)
 	//{

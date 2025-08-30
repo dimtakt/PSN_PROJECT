@@ -162,71 +162,52 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta)
+_bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 {
-    m_isFinished = false;
+
+    // model anim desc 변수 꺼내기
+
+    MODEL_ANIM_DESC& TargetAnimDesc = m_PlayingAnimDescs[iTargetCurAnimIndex];
+
+    _uint&  iCurAnimIndex       = TargetAnimDesc.iCurAnimIndex;
+    _uint&  iPrevAnimIndex      = TargetAnimDesc.iPrevAnimIndex;
+                                  
+    _bool&  isLoop              = TargetAnimDesc.isLoop;
+    _bool&  isFinished          = TargetAnimDesc.isFinished;
+                                  
+    _bool&	isAnimChanged       = TargetAnimDesc.isAnimChanged;
+    _bool&	isDoingTransition   = TargetAnimDesc.isDoingTransition;
+                                  
+    _float&	fTranslationTime    = TargetAnimDesc.fTranslationTime;
+    _float&	fAnimElapsedTime    = TargetAnimDesc.fAnimElapsedTime;
+
+
+
+
+
+    isFinished = false;
 
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
     
-#pragma region logic comment (animChange transition blending)
-
-    // 여기서 시간 경과에 따른 fTranslationTime 의 비율을 계산한 뒤
-    // 인자로 넘겨주어 갱신되도록
-
-    // 언제 블렌드가 이루어져야 하는가
-    // 1. 애니메이션 변경 직후
-    // 2. 변경된 지 0.2s 이내동안
-
-    // fTimeDelta 에 기반하여 남은 시간 이용, 비율 계산 
-
-
-
-
-    // if ( 애니메이션이 막 변경됐다면 )
-    //   { 경과 시간 계산 시작. 즉, 타이머 진행중을 뜻하는 변수의 On }
-
-    // 매 업데이트마다
-    // 
-    // 1. fDeltaTime 을 이용하여 경과 시간 계속 더함
-    // 
-    // 2. 남은시간 대비 경과시간에 비례해서 애닌메이션 블렌딩 << 인자로 비율 넘겨주어 내부에서 블렌딩되도록
-    // >> 블렌딩 방식? 시간 경과량만큼 기존 뼈대 위치 : 적용 뼈대 위치 비율 산정하여 적용
-    // >> 예시) 1초 중 0.1초만 지났다면       Anim : Existing =   1/10    : 9/10,
-    //          거기서 0.2초가 더 지났다면                        2/9     : 7/9,
-    //          거기서 0.5초가 더 지났다면                        5/7     : 2/7   ...
-    // >> 왜 이렇게 하느냐? 프레임 저하 상황에서도 시간 기반 변수로 일정하게 작동시키기 위함
-
-    // if ( 만약 경과시간이 최대시간을 넘겼다면 )
-    //   { 경과 시간 계산 종료. }
-
-#pragma endregion
-
-#pragma region logic comment (loop blending)
-
-    // 단, 애니메이션의 전/후가 같다면 blending 시점을 반 앞으로 당겨서 앞뒤 연결이 자연스럽게 되어야 함
-
-#pragma endregion
-
-
     // 필요 지역변수
     _float fAnimBlendRatio = 1.f;
     _float fBlendLeftTime = {};
-    m_isAnimChanged = (m_isAnimChanged)? true : m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop();
+    isFinished = (isFinished)? true : m_Animations[iCurAnimIndex]->Get_isFinishedLoop();
 
-    _bool isSameAnim = m_iCurrentAnimIndex == m_iPrevAnimIndex;
+    _bool isSameAnim = iCurAnimIndex == iPrevAnimIndex;
 
     // 블렌딩 트랜지션 시작 조건. 애니메이션이 바뀌었고, 블렌딩 진행중이 아닐 때 활성화
-    if (m_isAnimChanged && !m_isDoingTransition)
-        m_isDoingTransition = true;
+    if (TargetAnimDesc.isAnimChanged && !TargetAnimDesc.isDoingTransition)
+        TargetAnimDesc.isDoingTransition = true;
 
     // 경과시간 갱신 및 블렌딩 ratio 계산
-    if (m_isDoingTransition)
+    if (TargetAnimDesc.isDoingTransition)
     {
-        m_fAnimElapsedTime += fTimeDelta;
-        fBlendLeftTime = m_fTranslationTime - m_fAnimElapsedTime;
+        TargetAnimDesc.fAnimElapsedTime += fTimeDelta;
+        fBlendLeftTime = fTranslationTime - fAnimElapsedTime;
 
         //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;            // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 8/25 7:54)
-        fAnimBlendRatio = m_fAnimElapsedTime / m_fTranslationTime;  // 이게 적용돼야 할 신규 Anim 가중치
+        fAnimBlendRatio = fAnimElapsedTime / fTranslationTime;  // 이게 적용돼야 할 신규 Anim 가중치
 
 
         // clamping
@@ -236,8 +217,8 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         // 종료 조건
         if (fBlendLeftTime <= 0)
         {
-            m_isDoingTransition = false;
-            m_fAnimElapsedTime = 0.f;
+            isDoingTransition = false;
+            fAnimElapsedTime = 0.f;
         }
     }
 
@@ -245,12 +226,12 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
 
     CChannel::CHANNEL_UPD_DESC pDesc = {};
-    pDesc.fAnimDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
-    pDesc.fTransitionTime = m_fTranslationTime;
-    pDesc.fTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+    pDesc.fAnimDuration = m_Animations[iCurAnimIndex]->Get_Duration();
+    pDesc.fTransitionTime = fTranslationTime;
+    pDesc.fTickPerSecond = m_Animations[iCurAnimIndex]->Get_TickPerSecond();
 
     // 애니메이션 업데이트
-    if (m_isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
+    if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
     {
 
         // 문제..?
@@ -266,20 +247,20 @@ _bool CModel::Play_Animation(_float fTimeDelta)
 
         if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
         {
-            if (m_iPrevAnimIndex != UINT_MAX)
-                m_Animations[m_iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
+            if (iPrevAnimIndex != UINT_MAX)
+                m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
 
-            m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
+            m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
         }
         else                    // 전환 간 애니메이션이 같을 때
         {
-            m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+            m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
         }
         //std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
     }
     else                        // 전환 중이 아니면 현재 애니메이션만
     {
-        m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
         //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
     }
 
@@ -293,11 +274,11 @@ _bool CModel::Play_Animation(_float fTimeDelta)
 
 
     // 이전의 애니메이션이 남아있어, 신규 애니메이션 loop 시 영향을 받는 것을 막기 위함
-    if (m_Animations[m_iCurrentAnimIndex]->Get_isFinishedLoop())
-        m_iPrevAnimIndex = m_iCurrentAnimIndex;
+    if (m_Animations[iCurAnimIndex]->Get_isFinishedLoop())
+        iPrevAnimIndex = iCurAnimIndex;
 
 
-    return m_isFinished;
+    return isFinished;
 }
 
 HRESULT CModel::Export_ToBinary(_wstring* strSavePath)
@@ -612,22 +593,38 @@ HRESULT CModel::Render(_uint iMeshIndex)
     return S_OK;
 }
 
-void CModel::Set_Animation(_uint iIndex, _bool isLoop, _float fTransitionTime)
+void CModel::Set_Animation(_uint iIndex, _uint iTargetCurAnimIndex, _bool _isLoop, _float _fTransitionTime)
 {
     if (iIndex >= m_iNumAnimations)
         return;
 
-    m_fTranslationTime = fTransitionTime;
-    m_isLoop = isLoop;
+    MODEL_ANIM_DESC& TargetAnimDesc = m_PlayingAnimDescs[iTargetCurAnimIndex];
 
-    m_isAnimChanged = (m_iCurrentAnimIndex != iIndex);
+    _uint& iCurAnimIndex = TargetAnimDesc.iCurAnimIndex;
+    _uint& iPrevAnimIndex = TargetAnimDesc.iPrevAnimIndex;
 
-    if (m_isAnimChanged)
-        m_iPrevAnimIndex = m_iCurrentAnimIndex;
+    _bool& isLoop = TargetAnimDesc.isLoop;
+    _bool& isFinished = TargetAnimDesc.isFinished;
 
-    m_iCurrentAnimIndex = iIndex;
-    if (m_iPrevAnimIndex == UINT_MAX)
-        m_iPrevAnimIndex = iIndex;
+    _bool& isAnimChanged = TargetAnimDesc.isAnimChanged;
+    _bool& isDoingTransition = TargetAnimDesc.isDoingTransition;
+
+    _float& fTranslationTime = TargetAnimDesc.fTranslationTime;
+    _float& fAnimElapsedTime = TargetAnimDesc.fAnimElapsedTime;
+
+
+
+    fTranslationTime = _fTransitionTime;
+    isLoop = _isLoop;
+
+    isAnimChanged = (iCurAnimIndex != iIndex);
+
+    if (isAnimChanged)
+        iPrevAnimIndex = iCurAnimIndex;
+
+    iCurAnimIndex = iIndex;
+    if (iPrevAnimIndex == UINT_MAX)
+        iPrevAnimIndex = iIndex;
 }
 
 HRESULT CModel::Ready_Meshes()

@@ -24,7 +24,9 @@ HRESULT CCustomObj_Anim::Initialize(void* pArg)
     if (FAILED(this->Ready_Components(pArg)))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(0, true);
+
+    m_pModelCom->Add_Animation();
+    m_pModelCom->Set_Animation(0, 0, true);
 
     return S_OK;
 }
@@ -36,7 +38,8 @@ void CCustomObj_Anim::Priority_Update(_float fTimeDelta)
 
 void CCustomObj_Anim::Update(_float fTimeDelta)
 {
-    m_pModelCom->Play_Animation(fTimeDelta);
+    for (_uint i = 0; i < m_pModelCom->Get_NumPlayingAnims(); i++)
+        m_pModelCom->Play_Animation(fTimeDelta, i);
 }
 
 void CCustomObj_Anim::Late_Update(_float fTimeDelta)

@@ -1876,35 +1876,59 @@ void CLevel_Editor::ImGui_Inspector()
 		CModel* pTargetModel = dynamic_cast<CModel*>(m_pSelectedObject->Get_Component(L"Com_Model"));
 		_uint iNumAnim = pTargetModel->Get_NumAnim();
 
-
 		if (ImGui::CollapsingHeader("Animation Viewer"))
 		{
 			ImGui::Text("Animation Index");
 			ImGui::Separator();
 
-			static _uint iSelectedAnim = 0;
-			if (ImGui::Button("-##IndexMinus"))
+			vector<_wstring> vecCurAnimNames = pTargetModel->Get_CurAnimNames();
+
+			static vector<_uint> vecSelectedAnims = { 0 };
+			
+			for (_uint i = 0; i < vecCurAnimNames.size(); i++)
 			{
-				if (iSelectedAnim > 0)
-					iSelectedAnim--;
+				_string strLabelMinus	= "-##IndexMinus" + std::to_string(i);
+				_string strLabelPlus	= "-##IndexPlus" + std::to_string(i);
+
+				if (ImGui::Button(strLabelMinus.c_str()))
+				{
+					if (vecSelectedAnims[i] > 0)
+						vecSelectedAnims[i]--;
+				}
+				ImGui::SameLine();
+				ImGui::Text("%d", vecSelectedAnims[i]);
+				ImGui::SameLine();
+				if (ImGui::Button(strLabelPlus.c_str()))
+				{
+					if (vecSelectedAnims[i] < iNumAnim - 1)
+						vecSelectedAnims[i]++;
+				}
+				
+				pTargetModel->Set_Animation(vecSelectedAnims[i], i, true);
+
+				_char* szCurAnimName = WStringToChar(vecCurAnimNames[i]);
+				ImGui::Text(szCurAnimName);
+				
+				Safe_Delete(szCurAnimName);
+			}
+
+
+			if (ImGui::Button("Add Anim Layer"))
+			{
+				pTargetModel->Add_Animation();
+				vecSelectedAnims.push_back(0);
 			}
 			ImGui::SameLine();
-			ImGui::Text("%d", iSelectedAnim);
-			ImGui::SameLine();
-			if (ImGui::Button("+##IndexPlus"))
+			if (ImGui::Button("Remove Anim Layer"))
 			{
-				if (iSelectedAnim < iNumAnim - 1)
-					iSelectedAnim++;
+				if (pTargetModel->Get_NumPlayingAnims() > 0 &&
+					vecSelectedAnims.size() > 0)
+				{
+					pTargetModel->Remove_Animation();
+					vecSelectedAnims.pop_back();
+				}
 			}
 
-			_wstring strCurAnimName = pTargetModel->Get_CurAnimName();
-			char* szCurAnimName = WStringToChar(strCurAnimName);
-
-			ImGui::Text(szCurAnimName);
-
-			pTargetModel->Set_Animation(iSelectedAnim, true);
-
-			Safe_Delete(szCurAnimName);
 		}
 	}
 	
