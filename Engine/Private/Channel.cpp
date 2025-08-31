@@ -7,6 +7,8 @@ CChannel::CChannel()
 
 HRESULT CChannel::Initialize(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones)
 {
+    strcpy_s(m_szName, MAX_PATH, pAIChannel->mNodeName.C_Str());
+
     auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
         {
             if (true == pBone->Compare_Name(pAIChannel->mNodeName.data))
@@ -205,20 +207,16 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
         //}
 #pragma endregion
         // 야매로함
-        if (pArg != nullptr)
+        if (pArg != nullptr)    // Arg 가 존재하면..
         {
-            _float fAnimDuration = pDesc->fAnimDuration;      // tick 단위
-            _float fTransitionTimeSec = pDesc->fTransitionTime;    // 초 단위
-            _float fTickPerSecond = pDesc->fTickPerSecond;     // tick/s
+            _float fAnimDuration        = pDesc->fAnimDuration;     // tick 단위
+            _float fTransitionTimeSec   = pDesc->fTransitionTime;   // 초 단위
+            _float fTickPerSecond       = pDesc->fTickPerSecond;    // tick/s
 
-            // 애니메이션 지속 길이를 m_fDuration - fTranslationTime 로 축소함,
-            // 애니메이션 루프 중 loop 이후 fTransitionTimeSec 동안만 블렌딩할 것
-            // isSameAnim 조건이므로, 애니메이션 2회차 반복 시작 시 부터 적용됨
-            // isSameAnim 이 True 로 바뀌는 타이밍 문제려나.. 1->2 는 안되는데 2->3 부터는 잘됨
 
-            _float fTransitionTicks = fTransitionTimeSec * fTickPerSecond;  // 트랜지션이 일어날 Tick 기간
+            _float fTransitionTicks = fTransitionTimeSec * fTickPerSecond;      // 트랜지션이 일어날 Tick 기간
 
-            if (fCurrentTrackPosition <= fTransitionTicks)
+            if (fCurrentTrackPosition <= fTransitionTicks)  // 블렌딩 기간 중에는..
             {
                 _float fLocalBlendRatio = fCurrentTrackPosition / fTransitionTicks;
                 if (fLocalBlendRatio > 1.f) fLocalBlendRatio = 1.f;
@@ -240,12 +238,12 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
 
             // [이전 애니메이션이 적용된] 기존 뼈대의 Translation, Rotation, Scale 정보를 받아와서
             // Blend 수치에 맞게 반영하여 lerp 한 뒤 재반영시킴
-            _vector vExistTranslation = {}, vExistRotation = {}, vExistScale = {};
-            XMMatrixDecompose(&vExistScale, &vExistRotation, &vExistTranslation, pTargetBone->Get_TransformationMatrix());
+            _vector vExistScale, vExistRot, vExistTrans;
+            XMMatrixDecompose(&vExistScale, &vExistRot, &vExistTrans, pTargetBone->Get_TransformationMatrix());
 
             vScale = XMVectorLerp(vExistScale, vScale, fAnimBlendRatio);
-            vRotation = XMQuaternionSlerp(vExistRotation, vRotation, fAnimBlendRatio);
-            vTranslation = XMVectorSetW(XMVectorLerp(vExistTranslation, vTranslation, fAnimBlendRatio), 1.f);
+            vRotation = XMQuaternionSlerp(vExistRot, vRotation, fAnimBlendRatio);
+            vTranslation = XMVectorSetW(XMVectorLerp(vExistTrans, vTranslation, fAnimBlendRatio), 1.f);
         }
 
 
@@ -263,6 +261,7 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
         _float4 vStoreTranslation;
         XMStoreFloat4(&vStoreTranslation, vTranslation);
         _vector vLoadFixedTranslation = XMVectorSet(0/*vStoreTranslation.x*/, 0/*vStoreTranslation.y*/, vStoreTranslation.z, vStoreTranslation.w);
+        //_vector vLoadFixedTranslation = XMVectorSet(0/*vStoreTranslation.x*/, 0/*vStoreTranslation.y*/, 0/*vStoreTranslation.z*/, vStoreTranslation.w);
 
         TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vLoadFixedTranslation);
     }

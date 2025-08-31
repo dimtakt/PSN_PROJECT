@@ -162,6 +162,20 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
+_bool CModel::Play_Animation_AllLayer(_float fTimeDelta)
+{
+    _bool isTrue = true;
+
+    for (_int i = m_PlayingAnimDescs.size() - 1; i >= 0 ; i--)
+    {
+        _bool isAnimTrue = true;
+        isAnimTrue = Play_Animation(fTimeDelta, static_cast<_uint>(i));   // 하나 이상 false 리턴 시 false 리턴
+        if (isTrue) isTrue = isAnimTrue;
+    }
+
+    return isTrue;
+}
+
 _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 {
 
@@ -207,7 +221,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
         fBlendLeftTime = fTranslationTime - fAnimElapsedTime;
 
         //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;            // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 8/25 7:54)
-        fAnimBlendRatio = fAnimElapsedTime / fTranslationTime;  // 이게 적용돼야 할 신규 Anim 가중치
+        fAnimBlendRatio = fAnimElapsedTime / fTranslationTime;      // 이게 적용돼야 할 신규 Anim 가중치
 
 
         // clamping

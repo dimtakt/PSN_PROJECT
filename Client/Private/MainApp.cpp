@@ -107,11 +107,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	// 모델의 방향을 올바르게 로드하기 위해 사전에 변환용 벡터 정의
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	/* Prototype_Component_Model_Enemy */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy/Enemy.fbx", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy_Fixed/Enemy_ReFixed.fbx", PreTransformMatrix))))
 		return E_FAIL;
 
 

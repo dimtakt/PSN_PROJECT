@@ -38,6 +38,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pModelCom->Add_Animation();
 	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 
+
+
+
 	//if (FAILED(Ready_PartObjects()))
 	//	return E_FAIL;
 
@@ -84,20 +87,20 @@ void CPlayer::Update(_float fTimeDelta)
 	{
 		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
 	}
-
+	
 	_int iMouseMove;
 	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
 
 
 
-	//Update_AnimationState();
+	Update_AnimationState();
+	Update_AnimationIndex();
 
-	//Update_AnimationIndex();
+	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
+	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
+	//m_pModelCom->Play_Animation(fTimeDelta, PART_UPPER);
 
-
-
-	//m_pModelCom->Play_Animation(fTimeDelta);
 
 	__super::Update(fTimeDelta);
 }
@@ -240,85 +243,79 @@ void CPlayer::Update_AnimationState()
 	// 상태 확인 (켜져 있는지 검사) → &
 	
 
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_D) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
-		m_iState = ENEMY_STATE::MOVE_B;
+		m_iState |= ENUM_CLASS(PLAYER_STATE::MOVE);
+		m_iState &= ~ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
-	
-
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
+	else
 	{
-		m_iState = ENEMY_STATE::MOVE_L;
-	}
-
-
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
-	{
-		m_iState = ENEMY_STATE::MOVE_R;
+		m_iState &= ~ENUM_CLASS(PLAYER_STATE::MOVE);
+		m_iState |= ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
 
-
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
-	{
-		m_iState = ENEMY_STATE::MOVE_F;
-	}
-
-	if (!m_pGameInstance->Get_IsKeyPressing(DIK_S) &&
-		!m_pGameInstance->Get_IsKeyPressing(DIK_A) &&
-		!m_pGameInstance->Get_IsKeyPressing(DIK_D) &&
-		!m_pGameInstance->Get_IsKeyPressing(DIK_W))
-	{
-		m_iState = ENEMY_STATE::IDLE;
-	}
 }
 
 void CPlayer::Update_AnimationIndex()
 {
-	if (m_iState & ENEMY_STATE::IDLE)
+	// 가만히 있는 상태	
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::IDLE))
 	{
 		m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
 		m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 	}
-	//if (m_iState & ENEMY_STATE::MOVE_F)
-	//{
-	//	m_pModelCom->Set_Animation(MOVE_U_WALKING, true);
-	//	m_pModelCom->Set_Animation(ANIM_RUN_F, true);
-	//}
-	//if (m_iState & ENEMY_STATE::MOVE_B)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_RUN_B, true);
-	//	m_pModelCom->Set_Animation(ANIM_RUN_B, true);
-	//}
-	//if (m_iState & ENEMY_STATE::MOVE_L)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_RUN_L, true);
-	//	m_pModelCom->Set_Animation(ANIM_RUN_L, true);
-	//}
-	//if (m_iState & ENEMY_STATE::MOVE_R)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_RUN_R, true);
-	//	m_pModelCom->Set_Animation(ANIM_RUN_R, true);
-	//}
 
-	//if (m_iState & ENEMY_STATE::IDLE)
-	//{
-	//}
-	//if (m_iState & ENEMY_STATE::RUN_F)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_WALK_F, true);
-	//}
-	//if (m_iState & ENEMY_STATE::RUN_B)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_WALK_B, true);
-	//}
-	//if (m_iState & ENEMY_STATE::RUN_L)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_WALK_L, true);
-	//}
-	//if (m_iState & ENEMY_STATE::RUN_R)
-	//{
-	//	m_pModelCom->Set_Animation(ANIM_WALK_R, true);
-	//}
+
+	// 이동 중에만 동작
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::MOVE))
+	{
+		if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
+		{	
+			m_pModelCom->Set_Animation(MOVE_U_WALKING_BACK, PART_UPPER, true);
+			m_pModelCom->Set_Animation(MOVE_L_WALKING_BACK, PART_LOWER, true);
+		}
+		if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
+		{	
+			m_pModelCom->Set_Animation(MOVE_U_LEFT_STRAFE_WALK, PART_UPPER, true);
+			m_pModelCom->Set_Animation(MOVE_L_LEFT_STRAFE_WALK, PART_LOWER, true);
+		}
+		if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
+		{	
+			m_pModelCom->Set_Animation(MOVE_U_RIGHT_STRAFE_WALK, PART_UPPER, true);
+			m_pModelCom->Set_Animation(MOVE_L_RIGHT_STRAFE_WALK, PART_LOWER, true);
+		}
+		if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
+		{	
+			m_pModelCom->Set_Animation(MOVE_U_WALKING, PART_UPPER, true);
+			m_pModelCom->Set_Animation(MOVE_L_WALKING, PART_LOWER, true);
+		}
+	}
+	
+
+	// 공격 중에만 동작. 누른 후 특정 시간동안만
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
+	{
+		// 만약 들고 있는 무기가 무엇이라면 등..
+
+
+		// 일단 무기가 없는 경우 가정
+
+		if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+		{
+			_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
+			switch (iRandValue)
+			{
+			default:
+			case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false); break;
+			case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false); break;
+			case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false); break;
+			case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false); break;
+			}
+		}
+	}
 
 }
 

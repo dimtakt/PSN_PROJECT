@@ -79,7 +79,7 @@ public:
 	void Add_Animation(MODEL_ANIM_DESC tAnimDesc)	{	m_PlayingAnimDescs.push_back(tAnimDesc);			};
 	void Add_Animation()							{ 	m_PlayingAnimDescs.push_back(MODEL_ANIM_DESC{});	};
 
-	_uint Get_NumPlayingAnims()						{	return m_PlayingAnimDescs.size(); };
+	_uint Get_NumPlayingAnims()						{	return static_cast<_uint>(m_PlayingAnimDescs.size()); };
 
 	void Remove_Animation(_uint iCurAnimDescIndex = UINT_MAX)		
 	{	
@@ -91,6 +91,7 @@ public:
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	_bool Play_Animation_AllLayer(_float fTimeDelta);
 	_bool Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex = 0);
 
 public:

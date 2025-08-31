@@ -9,25 +9,53 @@ namespace Client
 	const unsigned int			g_iWinSizeX = 1280;
 	const unsigned int			g_iWinSizeY = 720;
 
-	enum ENEMY_STATE { 
+	enum class ENEMY_STATE {
 		IDLE		= (1 << 0),
 		
-		// Run State
-		MOVE_F		= (1 << 1),
-		MOVE_B		= (1 << 2),
-		MOVE_L		= (1 << 3),
-		MOVE_R		= (1 << 4),
+		// 타겟 추적하여 접근
+		TRACK_WEAPON_RUN,	// 근처의 무기 탐색
+		TRACK_PLAYER_RUN,	// 무기가 없을 시 플레이어 탐색
 
-		// Attack State
+		// 픽업중
+		PICKUP_GROUND,
+		PICKUP_MID,
+
+		// 조건 만족시 공격
+		ATK_MELEE,
+		ATK_WEAPON_BLUNT,
+		ATK_WEAPON_GUN,
+
+		// 
 
 
-		//ATTACK		= (1 << )
+		ENEMY_STATE_END
+	};
 
+	enum class PLAYER_STATE {
+		IDLE				= (1 << 0),		// 가만히
+
+		MOVE				= (1 << 1),		// 평상시(이동 등)
+
+		PICKUP				= (1 << 2),		// 줍는중
+
+		ATK					= (1 << 3),		// 공격
+		
+		
+		
+		
+		//ATK_MELEE			= (1 << 3),		// 공격
+		//ATK_WEAPON_BLUNT	= (1 << 4),		// 공격
+		//ATK_WEAPON_GUN		= (1 << 5),		// 공격
+
+		PLAYER_STATE_END
 	};
 
 	enum ANIM_PARTINDEX {
 		PART_UPPER = 0,
 		PART_LOWER = 1,
+		//PART_ETC1,
+		//PART_ETC2,
+		//PART_ETC3, // 필요에 따라 늘리기..
 
 		PART_END
 	};
@@ -62,19 +90,21 @@ namespace Client
 		MOVE_L_RIGHT_TURN_90		= 22, // [MOVE][Lower]right turn 90
 		MOVE_L_RUNNING				= 23, // [MOVE][Lower]running
 		MOVE_L_WALKING				= 24, // [MOVE][Lower]walking
+		MOVE_L_WALKING_BACK			= 25, // [MOVE][Lower]walking backwards
 
-		MOVE_U_IDLE					= 25, // [MOVE][Upper]idle
-		MOVE_U_JUMP					= 26, // [MOVE][Upper]jump
-		MOVE_U_LEFT_STRAFE			= 27, // [MOVE][Upper]left strafe
-		MOVE_U_LEFT_STRAFE_WALK		= 28, // [MOVE][Upper]left strafe walking
-		MOVE_U_LEFT_TURN			= 29, // [MOVE][Upper]left turn
-		MOVE_U_LEFT_TURN_90			= 30, // [MOVE][Upper]left turn 90
-		MOVE_U_RIGHT_STRAFE			= 31, // [MOVE][Upper]right strafe
-		MOVE_U_RIGHT_STRAFE_WALK	= 32, // [MOVE][Upper]right strafe walking
-		MOVE_U_RIGHT_TURN			= 33, // [MOVE][Upper]right turn
-		MOVE_U_RIGHT_TURN_90		= 34, // [MOVE][Upper]right turn 90
-		MOVE_U_RUNNING				= 35, // [MOVE][Upper]running
-		MOVE_U_WALKING				= 36, // [MOVE][Upper]walking
+		MOVE_U_IDLE					= 26, // [MOVE][Upper]idle
+		MOVE_U_JUMP					= 27, // [MOVE][Upper]jump
+		MOVE_U_LEFT_STRAFE			= 28, // [MOVE][Upper]left strafe
+		MOVE_U_LEFT_STRAFE_WALK		= 29, // [MOVE][Upper]left strafe walking
+		MOVE_U_LEFT_TURN			= 30, // [MOVE][Upper]left turn
+		MOVE_U_LEFT_TURN_90			= 31, // [MOVE][Upper]left turn 90
+		MOVE_U_RIGHT_STRAFE			= 32, // [MOVE][Upper]right strafe
+		MOVE_U_RIGHT_STRAFE_WALK	= 33, // [MOVE][Upper]right strafe walking
+		MOVE_U_RIGHT_TURN			= 34, // [MOVE][Upper]right turn
+		MOVE_U_RIGHT_TURN_90		= 35, // [MOVE][Upper]right turn 90
+		MOVE_U_RUNNING				= 36, // [MOVE][Upper]running
+		MOVE_U_WALKING				= 37, // [MOVE][Upper]walking
+		MOVE_U_WALKING_BACK			= 38, // [MOVE][Upper]walking backwards
 
 		ANIM_END
 	};
