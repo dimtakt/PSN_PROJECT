@@ -80,6 +80,7 @@ public:
 	void Add_Animation()							{ 	m_PlayingAnimDescs.push_back(MODEL_ANIM_DESC{});	};
 
 	_uint Get_NumPlayingAnims()						{	return static_cast<_uint>(m_PlayingAnimDescs.size()); };
+	MODEL_ANIM_DESC Get_PlayingAnimDesc(_uint index){	return m_PlayingAnimDescs[index]; };
 
 	void Remove_Animation(_uint iCurAnimDescIndex = UINT_MAX)		
 	{	

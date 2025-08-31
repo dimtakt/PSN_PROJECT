@@ -43,8 +43,9 @@ private:
 	HRESULT		Bind_ShaderResources();
 	HRESULT		Ready_PartObjects();
 
-	void		Update_AnimationState();	// 조작 등에 의한 "상태" 제어
-	void		Update_AnimationIndex();	// 상태에 의한 "애니메이션" 제어
+	void		Update_Transform(_float fTimeDelta);		// 조작 등에 의한 "Transform" 제어
+	void		Update_AnimationState(_float fTimeDelta);	// 조작 등에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
+	void		Update_AnimationIndex(_float fTimeDelta);	// 조작 등에 의한 "애니메이션" 제어
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)

@@ -68,34 +68,12 @@ void CPlayer::Update(_float fTimeDelta)
 	// 애니메이션 분기 테스트용
 	// 애니메이션 목록 확인 : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h 에도 있음
 
-	_float fTmpSpeed = 2.f * fTimeDelta;
-
-
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
-	{
-		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);
-	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
-	{
-		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
-	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
-	{
-		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
-	}
-	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
-	{
-		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
-	}
-	
-	_int iMouseMove;
-	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
 
 
 
-	Update_AnimationState();
-	Update_AnimationIndex();
+	Update_Transform(fTimeDelta);
+	Update_AnimationState(fTimeDelta);
+	Update_AnimationIndex(fTimeDelta);
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
@@ -177,9 +155,9 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	// 레벨이 추가될 때 마다 추가.. 추후 이걸 define쪽에 옮기는 것도 고려..
 	switch (iDestLevelIndex)
 	{
-	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25; break;
+	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25;	break;
 
-	default:								NaviDesc.iCurrentCellIndex = 0; break;
+	default:								NaviDesc.iCurrentCellIndex = 0;		break;
 	}
 	
 
@@ -234,7 +212,34 @@ HRESULT CPlayer::Ready_PartObjects()
 	return S_OK;
 }
 
-void CPlayer::Update_AnimationState()
+void CPlayer::Update_Transform(_float fTimeDelta)
+{
+	_float fTmpSpeed = 1.5f * fTimeDelta;
+
+
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
+	{
+		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);
+	}
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
+	{
+		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
+	}
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
+	{
+		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
+	}
+	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
+	{
+		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
+	}
+
+	_int iMouseMove;
+	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+}
+
+void CPlayer::Update_AnimationState(_float fTimeDelta)
 {
 	// 상태 추가 (켜기) → |=
 	// 상태 제거 (끄기) → &= ~
@@ -243,6 +248,7 @@ void CPlayer::Update_AnimationState()
 	// 상태 확인 (켜져 있는지 검사) → &
 	
 
+	// 이동 상태 제어
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_D) ||
@@ -257,10 +263,28 @@ void CPlayer::Update_AnimationState()
 		m_iState |= ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
 
+
+
+	// 공격 상태 제어
+	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+	{
+		m_iState |= ENUM_CLASS(PLAYER_STATE::ATK);
+	}
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
+		m_pModelCom->Get_PlayingAnimDesc(PART_UPPER).isFinished)	// 현재 애니메이션이 종료 될 시 state 회수
+	{
+		m_iState &= ~ENUM_CLASS(PLAYER_STATE::ATK);
+	}
+
+
+
 }
 
-void CPlayer::Update_AnimationIndex()
+void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 {
+
+	// ==============================
+
 	// 가만히 있는 상태	
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::IDLE))
 	{
@@ -294,28 +318,29 @@ void CPlayer::Update_AnimationIndex()
 		}
 	}
 	
-
-	// 공격 중에만 동작. 누른 후 특정 시간동안만
-	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
+	// 공격 중에만 동작. 누른 후 애니메이션 종료시까지만 유지 (state에서 관리)
+	static _bool isFistPlaying = false;
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
+		isFistPlaying)
 	{
-		// 만약 들고 있는 무기가 무엇이라면 등..
+		isFistPlaying = true;
+		_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
 
-
-		// 일단 무기가 없는 경우 가정
-
-		if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+		switch (iRandValue)
 		{
-			_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
-			switch (iRandValue)
-			{
-			default:
-			case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false); break;
-			case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false); break;
-			case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false); break;
-			case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false); break;
-			}
+		default:
+		case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false); break;
+		case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false); break;
+		case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false); break;
+		case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false); break;
 		}
 	}
+	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	{
+		isFistPlaying = false;
+	}
+
+
 
 }
 

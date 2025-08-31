@@ -173,6 +173,13 @@ _bool CModel::Play_Animation_AllLayer(_float fTimeDelta)
         if (isTrue) isTrue = isAnimTrue;
     }
 
+    //for (_int i = 0; i < m_PlayingAnimDescs.size(); i++)
+    //{
+    //    _bool isAnimTrue = true;
+    //    isAnimTrue = Play_Animation(fTimeDelta, static_cast<_uint>(i));   // 하나 이상 false 리턴 시 false 리턴
+    //    if (isTrue) isTrue = isAnimTrue;
+    //}
+
     return isTrue;
 }
 
