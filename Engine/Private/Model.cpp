@@ -262,25 +262,42 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     pDesc.fTransitionTime = fTranslationTime;
     pDesc.fTickPerSecond = m_Animations[iCurAnimIndex]->Get_TickPerSecond();
 
-    // 애니메이션 업데이트
-    if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
-    {
-        if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
-        {
-            if (iPrevAnimIndex != UINT_MAX)
-                m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
+    //// 애니메이션 업데이트
+    //if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
+    //{
+    //    if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
+    //    {
+    //        if (iPrevAnimIndex != UINT_MAX)
+    //            m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
 
-            m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
-        }
-        else                    // 전환 간 애니메이션이 같을 때
-        {
-            m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
-        }
-        //std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
+    //        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
+    //    }
+    //    else                    // 전환 간 애니메이션이 같을 때
+    //    {
+    //        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+    //    }
+    //    //std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
+    //}
+    //else                        // 전환 중이 아니면 현재 애니메이션만
+    //{
+    //    m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+    //    //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
+    //}
+
+
+
+    // 애니메이션 업데이트
+    if (isDoingTransition && !isSameAnim)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
+    {
+
+        if (iPrevAnimIndex != UINT_MAX)
+            m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
+
+        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
     }
     else                        // 전환 중이 아니면 현재 애니메이션만
     {
-        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
+        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);
         //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
     }
 
