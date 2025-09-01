@@ -1,4 +1,4 @@
-#include "Player.h"
+ï»¿#include "Player.h"
 #include "GameInstance.h"
 
 #include "Body_Player.h"
@@ -60,13 +60,13 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 
 void CPlayer::Update(_float fTimeDelta)
 {
-	// Çàµ¿ ÆĞÅÏ µî.. ÃßÈÄ ÄÄÆ÷³ÍÆ® µîÀ» ÀÌ¿ëÇÏ¿© ±¸Çö
-	// ÇÔ¼ö ²À ºĞ¸®ÇØ¼­ ³­ÀâÇÏÁö ¾Ê°Ô ¸¸µé±â
+	// í–‰ë™ íŒ¨í„´ ë“±.. ì¶”í›„ ì»´í¬ë„ŒíŠ¸ ë“±ì„ ì´ìš©í•˜ì—¬ êµ¬í˜„
+	// í•¨ìˆ˜ ê¼­ ë¶„ë¦¬í•´ì„œ ë‚œì¡í•˜ì§€ ì•Šê²Œ ë§Œë“¤ê¸°
 
 
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ºĞ±â Å×½ºÆ®¿ë
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ¸ñ·Ï È®ÀÎ : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h ¿¡µµ ÀÖÀ½
+	// ì• ë‹ˆë©”ì´ì…˜ ë¶„ê¸° í…ŒìŠ¤íŠ¸ìš©
+	// ì• ë‹ˆë©”ì´ì…˜ ëª©ë¡ í™•ì¸ : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h ì—ë„ ìˆìŒ
 
 
 
@@ -96,7 +96,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-	// ·»´õ
+	// ë Œë”
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -131,13 +131,31 @@ HRESULT CPlayer::Render()
 	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc)))
 	//	return E_FAIL;
 
+#ifdef _DEBUG
+
+	_wstring strFontTag = L"Font_DOS";
+	_uint iRenderStartX = 100.f;
+	_uint iRenderStartY = 25.f;
+	_uint iRenderSpaceY = 25.f;
+	_vector vLoadColor = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	_vector vBackColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+
+	m_pGameInstance->Render_Font_Begin(strFontTag);
+	for (_uint i = 0; i < m_pModelCom->Get_NumPlayingAnims(); i++)
+	{
+		m_pGameInstance->Render_Font(strFontTag, L"â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vBackColor);
+		m_pGameInstance->Render_Font(strFontTag, m_pModelCom->Get_CurAnimNames()[i].c_str(), _float2(iRenderStartX, iRenderStartY), vLoadColor);
+	}
+	m_pGameInstance->Render_Font_End(strFontTag);
+
+#endif // _DEBUG
 
 	return S_OK;
 }
 
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
-	// ÄÄÆ÷³ÍÆ® ÁØºñ
+	// ì»´í¬ë„ŒíŠ¸ ì¤€ë¹„
 	_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
 
 	m_pTransformCom->Scale(_float3{5.f, 5.f, 5.f});
@@ -152,7 +170,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 
 	CNavigation::NAVIGATION_DESC        NaviDesc{};
 
-	// ·¹º§ÀÌ Ãß°¡µÉ ¶§ ¸¶´Ù Ãß°¡.. ÃßÈÄ ÀÌ°É defineÂÊ¿¡ ¿Å±â´Â °Íµµ °í·Á..
+	// ë ˆë²¨ì´ ì¶”ê°€ë  ë•Œ ë§ˆë‹¤ ì¶”ê°€.. ì¶”í›„ ì´ê±¸ defineìª½ì— ì˜®ê¸°ëŠ” ê²ƒë„ ê³ ë ¤..
 	switch (iDestLevelIndex)
 	{
 	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25;	break;
@@ -234,21 +252,21 @@ void CPlayer::Update_Transform(_float fTimeDelta)
 		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
 	}
 
-	_int iMouseMove;
-	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+	//_int iMouseMove;
+	//if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
 }
 
 void CPlayer::Update_AnimationState(_float fTimeDelta)
 {
-	// »óÅÂ Ãß°¡ (ÄÑ±â) ¡æ |=
-	// »óÅÂ Á¦°Å (²ô±â) ¡æ &= ~
+	// ìƒíƒœ ì¶”ê°€ (ì¼œê¸°) â†’ |=
+	// ìƒíƒœ ì œê±° (ë„ê¸°) â†’ &= ~
 	// 
-	// »óÅÂ Åä±Û (¹İÀü) ¡æ ^=
-	// »óÅÂ È®ÀÎ (ÄÑÁ® ÀÖ´ÂÁö °Ë»ç) ¡æ &
+	// ìƒíƒœ í† ê¸€ (ë°˜ì „) â†’ ^=
+	// ìƒíƒœ í™•ì¸ (ì¼œì ¸ ìˆëŠ”ì§€ ê²€ì‚¬) â†’ &
 	
 
-	// ÀÌµ¿ »óÅÂ Á¦¾î
+	// ì´ë™ ìƒíƒœ ì œì–´
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_D) ||
@@ -265,15 +283,25 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 
 
 
-	// °ø°İ »óÅÂ Á¦¾î
+	// ê³µê²© ìƒíƒœ ì œì–´
+
+	static _float fFistProgressTime = 0.f;
+	_float fFistPlayTime = .5f;
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
+		fFistProgressTime += fTimeDelta;
+
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
 	{
 		m_iState |= ENUM_CLASS(PLAYER_STATE::ATK);
+		m_iState &= ~ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
-		m_pModelCom->Get_PlayingAnimDesc(PART_UPPER).isFinished)	// ÇöÀç ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Á¾·á µÉ ½Ã state È¸¼ö
+		fFistProgressTime >= fFistPlayTime)	// í˜„ì¬ ì• ë‹ˆë©”ì´ì…˜ì´ ì¢…ë£Œ ë  ì‹œ state íšŒìˆ˜
+		//m_pModelCom->Get_PlayingAnimDesc(PART_UPPER).isFinished)	// í˜„ì¬ ì• ë‹ˆë©”ì´ì…˜ì´ ì¢…ë£Œ ë  ì‹œ state íšŒìˆ˜
 	{
 		m_iState &= ~ENUM_CLASS(PLAYER_STATE::ATK);
+		m_iState |= ENUM_CLASS(PLAYER_STATE::IDLE);
+		fFistProgressTime = 0.f;
 	}
 
 
@@ -285,7 +313,7 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 
 	// ==============================
 
-	// °¡¸¸È÷ ÀÖ´Â »óÅÂ	
+	// ê°€ë§Œíˆ ìˆëŠ” ìƒíƒœ	
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::IDLE))
 	{
 		m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
@@ -293,7 +321,7 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 	}
 
 
-	// ÀÌµ¿ Áß¿¡¸¸ µ¿ÀÛ
+	// ì´ë™ ì¤‘ì—ë§Œ ë™ì‘
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::MOVE))
 	{
 		if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
@@ -318,10 +346,10 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		}
 	}
 	
-	// °ø°İ Áß¿¡¸¸ µ¿ÀÛ. ´©¸¥ ÈÄ ¾Ö´Ï¸ŞÀÌ¼Ç Á¾·á½Ã±îÁö¸¸ À¯Áö (state¿¡¼­ °ü¸®)
+	// ê³µê²© ì¤‘ì—ë§Œ ë™ì‘. ëˆ„ë¥¸ í›„ ì¼ì • ì‹œê°„ë™ì•ˆë§Œ ìœ ì§€ (stateì—ì„œ ê´€ë¦¬)
 	static _bool isFistPlaying = false;
-	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
-		isFistPlaying)
+	if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
+		!isFistPlaying)
 	{
 		isFistPlaying = true;
 		_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
@@ -329,13 +357,14 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		switch (iRandValue)
 		{
 		default:
-		case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false); break;
-		case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false); break;
-		case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false); break;
-		case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false); break;
+		case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false, .2f); break;
+		case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false, .2f); break;
+		case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false, .2f); break;
+		case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false, .2f); break;
 		}
 	}
-	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
+		isFistPlaying)
 	{
 		isFistPlaying = false;
 	}
