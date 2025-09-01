@@ -68,6 +68,10 @@ HRESULT CLoader::Loading()
 
 	HRESULT			hr = {};
 
+	//hr = Loading_For_Static_Levels(m_eNextLevelID);
+	//if (FAILED(hr))
+	//	return E_FAIL;
+
 	switch(m_eNextLevelID)
 	{
 	case LEVEL::LOGO:
@@ -86,6 +90,7 @@ HRESULT CLoader::Loading()
 
 	if (FAILED(hr))
 		return E_FAIL;
+
 
 	LeaveCriticalSection(&m_CriticalSection);
 

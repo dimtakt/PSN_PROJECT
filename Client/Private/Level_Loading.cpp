@@ -54,6 +54,7 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
 		case LEVEL::TEST_EXTRA1:
 			pNewLevel = CStage_Test1::Create(m_pDevice, m_pContext);
+			break;
 		}
 
 		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(m_eNextLevelID), pNewLevel)))

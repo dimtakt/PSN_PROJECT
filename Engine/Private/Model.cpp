@@ -262,6 +262,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     pDesc.fTransitionTime = fTranslationTime;
     pDesc.fTickPerSecond = m_Animations[iCurAnimIndex]->Get_TickPerSecond();
 
+#pragma region Old Animation (LoopAnim Lerping Test)
     //// 애니메이션 업데이트
     //if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
     //{
@@ -283,8 +284,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     //    m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
     //    //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
     //}
-
-
+#pragma endregion
 
     // 애니메이션 업데이트
     if (isDoingTransition && !isSameAnim)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생

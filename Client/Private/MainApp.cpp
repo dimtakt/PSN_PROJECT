@@ -105,6 +105,23 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 
+	/* Prototype_Component_Collider_AABB */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pContext, COLLIDERTYPE::AABB))))
+		return E_FAIL;
+
+	/* Prototype_Component_Collider_OBB */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pContext, COLLIDERTYPE::OBB))))
+		return E_FAIL;
+
+	/* Prototype_Component_Collider_Sphere */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+		CCollider::Create(m_pDevice, m_pContext, COLLIDERTYPE::SPHERE))))
+		return E_FAIL;
+
+
+
 	// 모델의 방향을 올바르게 로드하기 위해 사전에 변환용 벡터 정의
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));

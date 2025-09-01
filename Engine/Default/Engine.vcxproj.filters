@@ -151,6 +151,21 @@
     <Filter Include="01.Utility\_GValueManager\TimeSpeed">
       <UniqueIdentifier>{615ea55f-f342-4d84-a65f-7d643b028084}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Component\Collider">
+      <UniqueIdentifier>{cf3f8760-e0e3-4c95-80d6-a6b84ee69e98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Collider\Bounding">
+      <UniqueIdentifier>{9dd1b146-ad9b-4d63-b06b-fa4e5b7c043c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Collider\Bounding\AABB">
+      <UniqueIdentifier>{29cfca0e-8c22-4c70-b0ff-b1199bc93ab5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Collider\Bounding\Sphere">
+      <UniqueIdentifier>{d15412d6-a619-4cc4-9bd2-5b0c657f7c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Collider\Bounding\OBB">
+      <UniqueIdentifier>{973cba8b-be6e-4794-956d-dd845955695f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -284,6 +299,21 @@
     </ClCompile>
     <ClCompile Include="..\private\CustomObj.cpp">
       <Filter>01.Utility\02.GameObject\_Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider.cpp">
+      <Filter>01.Utility\03.Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding.cpp">
+      <Filter>01.Utility\03.Component\Collider\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_AABB.cpp">
+      <Filter>01.Utility\03.Component\Collider\Bounding\AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_OBB.cpp">
+      <Filter>01.Utility\03.Component\Collider\Bounding\OBB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_Sphere.cpp">
+      <Filter>01.Utility\03.Component\Collider\Bounding\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -439,6 +469,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\TimeSpeed_Manager.h">
       <Filter>01.Utility\_GValueManager\TimeSpeed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Collider.h">
+      <Filter>01.Utility\03.Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding.h">
+      <Filter>01.Utility\03.Component\Collider\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding_AABB.h">
+      <Filter>01.Utility\03.Component\Collider\Bounding\AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding_OBB.h">
+      <Filter>01.Utility\03.Component\Collider\Bounding\OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding_Sphere.h">
+      <Filter>01.Utility\03.Component\Collider\Bounding\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
