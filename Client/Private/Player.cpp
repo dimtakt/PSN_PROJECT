@@ -358,16 +358,18 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		}
 	}
 	
+
 	// 공격 중에만 동작. 누른 후 일정 시간동안만 유지 (state에서 관리)
 	static _bool isFistPlaying = false;
-	if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
-		!isFistPlaying)
+	static _uint iRandFistIndex = {};
+
+	if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && !isFistPlaying)		// 시작
 	{
 		isFistPlaying = true;
 
-		_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
+		iRandFistIndex = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
 		
-		switch (iRandValue)
+		switch (iRandFistIndex)
 		{
 		default:
 		case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
@@ -379,10 +381,22 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		isFistPlaying = true;
 		
 	}
-	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
-		isFistPlaying)
+	else if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)		// 진행중
+	{
+		switch (iRandFistIndex)
+		{
+		default:
+		case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
+		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
+		case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+		}
+
+	}
+	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)	// 종료
 	{
 		isFistPlaying = false;
+		iRandFistIndex = {};
 	}
 
 	m_pModelCom->Set_Animation(tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, tAnimDesc[PART_UPPER].isAnimLoop, tAnimDesc[PART_UPPER].fTransitionTime);

@@ -95,7 +95,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
         {
             *pFinished = true;
             m_fCurrentTrackPosition = fFixedDuration;
-            return;
+            //return;
         }
         else                        // 루프해야 할 애니메이션일 때
         {
