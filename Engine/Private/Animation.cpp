@@ -85,18 +85,19 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
         fTranslationTime = pDesc->fTransitionTime;
 
 
-    _float fFixedDuration = (isSameAnim) ? m_fDuration - pDesc->fTransitionTime : m_fDuration;
+    _float fFixedDuration = (isSameAnim) ? 
+        m_fDuration - pDesc->fTransitionTime * m_fTickPerSecond :   // 같은 애니메이션이라면, 타이밍을 조금 더 당김
+        m_fDuration;
 
     if (m_fCurrentTrackPosition >= fFixedDuration)
     {
-
-        if (false == isLoop)
+        if (false == isLoop)        // 루프하면 안되는 애니메이션일 때, 마지막 프레임에서 유지, 더이상 재생X
         {
             *pFinished = true;
             m_fCurrentTrackPosition = fFixedDuration;
             return;
         }
-        else
+        else                        // 루프해야 할 애니메이션일 때
         {
             m_isFinishedLoop = true;
             m_fCurrentTrackPosition = 0.f;

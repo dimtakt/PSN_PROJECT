@@ -266,6 +266,30 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 	// 상태 확인 (켜져 있는지 검사) → &
 	
 
+
+	// 공격 상태 제어
+
+	static _float fFistProgressTime = 0.f;
+	_float fFistPlayTime = 1.0f;
+
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
+		fFistProgressTime += fTimeDelta;
+
+	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) &&
+		!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	{
+		m_iState |= ENUM_CLASS(PLAYER_STATE::ATK);
+	}
+
+	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
+		//fFistProgressTime >= fFistPlayTime &&	// 현재 애니메이션이 종료 될 시 state 회수
+		m_pModelCom->Get_PlayingAnimDesc(PART_UPPER).isFinished)	// 현재 애니메이션이 종료 될 시 state 회수
+	{
+		m_iState &= ~ENUM_CLASS(PLAYER_STATE::ATK);
+		fFistProgressTime = 0.f;
+	}
+
+
 	// 이동 상태 제어
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
@@ -273,51 +297,39 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 		m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
 		m_iState |= ENUM_CLASS(PLAYER_STATE::MOVE);
-		m_iState &= ~ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
 	else
 	{
 		m_iState &= ~ENUM_CLASS(PLAYER_STATE::MOVE);
-		m_iState |= ENUM_CLASS(PLAYER_STATE::IDLE);
 	}
 
 
 
-	// 공격 상태 제어
 
-	static _float fFistProgressTime = 0.f;
-	_float fFistPlayTime = .5f;
-	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
-		fFistProgressTime += fTimeDelta;
 
-	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
-	{
-		m_iState |= ENUM_CLASS(PLAYER_STATE::ATK);
+
+
+	if (m_iState == 0)
+		m_iState = ENUM_CLASS(PLAYER_STATE::IDLE);
+	else if (m_iState & ~ENUM_CLASS(PLAYER_STATE::IDLE))
 		m_iState &= ~ENUM_CLASS(PLAYER_STATE::IDLE);
-	}
-	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK) &&
-		fFistProgressTime >= fFistPlayTime)	// 현재 애니메이션이 종료 될 시 state 회수
-		//m_pModelCom->Get_PlayingAnimDesc(PART_UPPER).isFinished)	// 현재 애니메이션이 종료 될 시 state 회수
-	{
-		m_iState &= ~ENUM_CLASS(PLAYER_STATE::ATK);
-		m_iState |= ENUM_CLASS(PLAYER_STATE::IDLE);
-		fFistProgressTime = 0.f;
-	}
-
-
 
 }
 
 void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 {
+	// 변수화를 하여 중간에 Set_Animation 중복 호출을 방지
+	// (중복 호출 시 내부적으로 Prev Animation 이 바뀌어 문제 발생
+	
+	static ANIMARG_DESC tAnimDesc[PART_END] = {};
 
 	// ==============================
 
 	// 가만히 있는 상태	
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::IDLE))
 	{
-		m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
-		m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
+		tAnimDesc[PART_UPPER] = { MOVE_U_IDLE , true };
+		tAnimDesc[PART_LOWER] = { MOVE_L_IDLE , true };
 	}
 
 
@@ -326,23 +338,23 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 	{
 		if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 		{	
-			m_pModelCom->Set_Animation(MOVE_U_WALKING_BACK, PART_UPPER, true);
-			m_pModelCom->Set_Animation(MOVE_L_WALKING_BACK, PART_LOWER, true);
+			tAnimDesc[PART_UPPER] = { MOVE_U_WALKING_BACK , true };
+			tAnimDesc[PART_LOWER] = { MOVE_L_WALKING_BACK , true };
 		}
 		if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 		{	
-			m_pModelCom->Set_Animation(MOVE_U_LEFT_STRAFE_WALK, PART_UPPER, true);
-			m_pModelCom->Set_Animation(MOVE_L_LEFT_STRAFE_WALK, PART_LOWER, true);
+			tAnimDesc[PART_UPPER] = { MOVE_U_LEFT_STRAFE_WALK , true };
+			tAnimDesc[PART_LOWER] = { MOVE_L_LEFT_STRAFE_WALK , true };
 		}
 		if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 		{	
-			m_pModelCom->Set_Animation(MOVE_U_RIGHT_STRAFE_WALK, PART_UPPER, true);
-			m_pModelCom->Set_Animation(MOVE_L_RIGHT_STRAFE_WALK, PART_LOWER, true);
+			tAnimDesc[PART_UPPER] = { MOVE_U_RIGHT_STRAFE_WALK , true };
+			tAnimDesc[PART_LOWER] = { MOVE_L_RIGHT_STRAFE_WALK , true };
 		}
 		if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
-		{	
-			m_pModelCom->Set_Animation(MOVE_U_WALKING, PART_UPPER, true);
-			m_pModelCom->Set_Animation(MOVE_L_WALKING, PART_LOWER, true);
+		{
+			tAnimDesc[PART_UPPER] = { MOVE_U_WALKING , true };
+			tAnimDesc[PART_LOWER] = { MOVE_L_WALKING , true };
 		}
 	}
 	
@@ -352,16 +364,20 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		!isFistPlaying)
 	{
 		isFistPlaying = true;
-		_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
 
+		_uint iRandValue = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
+		
 		switch (iRandValue)
 		{
 		default:
-		case 0:		m_pModelCom->Set_Animation(MELEE_U_FIST_01, PART_UPPER, false, .2f); break;
-		case 1:		m_pModelCom->Set_Animation(MELEE_U_FIST_02, PART_UPPER, false, .2f); break;
-		case 2:		m_pModelCom->Set_Animation(MELEE_U_FIST_03, PART_UPPER, false, .2f); break;
-		case 3:		m_pModelCom->Set_Animation(MELEE_U_FIST_04, PART_UPPER, false, .2f); break;
+		case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
+		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
+		case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
 		}
+
+		isFistPlaying = true;
+		
 	}
 	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
 		isFistPlaying)
@@ -369,8 +385,8 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		isFistPlaying = false;
 	}
 
-
-
+	m_pModelCom->Set_Animation(tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, tAnimDesc[PART_UPPER].isAnimLoop, tAnimDesc[PART_UPPER].fTransitionTime);
+	m_pModelCom->Set_Animation(tAnimDesc[PART_LOWER].iAnimIndex, PART_LOWER, tAnimDesc[PART_LOWER].isAnimLoop, tAnimDesc[PART_LOWER].fTransitionTime);
 }
 
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

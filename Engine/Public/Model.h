@@ -25,7 +25,7 @@ public:
 	typedef struct tModelSingleAnimDesc
 	{
 		// 현재 실행중인(했던) 애니메이션의 index
-		_uint	iCurAnimIndex;
+		_uint	iCurAnimIndex = UINT_MAX;
 		_uint	iPrevAnimIndex = UINT_MAX;
 
 		// 루트하는지, 루프가 아니라면 끝났는지를 저장

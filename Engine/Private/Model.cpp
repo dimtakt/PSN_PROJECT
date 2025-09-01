@@ -217,14 +217,19 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 
     _bool isSameAnim = iCurAnimIndex == iPrevAnimIndex;
 
+
+    // ==============================
+    // || 블렌딩 조건이 충족되면 ratio 를 1.0 이 아닌, 시간 경과 값에 따라 변경함
+    // ==============================
+
     // 블렌딩 트랜지션 시작 조건. 애니메이션이 바뀌었고, 블렌딩 진행중이 아닐 때 활성화
-    if (TargetAnimDesc.isAnimChanged && !TargetAnimDesc.isDoingTransition)
-        TargetAnimDesc.isDoingTransition = true;
+    if (isAnimChanged && !isDoingTransition)
+        isDoingTransition = true;
 
     // 경과시간 갱신 및 블렌딩 ratio 계산
-    if (TargetAnimDesc.isDoingTransition)
+    if (isDoingTransition)
     {
-        TargetAnimDesc.fAnimElapsedTime += fTimeDelta;
+        fAnimElapsedTime += fTimeDelta;
         fBlendLeftTime = fTranslationTime - fAnimElapsedTime;
 
         //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;            // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 8/25 7:54)
@@ -246,6 +251,12 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 
     //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
 
+
+
+    // ==============================
+    // || 블렌딩중이면 애니메이션 2개 동시에 돌림, 아니면 1개
+    // ==============================
+
     CChannel::CHANNEL_UPD_DESC pDesc = {};
     pDesc.fAnimDuration = m_Animations[iCurAnimIndex]->Get_Duration();
     pDesc.fTransitionTime = fTranslationTime;
@@ -254,18 +265,6 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     // 애니메이션 업데이트
     if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
     {
-
-        // 문제..?
-        // 위쪽 함수가 잠깐 실행되어 본 값을 이전 애니메이션으로 변경
-        // 뒤쪽 함수가 그 뒤 실행되어 본 값을 blend를 통해 이전 애니메이션으로부터 변환되듯이 변경
-        // 이게 매 loop마다 반복..
-        //
-        // 이전 애니메이션과 이후 애니메이션이 독립적으로 진행되는데
-        // 이를 blend시킬 방법을 찾아야 함
-        //
-        // 이전 건 1.f 로 주고
-        // 그럼 뼈 반영됐을테니까 그거 기반으로 그냥 뒤에꺼 fAnimBlendRatio 로 두면 되는 것 아닌지?
-
         if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
         {
             if (iPrevAnimIndex != UINT_MAX)
@@ -638,14 +637,19 @@ void CModel::Set_Animation(_uint iIndex, _uint iTargetCurAnimIndex, _bool _isLoo
     fTranslationTime = _fTransitionTime;
     isLoop = _isLoop;
 
-    isAnimChanged = (iCurAnimIndex != iIndex);
-
+    isAnimChanged = (iCurAnimIndex != iIndex);  // 같은 애니메이션으로 넘어가는 loop 의 경우 iPrevAnimIndex 가 변경되지 않음 (의도)
+    
     if (isAnimChanged)
         iPrevAnimIndex = iCurAnimIndex;
 
     iCurAnimIndex = iIndex;
-    if (iPrevAnimIndex == UINT_MAX)
+    if (iPrevAnimIndex == UINT_MAX) 
         iPrevAnimIndex = iIndex;
+
+    
+    if (iPrevAnimIndex == 0)
+        int i = 10;
+
 }
 
 HRESULT CModel::Ready_Meshes()
