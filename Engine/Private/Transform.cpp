@@ -53,16 +53,16 @@ void CTransform::Scaling(_float3 vScale)	// 상대적
 
 void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 {
-	_vector		vPosition = Get_State(STATE::POSITION);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
 	_vector		vLook = Get_State(STATE::LOOK);
 
-	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos + XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;	// 이동하려는 위치.
+	_vector		vCalcedPos = {};
 
-
-	_vector vDir = XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
-	_vector vNewPos = vPosition + vDir;
-
-	TryMoveOnNavMesh(vNewPos, vDir, pNavigation);
+	if (nullptr == pNavigation)
+		Set_State(STATE::POSITION, vTryPos);
+	else if (true == pNavigation->isMove(vTryPos, vOriginPos, &vCalcedPos))
+		Set_State(STATE::POSITION, vCalcedPos);		
 }
 
 void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
@@ -72,9 +72,9 @@ void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
 
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(vPosition))
-		Set_State(STATE::POSITION, vPosition);
+	//if (nullptr == pNavigation ||
+	//	true == pNavigation->isMove(vPosition))
+	//	Set_State(STATE::POSITION, vPosition);
 }
 
 void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation)
@@ -84,9 +84,9 @@ void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation)
 
 	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(vPosition))
-		Set_State(STATE::POSITION, vPosition);
+	//if (nullptr == pNavigation ||
+	//	true == pNavigation->isMove(vPosition))
+	//	Set_State(STATE::POSITION, vPosition);
 }
 
 void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
@@ -96,9 +96,9 @@ void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
 
 	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(vPosition))
-		Set_State(STATE::POSITION, vPosition);
+	//if (nullptr == pNavigation ||
+	//	true == pNavigation->isMove(vPosition))
+	//	Set_State(STATE::POSITION, vPosition);
 }
 
 void CTransform::Go_Above(_float fTimeDelta)
@@ -119,24 +119,6 @@ void CTransform::Go_Below(_float fTimeDelta)
 	vPosition -= XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
 
 	Set_State(STATE::POSITION, vPosition);
-}
-
-_bool CTransform::TryMoveOnNavMesh(_vector vPosition, _vector vDir, CNavigation* pNavigation)
-{
-	if (nullptr == pNavigation)
-	{
-		Set_State(STATE::POSITION, vPosition);
-		return true;
-	}
-
-	_vector vOutPos = vPosition;
-	if (pNavigation->isMove(vPosition, vDir, &vOutPos))
-	{
-		Set_State(STATE::POSITION, vOutPos);
-		return true;
-	}
-
-	return false;
 }
 
 void CTransform::Rotation(_fvector vAxis, _float fRadian)

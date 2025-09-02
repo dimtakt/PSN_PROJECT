@@ -68,6 +68,7 @@ HRESULT CNavigation::Initialize(void* pArg)
 	NAVIGATION_DESC* pDesc = static_cast<NAVIGATION_DESC*>(pArg);
 
 	m_iCurrentCellIndex = pDesc->iCurrentCellIndex;
+	m_iPastCellIndex = m_iCurrentCellIndex;
 
 	return S_OK;
 }
@@ -78,12 +79,19 @@ void CNavigation::Update(_fmatrix WorldMatrix)
 
 }
 
-_bool CNavigation::isMove(_fvector vPosition)
+_bool CNavigation::isMove(_fvector vPosition, _vector vOriginPosition, _vector* pOutPos)
 {
 	// 작동 순서
 	// 1. 네비메쉬 로컬좌표 기준 플레이어의 상대좌표를 구함. 이를 기준으로 확인할 것
 	// 2. "현재 Cell  " 에 있는지 검사.		있으면 True / 없으면 3번으로.
 	// 3. "이웃 Cell들" 에 있는지 검사.		있으면 True / 없으면 False.
+
+
+	// ==============================
+	// || 안에 있는지 확인
+	// ==============================
+
+	_bool	isInCell = false;
 
 	// 1번
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
@@ -92,7 +100,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 
 	// 2번
 	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex)) // 현재위치 그대로임
-		return true;
+		isInCell = true;
 	// 3번
 	else
 	{
@@ -103,20 +111,125 @@ _bool CNavigation::isMove(_fvector vPosition)
 			{	
 				// 모든 Cell을 돌았으나 어디에도 없음
 				if (-1 == iNeighborIndex)
-					return false;
-
+				{
+					isInCell = false;
+					break;
+				}
 				// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
 				if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
+				{
+					m_iPastCellIndex = m_iCurrentCellIndex;
+					m_iCurrentCellIndex = iNeighborIndex;
+
+					isInCell = true;
 					break;
+				}
 			}
-
-			m_iCurrentCellIndex = iNeighborIndex;
-
-			return true;
 		}
 		else							// 이웃 없음
-			return false;
+			isInCell = false;
 	}
+
+
+	if (isInCell)
+	{
+		*pOutPos = vPosition;
+		return true;
+	}
+
+	// ==============================
+	// || 안에 없으면 선타도록
+	// ==============================
+
+
+	// 이동 벡터
+	_vector vMoveDir = vPosition - vOriginPosition;
+
+	// 현재 Cell의 세 점
+	_vector pA = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::A);
+	_vector pB = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::B);
+	_vector pC = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::C);
+
+	// Cell의 면 법선
+	_vector faceNormal = XMVector3Normalize(XMVector3Cross(pB - pA, pC - pA));
+
+	// 충돌한 Edge들의 법선 모으기
+	std::vector<_vector> hitNormals;
+
+	struct Edge { _vector p1, p2; };
+	Edge edges[3] = { {pA,pB}, {pB,pC}, {pC,pA} };
+
+	for (int i = 0; i < 3; ++i)
+	{
+		_vector edgeDir = XMVector3Normalize(edges[i].p2 - edges[i].p1);
+		_vector wallNormal = XMVector3Normalize(XMVector3Cross(faceNormal, edgeDir));
+
+		// ==============================
+		// || Cell 내부/외부 판정 → 항상 외부로
+		// ==============================
+		_vector edgeCenter = (edges[i].p1 + edges[i].p2) * 0.5f;
+		_vector cellCenter = (pA + pB + pC) / 3.f;
+
+		if (XMVectorGetX(XMVector3Dot(cellCenter - edgeCenter, wallNormal)) > 0.f)
+			wallNormal *= -1.f;
+
+		// ==============================
+		// || 이동 방향이 벽을 뚫고 나가려는 경우만 추가
+		// ==============================
+		if (XMVectorGetX(XMVector3Dot(vMoveDir, wallNormal)) > 0.f)
+		{
+			hitNormals.push_back(wallNormal);
+		}
+	}
+
+
+	if (hitNormals.empty())
+	{
+		// 나간 선분이 없다는 건 → 단순 계산 상 오류, 안전하게 원위치
+		*pOutPos = vOriginPosition;
+		return false;
+	}
+	else if (hitNormals.size() == 1)
+	{
+		// ==============================
+		// || 하나의 벽에만 충돌 → Edge 방향으로 슬라이딩
+		// ==============================
+
+		// 어떤 Edge였는지 찾아야 함
+		_vector hitEdgeDir = XMVectorZero();
+		for (int i = 0; i < 3; ++i)
+		{
+			_vector edgeDir = XMVector3Normalize(edges[i].p2 - edges[i].p1);
+			_vector wallNormal = XMVector3Normalize(XMVector3Cross(faceNormal, edgeDir));
+
+			// Cell 외부 방향 보정
+			_vector edgeCenter = (edges[i].p1 + edges[i].p2) * 0.5f;
+			_vector cellCenter = (pA + pB + pC) / 3.f;
+			if (XMVectorGetX(XMVector3Dot(cellCenter - edgeCenter, wallNormal)) > 0.f)
+				wallNormal *= -1.f;
+
+			// 이번에 걸린 벽인지 확인
+			if (XMVectorGetX(XMVector3Dot(vMoveDir, wallNormal)) > 0.f)
+			{
+				hitEdgeDir = edgeDir;
+				break;
+			}
+		}
+
+		// 이동 벡터를 Edge 방향으로 투영
+		_vector vSlideDir = XMVector3Dot(vMoveDir, hitEdgeDir) * hitEdgeDir;
+
+		*pOutPos = vOriginPosition + vSlideDir;
+		return true;
+	}
+	else
+	{
+		// 두 개 이상의 벽에 동시에 충돌 (꼭짓점)
+		// → 이동 불가, 원래 자리에서 멈춤
+		*pOutPos = vOriginPosition;
+		return false;
+	}
+
 }
 
 _vector CNavigation::Compute_OnCell(_fvector vPosition)

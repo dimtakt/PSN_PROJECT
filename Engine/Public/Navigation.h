@@ -22,8 +22,7 @@ public:
 	virtual void Update(_fmatrix WorldMatrix);
 
 public:
-	_bool isMove(_fvector vPosition);
-	_bool isMove(_fvector vPosition, _vector vDir, _vector* pOutPos);
+	_bool isMove(_fvector vPosition, _vector vOriginPosition, _vector* pOutPos);
 	_vector Compute_OnCell(_fvector vPosition);
 
 #ifdef _DEBUG
@@ -34,7 +33,8 @@ public:
 #endif
 
 private:
-	_int							m_iCurrentCellIndex = { -1 };
+	_int							m_iCurrentCellIndex	= { -1 };
+	_int							m_iPastCellIndex	= { -1 };
 	vector<class CCell*>			m_Cells;
 
 	static _float4x4				m_WorldMatrix;
