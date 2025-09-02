@@ -58,9 +58,11 @@ void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(vPosition))
-		Set_State(STATE::POSITION, vPosition);
+
+	_vector vDir = XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	_vector vNewPos = vPosition + vDir;
+
+	TryMoveOnNavMesh(vNewPos, vDir, pNavigation);
 }
 
 void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
@@ -117,6 +119,24 @@ void CTransform::Go_Below(_float fTimeDelta)
 	vPosition -= XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
 
 	Set_State(STATE::POSITION, vPosition);
+}
+
+_bool CTransform::TryMoveOnNavMesh(_vector vPosition, _vector vDir, CNavigation* pNavigation)
+{
+	if (nullptr == pNavigation)
+	{
+		Set_State(STATE::POSITION, vPosition);
+		return true;
+	}
+
+	_vector vOutPos = vPosition;
+	if (pNavigation->isMove(vPosition, vDir, &vOutPos))
+	{
+		Set_State(STATE::POSITION, vOutPos);
+		return true;
+	}
+
+	return false;
 }
 
 void CTransform::Rotation(_fvector vAxis, _float fRadian)

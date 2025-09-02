@@ -86,7 +86,7 @@ HRESULT CStage_Test1::Ready_Layer_Camera(const _wstring& strLayerTag)
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
 	//	ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 	//	return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
 		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Player"), &CameraDesc)))
 		return E_FAIL;
 

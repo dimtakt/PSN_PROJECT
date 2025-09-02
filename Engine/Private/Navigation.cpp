@@ -82,8 +82,8 @@ _bool CNavigation::isMove(_fvector vPosition)
 {
 	// 작동 순서
 	// 1. 네비메쉬 로컬좌표 기준 플레이어의 상대좌표를 구함. 이를 기준으로 확인할 것
-	// 2. 현재 Cell   에 있는지 검사.	있으면 True / 없으면 3번으로.
-	// 3. 이웃 Cell들 에 있는지 검사.	있으면 True / 없으면 False.
+	// 2. "현재 Cell  " 에 있는지 검사.		있으면 True / 없으면 3번으로.
+	// 3. "이웃 Cell들" 에 있는지 검사.		있으면 True / 없으면 False.
 
 	// 1번
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));

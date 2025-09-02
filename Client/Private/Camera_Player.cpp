@@ -53,7 +53,7 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
         _uint iDestLevel = m_pGameInstance->Get_DestLevel();
         m_pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
 
-        _float fPlayerHeight = 8.5f;
+        _float fPlayerHeight = 7.8f;
 
         _vector vPlayerPos = m_pPlayerTransformCom->Get_State(STATE::POSITION);
         _vector pCalcedPlayerPos = vPlayerPos + XMVectorSet(0.f, fPlayerHeight, 0.f, 0.f);

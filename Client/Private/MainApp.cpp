@@ -132,6 +132,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy_Fixed/Enemy_ReFixed.fbx", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_Player */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, "../Bin/Resources/_SUPERHOT/Models/Enemy_Fixed/Player.fbx", PreTransformMatrix))))
+		return E_FAIL;
+
 
 
 

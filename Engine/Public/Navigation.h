@@ -23,6 +23,7 @@ public:
 
 public:
 	_bool isMove(_fvector vPosition);
+	_bool isMove(_fvector vPosition, _vector vDir, _vector* pOutPos);
 	_vector Compute_OnCell(_fvector vPosition);
 
 #ifdef _DEBUG

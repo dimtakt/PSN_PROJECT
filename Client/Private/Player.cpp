@@ -80,6 +80,8 @@ void CPlayer::Update(_float fTimeDelta)
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_UPPER);
 
 
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 	__super::Update(fTimeDelta);
 }
 
@@ -100,6 +102,32 @@ HRESULT CPlayer::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
+#ifdef _DEBUG
+
+	_wstring strFontTag = L"Font_DOS";
+	_uint iRenderStartX = 100.f;
+	_uint iRenderStartY = 25.f;
+	_uint iRenderSpaceY = 25.f;
+	_vector vLoadColor = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	_vector vBackColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+
+	m_pGameInstance->Render_Font_Begin(strFontTag);
+	for (_uint i = 0; i < m_pModelCom->Get_NumPlayingAnims(); i++)
+	{
+		m_pGameInstance->Render_Font(strFontTag, L"██████████████████████████████████████████", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vBackColor);
+		m_pGameInstance->Render_Font(strFontTag, m_pModelCom->Get_CurAnimNames()[i].c_str(), _float2(iRenderStartX, iRenderStartY), vLoadColor);
+	}
+	m_pGameInstance->Render_Font_End(strFontTag);
+
+
+	m_pColliderCom->Render();
+	m_pNavigationCom->Render();
+
+#endif // _DEBUG
+
+	// 신체는 공격 중에만 렌더할 것임.
+	if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+		return S_OK;
 
 
 
@@ -131,24 +159,7 @@ HRESULT CPlayer::Render()
 	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc)))
 	//	return E_FAIL;
 
-#ifdef _DEBUG
 
-	_wstring strFontTag = L"Font_DOS";
-	_uint iRenderStartX = 100.f;
-	_uint iRenderStartY = 25.f;
-	_uint iRenderSpaceY = 25.f;
-	_vector vLoadColor = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	_vector vBackColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
-
-	m_pGameInstance->Render_Font_Begin(strFontTag);
-	for (_uint i = 0; i < m_pModelCom->Get_NumPlayingAnims(); i++)
-	{
-		m_pGameInstance->Render_Font(strFontTag, L"██████████████████████████████████████████", _float2(iRenderStartX, iRenderStartY += iRenderSpaceY), vBackColor);
-		m_pGameInstance->Render_Font(strFontTag, m_pModelCom->Get_CurAnimNames()[i].c_str(), _float2(iRenderStartX, iRenderStartY), vLoadColor);
-	}
-	m_pGameInstance->Render_Font_End(strFontTag);
-
-#endif // _DEBUG
 
 	return S_OK;
 }
@@ -164,7 +175,10 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
 		return E_FAIL;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
+	//if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Enemy"),
+	//	TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+	//	return E_FAIL;
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
 		return E_FAIL;
 
@@ -181,6 +195,15 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 
 	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+		return E_FAIL;
+
+
+	CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+	AABBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 
 	Set_BufferRef(m_pModelCom);
@@ -252,9 +275,9 @@ void CPlayer::Update_Transform(_float fTimeDelta)
 		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
 	}
 
-	//_int iMouseMove;
-	//if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+	_int iMouseMove;
+	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
 }
 
 void CPlayer::Update_AnimationState(_float fTimeDelta)
@@ -360,22 +383,29 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 	
 
 	// 공격 중에만 동작. 누른 후 일정 시간동안만 유지 (state에서 관리)
-	static _bool isFistPlaying = false;
-	static _uint iRandFistIndex = {};
+	static _bool isFistPlaying = false;			// 현재 fist 중인디
+	static _float fFistTimeDelta = {};			// 마지막으로 fist 한 지 경과시간
+	static _uint iRandFistIndex = {};			// 애니메이션 랜덤 적용
+	static _uint iPastFistIndex = UINT_MAX;		// 마지막으로 재생된 fist 애니메이션 인덱스
+
+	//_float fFistComboExistTime = 0.2f;
 
 	if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && !isFistPlaying)		// 시작
 	{
 		isFistPlaying = true;
 
-		iRandFistIndex = static_cast<_uint>(m_pGameInstance->Rand(0, 4));
-		
+		iRandFistIndex = static_cast<_uint>(m_pGameInstance->Rand(1, 3));
+		iPastFistIndex = iRandFistIndex;
+
+		fFistTimeDelta = 0.f;
+
 		switch (iRandFistIndex)
 		{
 		default:
-		case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+		//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
 		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
 		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
-		case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+		//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
 		}
 
 		isFistPlaying = true;
@@ -383,18 +413,21 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 	}
 	else if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)		// 진행중
 	{
+		fFistTimeDelta += fTimeDelta;
+
 		switch (iRandFistIndex)
 		{
 		default:
-		case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+		//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
 		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
 		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
-		case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+		//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
 		}
 
 	}
 	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)	// 종료
 	{
+		fFistTimeDelta += fTimeDelta;
 		isFistPlaying = false;
 		iRandFistIndex = {};
 	}
@@ -433,6 +466,7 @@ void CPlayer::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
