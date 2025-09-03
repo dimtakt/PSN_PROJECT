@@ -79,7 +79,7 @@ void CNavigation::Update(_fmatrix WorldMatrix)
 
 }
 
-_bool CNavigation::isMove(_fvector vPosition, _vector vOriginPosition, _vector* pOutPos)
+_bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPos)
 {
 	// 작동 순서
 	// 1. 네비메쉬 로컬좌표 기준 플레이어의 상대좌표를 구함. 이를 기준으로 확인할 것
@@ -94,7 +94,7 @@ _bool CNavigation::isMove(_fvector vPosition, _vector vOriginPosition, _vector* 
 	_bool	isInCell = false;
 
 	// 1번
-	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalPos = XMVector3TransformCoord(vDestPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 
 	_int		iNeighborIndex = { -1 };
 
@@ -133,7 +133,7 @@ _bool CNavigation::isMove(_fvector vPosition, _vector vOriginPosition, _vector* 
 
 	if (isInCell)
 	{
-		*pOutPos = vPosition;
+		*pOutPos = vDestPos;
 		return true;
 	}
 
@@ -143,92 +143,134 @@ _bool CNavigation::isMove(_fvector vPosition, _vector vOriginPosition, _vector* 
 
 
 	// 이동 벡터
-	_vector vMoveDir = vPosition - vOriginPosition;
+	_vector vMoveDir = vDestPos - vOriginPos;
 
 	// 현재 Cell의 세 점
-	_vector pA = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::A);
-	_vector pB = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::B);
-	_vector pC = m_Cells[m_iCurrentCellIndex]->Get_Point(CELLPOINT::C);
+	_vector vPoint[ENUM_CLASS(CELLPOINT::END)] = {};
+	
+	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
+		vPoint[i] = m_Cells[m_iCurrentCellIndex]->Get_Point(static_cast<CELLPOINT>(i));
 
-	// Cell의 면 법선
-	_vector faceNormal = XMVector3Normalize(XMVector3Cross(pB - pA, pC - pA));
 
-	// 충돌한 Edge들의 법선 모으기
-	std::vector<_vector> hitNormals;
 
-	struct Edge { _vector p1, p2; };
-	Edge edges[3] = { {pA,pB}, {pB,pC}, {pC,pA} };
+	// AB, BC, CA 순서로 시계방향으로 그려짐을 이용
+	//
+	// 선분은 교차하는 선분을 대상으로 함
+	// 
+	// 1. 점의 좌표 순서를 통해 선의 바깥쪽 방향 벡터를 구함
+	// 2. 선분에 수직하는 좌표의 범위를 계산
+	// 3. 플레이어의 destPos 가 범위 내에 있는지 검사
+	// 3-1. 있다면) 벡터분리를 통해 선을 타도록
+	// 3-2. 없다면) 해당 방향의 꼭짓점으로 이동
+	
 
-	for (int i = 0; i < 3; ++i)
+	// 0. OriginPos -> DestPos 와 교차하는 Cell의 선분을 구함
+	
+	// 찾은 선분의 정보가 담길 변수
+	_vector vStart = XMVectorZero();
+	_vector vEnd = XMVectorZero();
+	_bool isFindLine = false;
+
+	_uint iMaxCellLine = ENUM_CLASS(CELLLINE::END);
+	for (_uint i = 0; i < iMaxCellLine; i++)
 	{
-		_vector edgeDir = XMVector3Normalize(edges[i].p2 - edges[i].p1);
-		_vector wallNormal = XMVector3Normalize(XMVector3Cross(faceNormal, edgeDir));
+		_vector vTmpStart = vPoint[i];
+		_vector vTmpEnd = vPoint[(i + 1) % iMaxCellLine];
 
-		// ==============================
-		// || Cell 내부/외부 판정 → 항상 외부로
-		// ==============================
-		_vector edgeCenter = (edges[i].p1 + edges[i].p2) * 0.5f;
-		_vector cellCenter = (pA + pB + pC) / 3.f;
+		Vec2 CellLine2DPos[2] = {
+			{XMVectorGetX(vTmpStart), XMVectorGetZ(vTmpStart)},
+			{XMVectorGetX(vTmpEnd), XMVectorGetZ(vTmpEnd)}
+		};
+		Vec2 Player2DPos[2] = {
+			{XMVectorGetX(vOriginPos), XMVectorGetZ(vOriginPos)},
+			{XMVectorGetX(vDestPos), XMVectorGetZ(vDestPos)}
+		};
 
-		if (XMVectorGetX(XMVector3Dot(cellCenter - edgeCenter, wallNormal)) > 0.f)
-			wallNormal *= -1.f;
-
-		// ==============================
-		// || 이동 방향이 벽을 뚫고 나가려는 경우만 추가
-		// ==============================
-		if (XMVectorGetX(XMVector3Dot(vMoveDir, wallNormal)) > 0.f)
+		if (IsIntersect(CellLine2DPos[0], CellLine2DPos[1], Player2DPos[0], Player2DPos[1]))	// 겹치는 선분을 발견 시
 		{
-			hitNormals.push_back(wallNormal);
-		}
+			vStart = vTmpStart;
+			vEnd = vTmpEnd;
+
+			isFindLine = true;
+			break;
+		}		
 	}
 
-
-	if (hitNormals.empty())
+	if (!isFindLine)
 	{
-		// 나간 선분이 없다는 건 → 단순 계산 상 오류, 안전하게 원위치
-		*pOutPos = vOriginPosition;
+		std::cout << "Cannot Find Line!" << std::endl;
 		return false;
 	}
-	else if (hitNormals.size() == 1)
-	{
-		// ==============================
-		// || 하나의 벽에만 충돌 → Edge 방향으로 슬라이딩
-		// ==============================
 
-		// 어떤 Edge였는지 찾아야 함
-		_vector hitEdgeDir = XMVectorZero();
-		for (int i = 0; i < 3; ++i)
-		{
-			_vector edgeDir = XMVector3Normalize(edges[i].p2 - edges[i].p1);
-			_vector wallNormal = XMVector3Normalize(XMVector3Cross(faceNormal, edgeDir));
+	// 1. y축 단위벡터와 0에서 구했던 선분을 외적하여, xz축 상의 바깥쪽 법선을 구함
 
-			// Cell 외부 방향 보정
-			_vector edgeCenter = (edges[i].p1 + edges[i].p2) * 0.5f;
-			_vector cellCenter = (pA + pB + pC) / 3.f;
-			if (XMVectorGetX(XMVector3Dot(cellCenter - edgeCenter, wallNormal)) > 0.f)
-				wallNormal *= -1.f;
+	_vector vOutsideNormal = XMVectorZero();
 
-			// 이번에 걸린 벽인지 확인
-			if (XMVectorGetX(XMVector3Dot(vMoveDir, wallNormal)) > 0.f)
-			{
-				hitEdgeDir = edgeDir;
-				break;
-			}
-		}
+	_vector vCellDir = XMVector3Normalize(vEnd - vStart);
+	_vector vYDir = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
-		// 이동 벡터를 Edge 방향으로 투영
-		_vector vSlideDir = XMVector3Dot(vMoveDir, hitEdgeDir) * hitEdgeDir;
+	vOutsideNormal = XMVector3Cross(vCellDir, vYDir);
+	_float4 Stored;
+	XMStoreFloat4(&Stored, vOutsideNormal);
 
-		*pOutPos = vOriginPosition + vSlideDir;
-		return true;
-	}
+
+	// 2. 선분과 겹치는 법선이 존재가능한 범위를 계산
+	// 3. 플레이어의 destPos 가 2번의 범위 내에 있는지 조건을 검사
+
+	_vector vEdge = vEnd - vStart;
+	_vector vDiff = vDestPos - vStart;
+
+	_bool isInRange = false;
+
+	_float det = XMVectorGetX(vOutsideNormal) * XMVectorGetZ(-vEdge) - XMVectorGetZ(vOutsideNormal) * XMVectorGetX(-vEdge);
+	if (fabs(det) < 1e-6f)
+		isInRange = false;
 	else
 	{
-		// 두 개 이상의 벽에 동시에 충돌 (꼭짓점)
-		// → 이동 불가, 원래 자리에서 멈춤
-		*pOutPos = vOriginPosition;
-		return false;
+		_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
+
+		if (u >= 0.f && u <= 1.f)
+			isInRange = true;  // 교차
+		else
+			isInRange = false;     // 교차 안 함
 	}
+
+
+	// 3-1. 있다) 벡터분리를 통해 선을 타도록
+	if (isInRange)
+	{
+		// 교차 좌표 구하기
+		_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
+
+		_vector vHitPos = vStart + u * vEdge;
+
+		// 교차점 좌표로 보정
+		*pOutPos = vHitPos;
+
+		std::cout << "Try Sliding" << std::endl;
+		return true;
+	}
+	// 3-2. 없다) 선분의 해당 방향의 꼭짓점으로 이동하도록
+	// 
+	//		꼭짓점에서는 무조건 꼭짓점에 위치하는 문제가 발생함
+	//		조건적으로 다른 인접하는 cell에 더 가까운지 확인 후 거기로 옮겨타도록 수정 필요
+	//		아예 isNear_onSlide 같은 함수를 따로 만들어서 검사하는게?
+	else
+	{
+		if (XMVectorGetX(XMVector3LengthSq(vDestPos - vStart)) < XMVectorGetX(XMVector3LengthSq(vDestPos - vEnd)))
+			*pOutPos = vStart;
+		else
+			*pOutPos = vEnd;
+
+		std::cout << "Edge Point." << std::endl;
+		return true;
+	}
+
+
+
+
+
+
 
 }
 

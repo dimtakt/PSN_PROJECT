@@ -92,6 +92,41 @@ namespace Engine
 		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, result, size_needed, nullptr, nullptr);
 		return result;
 	}
+
+	
+
+	struct Vec2
+	{
+		float start2DPoint, end2DPoint;
+	};
+
+	inline float CCW(const Vec2& a, const Vec2& b, const Vec2& c)
+	{
+		// >0: CCW, <0: CW, =0: 일직선
+		return (b.start2DPoint - a.start2DPoint) * (c.end2DPoint - a.end2DPoint) - (b.end2DPoint - a.end2DPoint) * (c.start2DPoint - a.start2DPoint);
+	}
+
+	inline bool IsIntersect(const Vec2& A, const Vec2& B, const Vec2& C, const Vec2& D)
+	{
+		const float EPS = 0.2f; // 오차 허용 범위
+		float ab_c = CCW(A, B, C);
+		float ab_d = CCW(A, B, D);
+		float cd_a = CCW(C, D, A);
+		float cd_b = CCW(C, D, B);
+
+		if (fabs(ab_c) < EPS && fabs(ab_d) < EPS && fabs(cd_a) < EPS && fabs(cd_b) < EPS)
+		{
+			// 일직선 상의 경우 → 구간 겹침 판정 필요
+			if (max(A.start2DPoint, B.start2DPoint) < min(C.start2DPoint, D.start2DPoint)) return false;
+			if (max(C.start2DPoint, D.start2DPoint) < min(A.start2DPoint, B.start2DPoint)) return false;
+			if (max(A.end2DPoint, B.end2DPoint) < min(C.end2DPoint, D.end2DPoint))     return false;
+			if (max(C.end2DPoint, D.end2DPoint) < min(A.end2DPoint, B.end2DPoint))     return false;
+
+			return true; // 구간이 겹침
+		}
+
+		return (ab_c * ab_d <= EPS) && (cd_a * cd_b <= EPS);
+	}
 }
 
 #endif // Engine_Function_h__

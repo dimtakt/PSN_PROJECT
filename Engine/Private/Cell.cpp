@@ -52,19 +52,42 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 
 	for (_uint i = 0; i < ENUM_CLASS(CELLLINE::END); ++i)
 	{
+		// 1번
 		_vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
+		// 2번
 		_vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
 
-		// 
+		// 3번
 		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
 		{
+			// 4번
 			*pNeighborIndex = m_iNeighborIndices[i];
 
 			return false;
 		}
 	}
 
+	// 5번
 	return true;
+}
+
+_bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
+{
+	const _float EPS = 0.2f; // 오차 허용 범위
+
+	// 겹치는 점이 있다면, 해당 점을 포함한 이웃 셀을 현재 cell로.
+	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); ++i)
+	{
+		_float fDiff_fromPoint = FLT_MAX;
+
+		fDiff_fromPoint = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vPoints[i]) - vPosition));
+
+		if (fDiff_fromPoint <= EPS)
+			return true;
+	}
+
+	// 없다면, isIn 함수를 이용 주변의 다른 cell로 pNeighborIndex 를 전환
+	return isIn(vPosition, pNeighborIndex);			// pNeighborIndex 의 갱신을 위함
 }
 
 _bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)

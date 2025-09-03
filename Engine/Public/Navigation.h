@@ -22,7 +22,7 @@ public:
 	virtual void Update(_fmatrix WorldMatrix);
 
 public:
-	_bool isMove(_fvector vPosition, _vector vOriginPosition, _vector* pOutPos);
+	_bool isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPos);
 	_vector Compute_OnCell(_fvector vPosition);
 
 #ifdef _DEBUG

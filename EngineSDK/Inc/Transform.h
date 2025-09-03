@@ -70,6 +70,8 @@ public:
 	void Go_Left(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 왼쪽으로
 	void Go_Right(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 오른쪽으로
 	void Go_Backward(_float fTimeDelta, CNavigation* pNavigation = nullptr);			// 뒤로
+	_bool TryMoveOnNavMesh(_vector vPosition, _vector vDir, CNavigation* pNavigation);
+
 	void Go_Above(_float fTimeDelta);				// 위로
 	void Go_Below(_float fTimeDelta);				// 아래로
 	void Rotation(_fvector vAxis, _float fRadian);	// 회전 (절대적, 해당 수치 변경)
