@@ -18,6 +18,9 @@ public:
 	void Set_Neighbor(CELLLINE eLine, CCell* pNeighborCell) {
 		m_iNeighborIndices[ENUM_CLASS(eLine)] = pNeighborCell->m_iIndex;
 	}
+	_int* Get_Neighbor() {
+		return m_iNeighborIndices;
+	}
 
 public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);

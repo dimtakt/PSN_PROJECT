@@ -83,6 +83,8 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 {
 	// 작동 순서
 	// 1. 네비메쉬 로컬좌표 기준 플레이어의 상대좌표를 구함. 이를 기준으로 확인할 것
+	// ㄴ 처음에는 iNeighborIndex 값을 더미로 둠.
+	// ㄴ 현재 cell에서 검사 후 여기에 없으면 인접 방향 cell의 인덱스가 할당.
 	// 2. "현재 Cell  " 에 있는지 검사.		있으면 True / 없으면 3번으로.
 	// 3. "이웃 Cell들" 에 있는지 검사.		있으면 True / 없으면 False.
 
@@ -94,12 +96,13 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	_bool	isInCell = false;
 
 	// 1번
-	_vector vLocalPos = XMVector3TransformCoord(vDestPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalDestPos = XMVector3TransformCoord(vDestPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalOriginPos = XMVector3TransformCoord(vOriginPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 
 	_int		iNeighborIndex = { -1 };
 
 	// 2번
-	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex)) // 현재위치 그대로임
+	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalDestPos, &iNeighborIndex)) // 현재위치 그대로임
 		isInCell = true;
 	// 3번
 	else
@@ -116,7 +119,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 					break;
 				}
 				// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
-				if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->isIn(vLocalDestPos, &iNeighborIndex))
 				{
 					m_iPastCellIndex = m_iCurrentCellIndex;
 					m_iCurrentCellIndex = iNeighborIndex;
@@ -133,7 +136,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 
 	if (isInCell)
 	{
-		*pOutPos = vDestPos;
+		*pOutPos = vLocalDestPos;
 		return true;
 	}
 
@@ -143,7 +146,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 
 
 	// 이동 벡터
-	_vector vMoveDir = vDestPos - vOriginPos;
+	_vector vMoveDir = vLocalDestPos - vLocalOriginPos;
 
 	// 현재 Cell의 세 점
 	_vector vPoint[ENUM_CLASS(CELLPOINT::END)] = {};
@@ -182,8 +185,8 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 			{XMVectorGetX(vTmpEnd), XMVectorGetZ(vTmpEnd)}
 		};
 		Vec2 Player2DPos[2] = {
-			{XMVectorGetX(vOriginPos), XMVectorGetZ(vOriginPos)},
-			{XMVectorGetX(vDestPos), XMVectorGetZ(vDestPos)}
+			{XMVectorGetX(vLocalOriginPos), XMVectorGetZ(vLocalOriginPos)},
+			{XMVectorGetX(vLocalDestPos), XMVectorGetZ(vLocalDestPos)}
 		};
 
 		if (IsIntersect(CellLine2DPos[0], CellLine2DPos[1], Player2DPos[0], Player2DPos[1]))	// 겹치는 선분을 발견 시
@@ -218,7 +221,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	// 3. 플레이어의 destPos 가 2번의 범위 내에 있는지 조건을 검사
 
 	_vector vEdge = vEnd - vStart;
-	_vector vDiff = vDestPos - vStart;
+	_vector vDiff = vLocalDestPos - vStart;
 
 	_bool isInRange = false;
 
@@ -257,7 +260,60 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	//		아예 isNear_onSlide 같은 함수를 따로 만들어서 검사하는게?
 	else
 	{
-		if (XMVectorGetX(XMVector3LengthSq(vDestPos - vStart)) < XMVectorGetX(XMVector3LengthSq(vDestPos - vEnd)))
+		// ===== test
+		
+
+
+
+
+		_bool	isFind_NearCell = false;
+		
+
+		if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex, true)) // 현재위치 그대로임
+			isFind_NearCell = true;
+		
+		else
+		{
+			if (-1 != iNeighborIndex)		// 이웃 있음
+			{
+				// 계속 검사
+				while (true)
+				{
+					// 모든 Cell을 돌았으나 어디에도 없음
+					if (-1 == iNeighborIndex)
+					{
+						isFind_NearCell = false;
+						break;
+					}
+					// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
+					if (true == m_Cells[iNeighborIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex))
+					{
+						m_iPastCellIndex = m_iCurrentCellIndex;
+						m_iCurrentCellIndex = iNeighborIndex;
+		
+						isFind_NearCell = true;
+						break;
+					}
+				}
+			}
+			else							// 이웃 없음
+				isFind_NearCell = false;
+		}
+
+
+		if (isFind_NearCell)	// 찾았으면 현재 Cell Index 변경 및 반환, 못 찾았으면 꼭짓점으로 이동
+			return true;
+		
+		// =====
+
+
+
+
+
+
+
+
+		if (XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vStart)) < XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vEnd)))
 			*pOutPos = vStart;
 		else
 			*pOutPos = vEnd;

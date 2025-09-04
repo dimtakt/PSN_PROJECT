@@ -58,8 +58,8 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 		_vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
 
 		// 3번
-		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
-		{
+		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))	// 두 벡터가 90도 초과 차이. (서로 반대 방향을 의미) acos -> rad2deg 하면 각도가 됨
+		{													// 이로써 플레이어가 위치한 방향의 cell을 이웃 셀로 반환하면서 가까운 곳으로 탐색하게끔 작동.
 			// 4번
 			*pNeighborIndex = m_iNeighborIndices[i];
 
@@ -73,7 +73,7 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 
 _bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
 {
-	const _float EPS = 0.2f; // 오차 허용 범위
+	const _float EPS = 0.3f; // 오차 허용 범위
 
 	// 겹치는 점이 있다면, 해당 점을 포함한 이웃 셀을 현재 cell로.
 	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); ++i)
@@ -82,13 +82,31 @@ _bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
 
 		fDiff_fromPoint = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vPoints[i]) - vPosition));
 
-		if (fDiff_fromPoint <= EPS)
-			return true;
+		if (fDiff_fromPoint <= EPS)	// 충분히 가까이 있으면, 이웃 갯수를 탐색. 2개 이하면 OK.
+		{
+			_uint inumNeighbors = 0;
+			for (_uint i = 0; i < ENUM_CLASS(CELLLINE::END); i++)
+				if (m_iNeighborIndices[i] != -1)
+					inumNeighbors++;
+
+			if (inumNeighbors < 3)	// OK? 좋아 이걸로 가. 현재 인덱스도 네비에서 갱신.
+			{
+				return true;		// 겹치는 점 있음!	// 이거 지금 Cell 이 계속 걸림. 그럼 CurrentCell을 무조건 Pass 하게 해야 하나?
+			}
+			else					// OK가 아냐? 그럼 다른 Cell 탐색해.
+			{
+				isIn(vPosition, pNeighborIndex); // 플레이랑 가까운 방향의 cell 탐색으로 갱신하는 역할
+				return false;		// 겹치는 점 없음!
+			}
+		}
 	}
 
-	// 없다면, isIn 함수를 이용 주변의 다른 cell로 pNeighborIndex 를 전환
-	return isIn(vPosition, pNeighborIndex);			// pNeighborIndex 의 갱신을 위함
+	// 없다면, isIn 함수를 이용 주변의 다른 cell로 pNeighborIndex 를 전환. 이웃하는 셀이 없어서, pNeighborIndex 에 -1이 들어가는 게 문제. 
+	isIn(vPosition, pNeighborIndex);
+	return false;
 }
+
+
 
 _bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)
 {
