@@ -12,7 +12,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CWeapon final : public CPartObject
+class CWeapon /*abstract*/ : public CPartObject
 {
 public:
 	typedef struct tagWeaponDesc : public CPartObject::PARTOBJECT_DESC

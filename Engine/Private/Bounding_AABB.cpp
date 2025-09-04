@@ -14,6 +14,7 @@ HRESULT CBounding_AABB::Initialize(const CBounding::BOUNDING_DESC* pDesc)
 
 	m_pOriginalDesc = new BoundingBox(pAABBDesc->vCenter, pAABBDesc->vExtents);
 	m_pDesc = new BoundingBox(*m_pOriginalDesc);
+	m_isFix = pAABBDesc->isFix;
 
 	return S_OK;
 }
@@ -22,9 +23,15 @@ void CBounding_AABB::Update(_fmatrix WorldMatrix)
 {
 	_matrix		TransformMatrix = WorldMatrix;
 
-	TransformMatrix.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f) * XMVector3Length(TransformMatrix.r[0]);
-	TransformMatrix.r[1] = XMVectorSet(0.f, 1.f, 0.f, 0.f) * XMVector3Length(TransformMatrix.r[1]);
-	TransformMatrix.r[2] = XMVectorSet(0.f, 0.f, 1.f, 0.f) * XMVector3Length(TransformMatrix.r[2]);
+	// rotation 성분 제거한 부분.
+	// 1차적으로 aabb, 2차적으로 obb 를 통해 충돌 비용을 최소화하려는 목적이면,
+	// 원래대로 돌려야 할 듯
+	if (m_isFix)
+	{
+		TransformMatrix.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f) * XMVector3Length(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVectorSet(0.f, 1.f, 0.f, 0.f) * XMVector3Length(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVectorSet(0.f, 0.f, 1.f, 0.f) * XMVector3Length(TransformMatrix.r[2]);
+	}
 
 	m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }

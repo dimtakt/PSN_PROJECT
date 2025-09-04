@@ -193,10 +193,20 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
-
+	
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
 		return E_FAIL;
+
+	//CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+	////AABBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	//AABBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
+	//AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+	//AABBDesc.isFix = true;
+	//
+	//if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+	//	TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+	//	return E_FAIL;
 
 	Set_BufferRef(m_pModelCom);
 

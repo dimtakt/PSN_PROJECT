@@ -177,6 +177,10 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
     <ClInclude Include="..\public\Weapon.h" />
+    <ClInclude Include="..\public\Weapon_Gun.h" />
+    <ClInclude Include="..\public\Weapon_Karabin.h" />
+    <ClInclude Include="..\public\Weapon_Pistol.h" />
+    <ClInclude Include="..\public\Weapon_Shotgun.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h" />
     <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h" />
@@ -216,6 +220,10 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
     <ClCompile Include="..\private\Weapon.cpp" />
+    <ClCompile Include="..\private\Weapon_Gun.cpp" />
+    <ClCompile Include="..\private\Weapon_Karabin.cpp" />
+    <ClCompile Include="..\private\Weapon_Pistol.cpp" />
+    <ClCompile Include="..\private\Weapon_Shotgun.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp" />
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp" />

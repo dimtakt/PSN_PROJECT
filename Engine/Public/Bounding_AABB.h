@@ -10,6 +10,7 @@ public:
 	typedef struct tagBoundingAABBDesc : public CBounding::BOUNDING_DESC
 	{
 		_float3		vExtents;
+		_bool		isFix = true;
 	}BOUNDING_AABB_DESC;
 private:
 	CBounding_AABB(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -38,6 +39,9 @@ private:
 	_bool Intersect_AABB(const CBounding_AABB* pTarget);
 	_float3 Compute_Min()  const;
 	_float3 Compute_Max()  const;
+
+private:
+	_bool m_isFix = true;
 
 public:
 	static CBounding_AABB* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CBounding::BOUNDING_DESC* pDesc);

@@ -85,9 +85,6 @@
     <Filter Include="02.GameObject\_AnimObject\Player\Body">
       <UniqueIdentifier>{cda27a66-05b2-4e3a-8e8c-489507d36161}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\_AnimObject\Player\SubObj_Weapon">
-      <UniqueIdentifier>{e956ac9c-df4a-4a24-bf43-6467ce1a1334}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\UI\BackGround">
       <UniqueIdentifier>{dd1b4364-796d-40a5-aad0-a826b661a0f4}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,27 @@
     </Filter>
     <Filter Include="01.Levels\GamePlay %28Temp%29">
       <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject">
+      <UniqueIdentifier>{013ac14e-1deb-46b5-ab3e-01114a0f9f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon">
+      <UniqueIdentifier>{21310dbb-0100-4fea-b760-600cc92fbdb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon\Gun">
+      <UniqueIdentifier>{b035fff1-8f43-4aba-b003-0a853902884c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon\Gun\Karabin">
+      <UniqueIdentifier>{143a1b57-411f-4870-9a26-542b4ed84d5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon\Gun\Pistol">
+      <UniqueIdentifier>{f67d7056-a723-435c-ae72-76d12950f85f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon\Gun\Shotgun">
+      <UniqueIdentifier>{af875fea-aa3a-46d0-8749-e76956d95bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_PartObject\Weapon\Thrown">
+      <UniqueIdentifier>{e650a5da-a7f6-4cd9-aea9-76b370f8ff0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,9 +228,6 @@
     <ClInclude Include="..\Public\Body_Player.h">
       <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Weapon.h">
-      <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Skybox.h">
       <Filter>02.GameObject\Skybox</Filter>
     </ClInclude>
@@ -224,6 +239,21 @@
     </ClInclude>
     <ClInclude Include="..\public\Camera_Player.h">
       <Filter>02.GameObject\Camera\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon.h">
+      <Filter>02.GameObject\_PartObject\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon_Karabin.h">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Karabin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon_Pistol.h">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Pistol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon_Shotgun.h">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Shotgun</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon_Gun.h">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -324,9 +354,6 @@
     <ClCompile Include="..\Private\Body_Player.cpp">
       <Filter>02.GameObject\_AnimObject\Player\Body</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Weapon.cpp">
-      <Filter>02.GameObject\_AnimObject\Player\SubObj_Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Skybox.cpp">
       <Filter>02.GameObject\Skybox</Filter>
     </ClCompile>
@@ -338,6 +365,21 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Player.cpp">
       <Filter>02.GameObject\Camera\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon.cpp">
+      <Filter>02.GameObject\_PartObject\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon_Karabin.cpp">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Karabin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon_Pistol.cpp">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon_Shotgun.cpp">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun\Shotgun</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon_Gun.cpp">
+      <Filter>02.GameObject\_PartObject\Weapon\Gun</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
