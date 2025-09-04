@@ -154,8 +154,6 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
 		vPoint[i] = m_Cells[m_iCurrentCellIndex]->Get_Point(static_cast<CELLPOINT>(i));
 
-
-
 	// AB, BC, CA 순서로 시계방향으로 그려짐을 이용
 	//
 	// 선분은 교차하는 선분을 대상으로 함
@@ -164,7 +162,11 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	// 2. 선분에 수직하는 좌표의 범위를 계산
 	// 3. 플레이어의 destPos 가 범위 내에 있는지 검사
 	// 3-1. 있다면) 벡터분리를 통해 선을 타도록
-	// 3-2. 없다면) 해당 방향의 꼭짓점으로 이동
+	// 3-2. 없다면) 이동할 Cell 탐색.
+	//				기준은 이웃 Cell이 3개가 아닌 가장자리 Cell인지, 현재 내 위치와 가까운 Point를 가지고 있는지
+	// 3-2-1.	대상 Cell이 2개이상이라면)	목적지 좌표가 해당 Cell 내부인지 확인. 맞으면 거기로. 다만 반례가 존재.
+	// 3-2-1-2.		(반례 대응)				목적지 좌표가 가장자리 CellLine의 Point와 가까운 Cell인지. 맞으면 거기로.
+	// 3-2-2.	1개 이상이라면)				그냥 거기로 이동.
 	
 
 	// 0. OriginPos -> DestPos 와 교차하는 Cell의 선분을 구함
@@ -253,25 +255,14 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 		std::cout << "Try Sliding" << std::endl;
 		return true;
 	}
-	// 3-2. 없다) 선분의 해당 방향의 꼭짓점으로 이동하도록
-	// 
-	//		꼭짓점에서는 무조건 꼭짓점에 위치하는 문제가 발생함
-	//		조건적으로 다른 인접하는 cell에 더 가까운지 확인 후 거기로 옮겨타도록 수정 필요
-	//		아예 isNear_onSlide 같은 함수를 따로 만들어서 검사하는게?
+	// 3-2. 없다) 이동할 Cell 탐색.
 	else
 	{
-		// ===== test
-		
-		// isNear_onSlide 주석 참고
-		// 
-		// 
-		// 
-
 		// 1. 일단 전체 Cell 순회하되, 포인트 겹치고 이웃 갯수 3개 미만인 Cell 탐색
 		// 2. 해당 Cell로 이동판정 내림
 
 
-		const _float EPS = 0.3f; // 오차 허용 범위
+		const _float EPS = 0.4f; // 오차 허용 범위
 		vector<_uint> vecFindIndex = {};
 
 		for (_uint i = 0; i < m_Cells.size(); i++)
@@ -317,10 +308,14 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 				vecFindIndex.push_back(i);
 		}
 
+
+		// 3-2-1
 		if (vecFindIndex.size() >= 2)
 		{
-			std::cout << "사이즈 2 이상 들어감. 1개만 들어가야 하는데 이거 뭔가 이상함" << std::endl;
+			std::cout << "이동 후보 Cell에 사이즈 2 이상 들어감." << std::endl;
 			_int iTmpIndex = { -1 };
+
+			// 이동 후보 Cell 내에 있는지 확인. 있다면 해당 Cell로.
 			for (auto& index : vecFindIndex)
 				if (m_Cells[index]->isIn(vLocalDestPos, &iTmpIndex))
 				{
@@ -336,20 +331,66 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 					return true;
 				}
 
-
-			// 이제 여기서부터 고쳐야 함..
-			// > 현재 위치의 point와, cell의 이웃이 없는 부분의 면을 비교하면 어떻게든 될 듯
+			// 3-2-1-2
+			// 이동 후보 Cell 의 이웃 없는 선분의 꼭짓점이 현재 캐릭터의 위치랑 일치하는지 여부
 			// 
-			// 1. "현재 겹치는 위치의 point'가
-			// 2. 비교대상 cell의 "이웃이 없는 부분"의 선분 시작점/꼭짓점 중 어디와도 일치(보정없이 ==)하지 않으면
-			// 3. 그건 갈아타는 대상이 아님. 일치하면 바로 cell 전환.
+			// (일치하지 않는다면, 가장자리 Cell은 맞으나 캐릭터의 이동방향에 슬라이딩이 불가능한 Cell을 뜻하므로 pass)
+			// 해당 반례 이미지 : "../../Client/Bin/Resources/_dummyInfoTexture_ForDebug/mspaint_2025-09-04_13-30-15.png";
+			for (auto& index : vecFindIndex)
+			{
+				auto targetCell = m_Cells[index];
+
+				vector<_int>	vecTargetLineIndices = {};	// 이웃이 없는 라인 인덱스를 담음
+				_int* pNeighborIndices = targetCell->Get_Neighbor();
+				
+				for (_int i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
+				{
+					if (pNeighborIndices[i] == -1)
+						vecTargetLineIndices.push_back(i);
+				}
+
+				for (auto& lineIndex : vecTargetLineIndices)
+				{
+					_vector vTargetPoints[2] = {};
+
+					vTargetPoints[0] = targetCell->Get_Point(static_cast<CELLPOINT>(lineIndex));
+					vTargetPoints[1] = targetCell->Get_Point(static_cast<CELLPOINT>((lineIndex + 1) % ENUM_CLASS(CELLPOINT::END)));
+
+					for (auto& point : vTargetPoints)
+					{
+						_float fDistance = XMVectorGetX(XMVector3Length(point - vLocalDestPos));
+						if (fDistance <= EPS)
+						{
+							m_iCurrentCellIndex = index;
+							std::cout << "2-2]Moved to Other Cells. when sliding." << std::endl;
+							// 교차 좌표 구하기
+							// 현재 cell 기준으로 작동해서 그런가? outsidenormal 이랑 diff 이런걸 넘어간 cell의 해당 면 것으로 다시 계산해줘야 할 듯
+							vStart = vTargetPoints[1];
+							vEnd = vTargetPoints[0];
+							vCellDir = XMVector3Normalize(vEnd - vStart);
+							vOutsideNormal = XMVector3Cross(vCellDir, vYDir);
+							vDiff = vLocalDestPos - vStart;
 
 
+							_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
+
+							_vector vHitPos = vStart + u * vEdge;
+
+							// 교차점 좌표로 보정
+							*pOutPos = vHitPos;
+							return true;
+						}
+					}
+				}
+
+			}
 		}
+		// 3-2-2
 		if (vecFindIndex.size() >= 1)
 		{
 			// 조건이 2개인데 위에서 처리되지 않으면 에러 발생
-			assert(!(vecFindIndex.size() >= 2));
+			if (vecFindIndex.size() >= 2)
+				assert(false);
 
 			
 			m_iCurrentCellIndex = vecFindIndex[0];	
@@ -363,51 +404,6 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 			*pOutPos = vHitPos;
 			return true;
 		}
-
-
-
-
-#pragma region Test
-
-		//_bool	isFind_NearCell = false;
-		//
-		//
-		//if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex)) // 현재위치 그대로임
-		//	isFind_NearCell = true;
-		//
-		//else
-		//{
-		//	if (-1 != iNeighborIndex)		// 이웃 있음
-		//	{
-		//		// 계속 검사
-		//		while (true)
-		//		{
-		//			// 모든 Cell을 돌았으나 어디에도 없음
-		//			if (-1 == iNeighborIndex)
-		//			{
-		//				isFind_NearCell = false;
-		//				break;
-		//			}
-		//			// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
-		//			if (true == m_Cells[iNeighborIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex))
-		//			{
-		//				m_iPastCellIndex = m_iCurrentCellIndex;
-		//				m_iCurrentCellIndex = iNeighborIndex;
-		//
-		//				isFind_NearCell = true;
-		//				break;
-		//			}
-		//		}
-		//	}
-		//	else							// 이웃 없음
-		//		isFind_NearCell = false;
-		//}
-		//
-		//
-		//if (isFind_NearCell)	// 찾았으면 현재 Cell Index 변경 및 반환, 못 찾았으면 꼭짓점으로 이동
-		//	return true;
-
-#pragma endregion
 		
 		// =====
 

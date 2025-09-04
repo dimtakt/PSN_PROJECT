@@ -70,48 +70,6 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 	return true;
 }
 
-_bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
-{
-	// 1. 현재 이 Cell 이 오차범위 이내로 가까운 점을 포함하는지 검증
-	// 2-1 (포함O) true 반환
-	// 2-2 (포함X) isIn 호출로 플레이어와 가까운 Cell로 이동.. 을 의도했으나 이를 통해 반환되는 인덱스는 이웃 Cell이 없는 선분이므로 대부분 -1이 반환됨
-	// "꼭짓점에서" 벽을 향해 움직이려 하면 슬라이딩이 안되던 것도 이게 원인인 것으로 보임. 바로 false 떨어져 버리니까 이동이 안되던 것
-
-
-	const _float EPS = 0.3f; // 오차 허용 범위
-
-	// 겹치는 점이 있다면, 해당 점을 포함한 이웃 셀을 현재 cell로.
-	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); ++i)
-	{
-		_float fDiff_fromPoint = FLT_MAX;
-
-		fDiff_fromPoint = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vPoints[i]) - vPosition));
-
-		if (fDiff_fromPoint <= EPS)	// 충분히 가까이 있으면, 이웃 갯수를 탐색. 2개 이하면 OK.
-		{
-			_uint inumNeighbors = 0;
-			for (_uint i = 0; i < ENUM_CLASS(CELLLINE::END); i++)
-				if (m_iNeighborIndices[i] != -1)
-					inumNeighbors++;
-
-			if (inumNeighbors < 3)	// OK? 좋아 이걸로 가. 현재 인덱스도 네비에서 갱신.
-			{
-				return true;		// 겹치는 점 있음!	// 이거 지금 Cell 이 계속 걸림. 그럼 CurrentCell을 무조건 Pass 하게 해야 하나?
-			}
-			else					// OK가 아냐? 그럼 다른 Cell 탐색해.
-			{
-				isIn(vPosition, pNeighborIndex); // 플레이랑 가까운 방향의 cell 탐색으로 갱신하는 역할
-				return false;		// 겹치는 점 없음!
-			}
-		}
-	}
-
-	isIn(vPosition, pNeighborIndex);
-	return false;
-}
-
-
-
 _bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)
 {
 	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), vSourPoint))

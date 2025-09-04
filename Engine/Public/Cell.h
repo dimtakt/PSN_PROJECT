@@ -25,7 +25,6 @@ public:
 public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);
 	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
-	_bool isNear_onSlide(_fvector vPosition, _int* pNeighborIndex);
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_float Compute_Height(_fvector vLocalPos);
