@@ -63,14 +63,6 @@ void CPlayer::Update(_float fTimeDelta)
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 
-
-
-	// 애니메이션 분기 테스트용
-	// 애니메이션 목록 확인 : https://puu.sh/Kzk7z/bad5f5726a.png, Client_Defines.h 에도 있음
-
-
-
-
 	Update_Transform(fTimeDelta);
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
@@ -197,13 +189,13 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
 		return E_FAIL;
 
+	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
+	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
-	CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-	AABBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
-	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
 		return E_FAIL;
 
 	Set_BufferRef(m_pModelCom);

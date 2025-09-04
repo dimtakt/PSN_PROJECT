@@ -67,58 +67,64 @@ void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 
 void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
 {
-	_vector		vPosition = Get_State(STATE::POSITION);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
 	_vector		vRight = Get_State(STATE::RIGHT);
 
-	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos - XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;;	// 이동하려는 위치.
+	_vector		vCalcedPos = {};
 
-	//if (nullptr == pNavigation ||
-	//	true == pNavigation->isMove(vPosition))
-	//	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation)
+		Set_State(STATE::POSITION, vTryPos);
+	else if (true == pNavigation->isMove(vTryPos, vOriginPos, &vCalcedPos))
+		Set_State(STATE::POSITION, vCalcedPos);
 }
 
 void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation)
 {
-	_vector		vPosition = Get_State(STATE::POSITION);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
 	_vector		vRight = Get_State(STATE::RIGHT);
 
-	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos + XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;;	// 이동하려는 위치.
+	_vector		vCalcedPos = {};
 
-	//if (nullptr == pNavigation ||
-	//	true == pNavigation->isMove(vPosition))
-	//	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation)
+		Set_State(STATE::POSITION, vTryPos);
+	else if (true == pNavigation->isMove(vTryPos, vOriginPos, &vCalcedPos))
+		Set_State(STATE::POSITION, vCalcedPos);
 }
 
 void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
 {
-	_vector		vPosition = Get_State(STATE::POSITION);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
 	_vector		vLook = Get_State(STATE::LOOK);
 
-	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos - XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;;	// 이동하려는 위치.
+	_vector		vCalcedPos = {};
 
-	//if (nullptr == pNavigation ||
-	//	true == pNavigation->isMove(vPosition))
-	//	Set_State(STATE::POSITION, vPosition);
+	if (nullptr == pNavigation)
+		Set_State(STATE::POSITION, vTryPos);
+	else if (true == pNavigation->isMove(vTryPos, vOriginPos, &vCalcedPos))
+		Set_State(STATE::POSITION, vCalcedPos);
 }
 
 void CTransform::Go_Above(_float fTimeDelta)
 {
-	_vector vPosition = Get_State(STATE::POSITION);
-	_vector vUp = Get_State(STATE::UP);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
+	_vector		vUp = Get_State(STATE::UP);
 
-	vPosition += XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos + XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;;	// 이동하려는 위치.
 
-	Set_State(STATE::POSITION, vPosition);
+	Set_State(STATE::POSITION, vTryPos);
 }
 
 void CTransform::Go_Below(_float fTimeDelta)
 {
-	_vector vPosition = Get_State(STATE::POSITION);
-	_vector vUp = Get_State(STATE::UP);
+	_vector		vOriginPos = Get_State(STATE::POSITION);
+	_vector		vUp = Get_State(STATE::UP);
 
-	vPosition -= XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
+	_vector		vTryPos = vOriginPos - XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;;	// 이동하려는 위치.
 
-	Set_State(STATE::POSITION, vPosition);
+	Set_State(STATE::POSITION, vTryPos);
 }
 
 void CTransform::Rotation(_fvector vAxis, _float fRadian)
@@ -134,10 +140,6 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	Set_State(STATE::RIGHT, XMVector4Transform(vRight, RotationMatrix));
 	Set_State(STATE::UP, XMVector4Transform(vUp, RotationMatrix));
 	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
-	
-	// XMVector3TransformNormal();
-
-
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
@@ -151,7 +153,6 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 	Set_State(STATE::RIGHT, XMVector4Transform(vRight, RotationMatrix));
 	Set_State(STATE::UP, XMVector4Transform(vUp, RotationMatrix));
 	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
-
 }
 
 void CTransform::LookAt(_fvector vAt)

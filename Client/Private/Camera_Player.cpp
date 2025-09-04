@@ -62,27 +62,25 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     }
 
 
-    //if (m_pGameInstance->Get_IsKeyUp(DIK_P) ||
-    //    m_pGameInstance->Get_IsKeyDown(DIK_P))
-    //    m_pTransformCom->Go_Straight(fTimeDelta * 20);
-
-    // * 마우스 움직임에 의한 카메라 회전
-
     _int    iMouseMove = {};
 
     // 항시 글로벌 Y축에 따라 회전해야 하므로 Y축을 고정적인 회전 기준점으로 둠
     if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
         m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
 
-    // Y축 회전값에 따라 변하는, 로컬 X축에 따라 회전해야 하므로
+    // Y축 회전값에 따라 변하는, 로컬 X축을 기준으로 회전해야 하므로
     // Get_State로 RIGHT 값을 받아와 사용
     if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
+    {
         m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * iMouseMove * m_fMouseSensor);
 
+        const _float3 vRot = m_pTransformCom->Get_RotationEuler_Store(); 
+        _float fAngleLimit = 80.f;      // 상하 회전 각도제한
+        if (vRot.x >= fAngleLimit   )   m_pTransformCom->Set_Rotation_DirectEuler(_float3(fAngleLimit, vRot.y, 0));
+        if (vRot.x <= -fAngleLimit  )   m_pTransformCom->Set_Rotation_DirectEuler(_float3(-fAngleLimit, vRot.y, 0));
+    }
 
     __super::Update_PipeLines();
-
-
 }
 
 void CCamera_Player::Update(_float fTimeDelta)

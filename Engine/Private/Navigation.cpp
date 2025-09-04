@@ -225,7 +225,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 		return true;
 	}
 	else
-		return false;
+		return false; 
 }
 
 _vector CNavigation::Compute_OnCell(_fvector vPosition)

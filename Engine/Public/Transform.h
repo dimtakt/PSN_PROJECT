@@ -70,14 +70,33 @@ public:
 	void Go_Left(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 왼쪽으로
 	void Go_Right(_float fTimeDelta, CNavigation* pNavigation = nullptr);				// 오른쪽으로
 	void Go_Backward(_float fTimeDelta, CNavigation* pNavigation = nullptr);			// 뒤로
-	_bool TryMoveOnNavMesh(_vector vPosition, _vector vDir, CNavigation* pNavigation);
 
 	void Go_Above(_float fTimeDelta);				// 위로
 	void Go_Below(_float fTimeDelta);				// 아래로
 	void Rotation(_fvector vAxis, _float fRadian);	// 회전 (절대적, 해당 수치 변경)
 	void Turn(_fvector vAxis, _float fTimeDelta);	// 회전 (상대적, 현재 대비 변경)
 	void LookAt(_fvector vAt);						// 해당 방향을 바라보도록 회전
-	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
+	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f); // 머임? 타겟한테 쫒아오는거인듯
+
+
+
+	_vector Get_Position()					{ _vector vOut, tmp; XMMatrixDecompose(&tmp, &tmp, &vOut, XMLoadFloat4x4(&m_WorldMatrix)); return vOut; };
+	_vector Get_RotationQuat()				{ _vector vOut, tmp; XMMatrixDecompose(&tmp, &vOut, &tmp, XMLoadFloat4x4(&m_WorldMatrix)); return vOut; };
+	_vector Get_Scale()						{ _vector vOut, tmp; XMMatrixDecompose(&vOut, &tmp, &tmp, XMLoadFloat4x4(&m_WorldMatrix)); return vOut; };
+
+	_float3 Get_Position_Store()			{ _float3 vOut; XMStoreFloat3(&vOut, Get_Position()); return vOut; }
+	_float3 Get_Scale_Store()				{ _float3 vOut; XMStoreFloat3(&vOut, Get_Scale()); return vOut; }
+	_float3 Get_RotationEuler_Store()		{ _float4x4 mat; XMStoreFloat4x4(&mat, QUAT_TO_MAT(Get_RotationQuat())); return MAT_TO_ROT(mat); };			// Degree로 반환됨에 유의
+
+	void Set_Position_Direct(_vector vPos)			{ Set_WorldMatrix(XMMatrixScalingFromVector(Get_Scale()) * XMMatrixRotationQuaternion(Get_RotationQuat()) * XMMatrixTranslationFromVector(vPos)); };
+	void Set_Rotation_DirectEuler(_float3 vRotDegs)	{ Set_WorldMatrix(XMMatrixScalingFromVector(Get_Scale()) * XMMatrixRotationRollPitchYaw(TO_RAD(vRotDegs.x), TO_RAD(vRotDegs.y), TO_RAD(vRotDegs.z)) * XMMatrixTranslationFromVector(Get_Position())); };	// Degree를 받음에 유의
+	void Set_Rotation_DirectQuat(_vector vQuat)		{ Set_WorldMatrix(XMMatrixScalingFromVector(Get_Scale()) * XMMatrixRotationQuaternion(vQuat) * XMMatrixTranslationFromVector(Get_Position())); };
+	void Set_Scale_Direct(_vector vSca)				{ Set_WorldMatrix(XMMatrixScalingFromVector(vSca) * XMMatrixRotationQuaternion(Get_RotationQuat()) * XMMatrixTranslationFromVector(Get_Position())); };
+
+	void Set_Position_Direct(_float3 vPos)	{ Set_Position_Direct(XMLoadFloat3(&vPos)); };
+	void Set_Scale_Direct(_float3 vSca)		{ Set_Scale_Direct(XMLoadFloat3(&vSca)); };
+
+
 
 private:
 	_float4x4				m_WorldMatrix = {};
