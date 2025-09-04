@@ -144,6 +144,43 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	// || 안에 없으면 선타도록
 	// ==============================
 
+	// 1. 가장자리 Cell 들 탐색
+	vector<_uint> vecEdgeCellIndices = {};
+	
+	for (_uint i = 0; i < m_Cells.size(); i++)
+	{
+		for (_uint j = 0; j < ENUM_CLASS(CELLLINE::END); j++)
+			if (m_Cells[i]->Get_Neighbor()[j] == -1)
+			{
+				vecEdgeCellIndices.push_back(i);
+				break;
+			}
+	}
+
+	// 2. destpos 와 가장 가까운 가장자리 선분을 찾음
+	//
+	// - 점과 선분 사이의 최소 거리를 구함
+	// - 만약 해당 선분과 외곽라인이 겹치지 않는다면, 가까운 점을 기준으로 탐색함 
+	for (auto& cellIndex : vecEdgeCellIndices)
+	{
+		CCell* pTargetCell = m_Cells[cellIndex];	// 현재 인덱스의 Cell
+		vector<_uint> vecEdgeIndices = {};			// Cell 내의 가장자리 선분 인덱스
+
+		for (_uint i = 0; i < ENUM_CLASS(CELLLINE::END); i++)
+			if (m_Cells[i]->Get_Neighbor()[i] == -1)
+				vecEdgeIndices.push_back(i);
+
+
+
+	}
+
+	// 3. 해당 위치로 이동
+
+
+#pragma region oldBackup
+	/*
+	
+	
 
 	// 이동 벡터
 	_vector vMoveDir = vLocalDestPos - vLocalOriginPos;
@@ -365,12 +402,6 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 							std::cout << "2-2]Moved to Other Cells. when sliding." << std::endl;
 							// 교차 좌표 구하기
 							// 현재 cell 기준으로 작동해서 그런가? outsidenormal 이랑 diff 이런걸 넘어간 cell의 해당 면 것으로 다시 계산해줘야 할 듯
-							vStart = vTargetPoints[1];
-							vEnd = vTargetPoints[0];
-							vCellDir = XMVector3Normalize(vEnd - vStart);
-							vOutsideNormal = XMVector3Cross(vCellDir, vYDir);
-							vDiff = vLocalDestPos - vStart;
-
 
 							_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
 
@@ -405,14 +436,7 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 			return true;
 		}
 		
-		// =====
-
-
-
-
-
-
-
+	
 
 		if (XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vStart)) < XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vEnd)))
 			*pOutPos = vStart;
@@ -422,6 +446,19 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 		std::cout << "Edge Point." << std::endl;
 		return true;
 	}
+
+	
+	
+	
+	*/
+#pragma endregion
+
+
+
+
+
+
+
 
 
 
