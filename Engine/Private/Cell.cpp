@@ -75,6 +75,7 @@ _bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
 	// 1. 현재 이 Cell 이 오차범위 이내로 가까운 점을 포함하는지 검증
 	// 2-1 (포함O) true 반환
 	// 2-2 (포함X) isIn 호출로 플레이어와 가까운 Cell로 이동.. 을 의도했으나 이를 통해 반환되는 인덱스는 이웃 Cell이 없는 선분이므로 대부분 -1이 반환됨
+	// "꼭짓점에서" 벽을 향해 움직이려 하면 슬라이딩이 안되던 것도 이게 원인인 것으로 보임. 바로 false 떨어져 버리니까 이동이 안되던 것
 
 
 	const _float EPS = 0.3f; // 오차 허용 범위
@@ -105,7 +106,6 @@ _bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
 		}
 	}
 
-	// 없다면, isIn 함수를 이용 주변의 다른 cell로 pNeighborIndex 를 전환. 이웃하는 셀이 없어서, pNeighborIndex 에 -1이 들어가는 게 문제. 
 	isIn(vPosition, pNeighborIndex);
 	return false;
 }

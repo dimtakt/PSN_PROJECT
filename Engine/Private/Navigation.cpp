@@ -267,45 +267,147 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 		// 
 		// 
 
+		// 1. 일단 전체 Cell 순회하되, 포인트 겹치고 이웃 갯수 3개 미만인 Cell 탐색
+		// 2. 해당 Cell로 이동판정 내림
 
 
-		_bool	isFind_NearCell = false;
-		
+		const _float EPS = 0.3f; // 오차 허용 범위
+		vector<_uint> vecFindIndex = {};
 
-		if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex)) // 현재위치 그대로임
-			isFind_NearCell = true;
-		
-		else
+		for (_uint i = 0; i < m_Cells.size(); i++)
 		{
-			if (-1 != iNeighborIndex)		// 이웃 있음
+			CCell* cell = m_Cells[i];
+
+
+			// 일단 현재 Cell은 패스. 넘어갈 Cell의 탐색 과정이므로
+			if (m_iCurrentCellIndex == i)
+				continue;
+			
+
+			// 이웃하는 Cell이 3개 미만인지
+			_uint iNumNeighbors = 0;
+
+			_int* pNeighbors = cell->Get_Neighbor();
+            _int iNeighbors[3] = { pNeighbors[0], pNeighbors[1], pNeighbors[2] };
+
+
+			for (auto& neighbor : iNeighbors)
+				if (neighbor != -1)
+					iNumNeighbors++;
+
+			if (iNumNeighbors >= 3)
+				continue;
+
+
+			// 일치하는 점이 있는지
+			_bool isFind = false;
+			for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
 			{
-				// 계속 검사
-				while (true)
+				_vector cellPointPos = cell->Get_Point(static_cast<CELLPOINT>(i));
+				_float fDistance = XMVectorGetX(XMVector3Length(vLocalDestPos - cellPointPos));
+
+				if (fDistance <= EPS)
 				{
-					// 모든 Cell을 돌았으나 어디에도 없음
-					if (-1 == iNeighborIndex)
-					{
-						isFind_NearCell = false;
-						break;
-					}
-					// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
-					if (true == m_Cells[iNeighborIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex))
-					{
-						m_iPastCellIndex = m_iCurrentCellIndex;
-						m_iCurrentCellIndex = iNeighborIndex;
-		
-						isFind_NearCell = true;
-						break;
-					}
+					isFind = true;
+					break;
 				}
 			}
-			else							// 이웃 없음
-				isFind_NearCell = false;
+
+			if (isFind)
+				vecFindIndex.push_back(i);
+		}
+
+		if (vecFindIndex.size() >= 2)
+		{
+			std::cout << "사이즈 2 이상 들어감. 1개만 들어가야 하는데 이거 뭔가 이상함" << std::endl;
+			_int iTmpIndex = { -1 };
+			for (auto& index : vecFindIndex)
+				if (m_Cells[index]->isIn(vLocalDestPos, &iTmpIndex))
+				{
+					m_iCurrentCellIndex = index;
+					std::cout << "2] Moved to Other Cells. when sliding." << std::endl;
+					// 교차 좌표 구하기
+					_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
+
+					_vector vHitPos = vStart + u * vEdge;
+
+					// 교차점 좌표로 보정
+					*pOutPos = vHitPos;
+					return true;
+				}
+
+
+			// 이제 여기서부터 고쳐야 함..
+			// > 현재 위치의 point와, cell의 이웃이 없는 부분의 면을 비교하면 어떻게든 될 듯
+			// 
+			// 1. "현재 겹치는 위치의 point'가
+			// 2. 비교대상 cell의 "이웃이 없는 부분"의 선분 시작점/꼭짓점 중 어디와도 일치(보정없이 ==)하지 않으면
+			// 3. 그건 갈아타는 대상이 아님. 일치하면 바로 cell 전환.
+
+
+		}
+		if (vecFindIndex.size() >= 1)
+		{
+			// 조건이 2개인데 위에서 처리되지 않으면 에러 발생
+			assert(!(vecFindIndex.size() >= 2));
+
+			
+			m_iCurrentCellIndex = vecFindIndex[0];	
+			std::cout << "Moved to Other Cells. when sliding." << std::endl;
+			// 교차 좌표 구하기
+			_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
+
+			_vector vHitPos = vStart + u * vEdge;
+
+			// 교차점 좌표로 보정
+			*pOutPos = vHitPos;
+			return true;
 		}
 
 
-		if (isFind_NearCell)	// 찾았으면 현재 Cell Index 변경 및 반환, 못 찾았으면 꼭짓점으로 이동
-			return true;
+
+
+#pragma region Test
+
+		//_bool	isFind_NearCell = false;
+		//
+		//
+		//if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex)) // 현재위치 그대로임
+		//	isFind_NearCell = true;
+		//
+		//else
+		//{
+		//	if (-1 != iNeighborIndex)		// 이웃 있음
+		//	{
+		//		// 계속 검사
+		//		while (true)
+		//		{
+		//			// 모든 Cell을 돌았으나 어디에도 없음
+		//			if (-1 == iNeighborIndex)
+		//			{
+		//				isFind_NearCell = false;
+		//				break;
+		//			}
+		//			// 인접 셀로 계속 퍼지며 검사. iNeighborIndex 는 내부에서 계속 변화함
+		//			if (true == m_Cells[iNeighborIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex))
+		//			{
+		//				m_iPastCellIndex = m_iCurrentCellIndex;
+		//				m_iCurrentCellIndex = iNeighborIndex;
+		//
+		//				isFind_NearCell = true;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//	else							// 이웃 없음
+		//		isFind_NearCell = false;
+		//}
+		//
+		//
+		//if (isFind_NearCell)	// 찾았으면 현재 Cell Index 변경 및 반환, 못 찾았으면 꼭짓점으로 이동
+		//	return true;
+
+#pragma endregion
 		
 		// =====
 
