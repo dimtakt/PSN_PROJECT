@@ -160,312 +160,72 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	// 2. destpos 와 가장 가까운 가장자리 선분을 찾음
 	//
 	// - 점과 선분 사이의 최소 거리를 구함
-	// - 만약 해당 선분과 외곽라인이 겹치지 않는다면, 가까운 점을 기준으로 탐색함 
+	// - 만약 해당 선분과 외곽라인이 겹치지 않는다면, 가까운 점을 기준으로 탐색함
+
+	_uint iNearest_CellIndex			= UINT_MAX;		// 가장 가까운 Edge를 가진 Cell의 Index
+	_uint iNearest_CellEdgeIndex		= UINT_MAX;		// 가장 가까운 Edge를 가진 Cell 내에서 가까운 Edge 자체의 인덱스
+
+	_float fNearest_EdgeDist			= FLT_MAX;		// 비교 후 갱신을 위한 임시 거리저장
+
+	_vector vNearest_Point				= XMVectorZero();
+
 	for (auto& cellIndex : vecEdgeCellIndices)
 	{
 		CCell* pTargetCell = m_Cells[cellIndex];	// 현재 인덱스의 Cell
 		vector<_uint> vecEdgeIndices = {};			// Cell 내의 가장자리 선분 인덱스
 
 		for (_uint i = 0; i < ENUM_CLASS(CELLLINE::END); i++)
-			if (m_Cells[i]->Get_Neighbor()[i] == -1)
+			if (m_Cells[cellIndex]->Get_Neighbor()[i] == -1)
 				vecEdgeIndices.push_back(i);
 
+		// 한 Cell 내에서. 가장 가까운 가장자리 선분을 찾음
+		// ksta : 외곽 edge가 두개 이상일 때에 문제 발생함
+		_uint iNearestEdgeIndex = UINT_MAX;
+		_float fNearestDist		= FLT_MAX;
+		_vector vNearPoint		= XMVectorZero();
+
+		for (auto& edgeIndex : vecEdgeIndices)
+		{
+			_vector vPoint_LineStart	= pTargetCell->Get_Point(static_cast<CELLPOINT>(edgeIndex));
+			_vector vPoint_LineEnd		= pTargetCell->Get_Point(static_cast<CELLPOINT>((edgeIndex + 1) % ENUM_CLASS(CELLPOINT::END)));
+
+			_vector vPoint_DestPos		= vLocalDestPos;
+			_vector vPoint_Intersect	= XMVectorZero();
+
+			_float fDist = Calc_NearistDist(vPoint_LineStart, vPoint_LineEnd, vPoint_DestPos, &vPoint_Intersect);
 
 
+			if (fNearestDist > fDist)
+			{
+				fNearestDist = fDist;
+				iNearestEdgeIndex = edgeIndex;
+
+				vNearPoint = vPoint_Intersect;
+			}
+		}
+
+		// 현재 값보다 더 가까우면 갱신
+		if (fNearest_EdgeDist > fNearestDist)
+		{
+			iNearest_CellIndex		= cellIndex;
+			iNearest_CellEdgeIndex	= iNearestEdgeIndex;
+
+			fNearest_EdgeDist		= fNearestDist;
+
+			vNearest_Point			= vNearPoint;
+		}
 	}
+
 
 	// 3. 해당 위치로 이동
-
-
-#pragma region oldBackup
-	/*
-	
-	
-
-	// 이동 벡터
-	_vector vMoveDir = vLocalDestPos - vLocalOriginPos;
-
-	// 현재 Cell의 세 점
-	_vector vPoint[ENUM_CLASS(CELLPOINT::END)] = {};
-	
-	for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
-		vPoint[i] = m_Cells[m_iCurrentCellIndex]->Get_Point(static_cast<CELLPOINT>(i));
-
-	// AB, BC, CA 순서로 시계방향으로 그려짐을 이용
-	//
-	// 선분은 교차하는 선분을 대상으로 함
-	// 
-	// 1. 점의 좌표 순서를 통해 선의 바깥쪽 방향 벡터를 구함
-	// 2. 선분에 수직하는 좌표의 범위를 계산
-	// 3. 플레이어의 destPos 가 범위 내에 있는지 검사
-	// 3-1. 있다면) 벡터분리를 통해 선을 타도록
-	// 3-2. 없다면) 이동할 Cell 탐색.
-	//				기준은 이웃 Cell이 3개가 아닌 가장자리 Cell인지, 현재 내 위치와 가까운 Point를 가지고 있는지
-	// 3-2-1.	대상 Cell이 2개이상이라면)	목적지 좌표가 해당 Cell 내부인지 확인. 맞으면 거기로. 다만 반례가 존재.
-	// 3-2-1-2.		(반례 대응)				목적지 좌표가 가장자리 CellLine의 Point와 가까운 Cell인지. 맞으면 거기로.
-	// 3-2-2.	1개 이상이라면)				그냥 거기로 이동.
-	
-
-	// 0. OriginPos -> DestPos 와 교차하는 Cell의 선분을 구함
-	
-	// 찾은 선분의 정보가 담길 변수
-	_vector vStart = XMVectorZero();
-	_vector vEnd = XMVectorZero();
-	_bool isFindLine = false;
-
-	_uint iMaxCellLine = ENUM_CLASS(CELLLINE::END);
-	for (_uint i = 0; i < iMaxCellLine; i++)
+	if (iNearest_CellIndex != UINT_MAX)
 	{
-		_vector vTmpStart = vPoint[i];
-		_vector vTmpEnd = vPoint[(i + 1) % iMaxCellLine];
-
-		Vec2 CellLine2DPos[2] = {
-			{XMVectorGetX(vTmpStart), XMVectorGetZ(vTmpStart)},
-			{XMVectorGetX(vTmpEnd), XMVectorGetZ(vTmpEnd)}
-		};
-		Vec2 Player2DPos[2] = {
-			{XMVectorGetX(vLocalOriginPos), XMVectorGetZ(vLocalOriginPos)},
-			{XMVectorGetX(vLocalDestPos), XMVectorGetZ(vLocalDestPos)}
-		};
-
-		if (IsIntersect(CellLine2DPos[0], CellLine2DPos[1], Player2DPos[0], Player2DPos[1]))	// 겹치는 선분을 발견 시
-		{
-			vStart = vTmpStart;
-			vEnd = vTmpEnd;
-
-			isFindLine = true;
-			break;
-		}		
+		m_iCurrentCellIndex = iNearest_CellIndex;
+		*pOutPos = vNearest_Point;
+		return true;
 	}
-
-	if (!isFindLine)
-	{
-		std::cout << "Cannot Find Line!" << std::endl;
+	else
 		return false;
-	}
-
-	// 1. y축 단위벡터와 0에서 구했던 선분을 외적하여, xz축 상의 바깥쪽 법선을 구함
-
-	_vector vOutsideNormal = XMVectorZero();
-
-	_vector vCellDir = XMVector3Normalize(vEnd - vStart);
-	_vector vYDir = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-	vOutsideNormal = XMVector3Cross(vCellDir, vYDir);
-	_float4 Stored;
-	XMStoreFloat4(&Stored, vOutsideNormal);
-
-
-	// 2. 선분과 겹치는 법선이 존재가능한 범위를 계산
-	// 3. 플레이어의 destPos 가 2번의 범위 내에 있는지 조건을 검사
-
-	_vector vEdge = vEnd - vStart;
-	_vector vDiff = vLocalDestPos - vStart;
-
-	_bool isInRange = false;
-
-	_float det = XMVectorGetX(vOutsideNormal) * XMVectorGetZ(-vEdge) - XMVectorGetZ(vOutsideNormal) * XMVectorGetX(-vEdge);
-	if (fabs(det) < 1e-6f)
-		isInRange = false;
-	else
-	{
-		_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
-
-		if (u >= 0.f && u <= 1.f)
-			isInRange = true;  // 교차
-		else
-			isInRange = false;     // 교차 안 함
-	}
-
-
-	// 3-1. 있다) 벡터분리를 통해 선을 타도록
-	if (isInRange)
-	{
-		// 교차 좌표 구하기
-		_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
-
-		_vector vHitPos = vStart + u * vEdge;
-
-		// 교차점 좌표로 보정
-		*pOutPos = vHitPos;
-
-		std::cout << "Try Sliding" << std::endl;
-		return true;
-	}
-	// 3-2. 없다) 이동할 Cell 탐색.
-	else
-	{
-		// 1. 일단 전체 Cell 순회하되, 포인트 겹치고 이웃 갯수 3개 미만인 Cell 탐색
-		// 2. 해당 Cell로 이동판정 내림
-
-
-		const _float EPS = 0.4f; // 오차 허용 범위
-		vector<_uint> vecFindIndex = {};
-
-		for (_uint i = 0; i < m_Cells.size(); i++)
-		{
-			CCell* cell = m_Cells[i];
-
-
-			// 일단 현재 Cell은 패스. 넘어갈 Cell의 탐색 과정이므로
-			if (m_iCurrentCellIndex == i)
-				continue;
-			
-
-			// 이웃하는 Cell이 3개 미만인지
-			_uint iNumNeighbors = 0;
-
-			_int* pNeighbors = cell->Get_Neighbor();
-            _int iNeighbors[3] = { pNeighbors[0], pNeighbors[1], pNeighbors[2] };
-
-
-			for (auto& neighbor : iNeighbors)
-				if (neighbor != -1)
-					iNumNeighbors++;
-
-			if (iNumNeighbors >= 3)
-				continue;
-
-
-			// 일치하는 점이 있는지
-			_bool isFind = false;
-			for (_uint i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
-			{
-				_vector cellPointPos = cell->Get_Point(static_cast<CELLPOINT>(i));
-				_float fDistance = XMVectorGetX(XMVector3Length(vLocalDestPos - cellPointPos));
-
-				if (fDistance <= EPS)
-				{
-					isFind = true;
-					break;
-				}
-			}
-
-			if (isFind)
-				vecFindIndex.push_back(i);
-		}
-
-
-		// 3-2-1
-		if (vecFindIndex.size() >= 2)
-		{
-			std::cout << "이동 후보 Cell에 사이즈 2 이상 들어감." << std::endl;
-			_int iTmpIndex = { -1 };
-
-			// 이동 후보 Cell 내에 있는지 확인. 있다면 해당 Cell로.
-			for (auto& index : vecFindIndex)
-				if (m_Cells[index]->isIn(vLocalDestPos, &iTmpIndex))
-				{
-					m_iCurrentCellIndex = index;
-					std::cout << "2] Moved to Other Cells. when sliding." << std::endl;
-					// 교차 좌표 구하기
-					_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
-
-					_vector vHitPos = vStart + u * vEdge;
-
-					// 교차점 좌표로 보정
-					*pOutPos = vHitPos;
-					return true;
-				}
-
-			// 3-2-1-2
-			// 이동 후보 Cell 의 이웃 없는 선분의 꼭짓점이 현재 캐릭터의 위치랑 일치하는지 여부
-			// 
-			// (일치하지 않는다면, 가장자리 Cell은 맞으나 캐릭터의 이동방향에 슬라이딩이 불가능한 Cell을 뜻하므로 pass)
-			// 해당 반례 이미지 : "../../Client/Bin/Resources/_dummyInfoTexture_ForDebug/mspaint_2025-09-04_13-30-15.png";
-			for (auto& index : vecFindIndex)
-			{
-				auto targetCell = m_Cells[index];
-
-				vector<_int>	vecTargetLineIndices = {};	// 이웃이 없는 라인 인덱스를 담음
-				_int* pNeighborIndices = targetCell->Get_Neighbor();
-				
-				for (_int i = 0; i < ENUM_CLASS(CELLPOINT::END); i++)
-				{
-					if (pNeighborIndices[i] == -1)
-						vecTargetLineIndices.push_back(i);
-				}
-
-				for (auto& lineIndex : vecTargetLineIndices)
-				{
-					_vector vTargetPoints[2] = {};
-
-					vTargetPoints[0] = targetCell->Get_Point(static_cast<CELLPOINT>(lineIndex));
-					vTargetPoints[1] = targetCell->Get_Point(static_cast<CELLPOINT>((lineIndex + 1) % ENUM_CLASS(CELLPOINT::END)));
-
-					for (auto& point : vTargetPoints)
-					{
-						_float fDistance = XMVectorGetX(XMVector3Length(point - vLocalDestPos));
-						if (fDistance <= EPS)
-						{
-							m_iCurrentCellIndex = index;
-							std::cout << "2-2]Moved to Other Cells. when sliding." << std::endl;
-							// 교차 좌표 구하기
-							// 현재 cell 기준으로 작동해서 그런가? outsidenormal 이랑 diff 이런걸 넘어간 cell의 해당 면 것으로 다시 계산해줘야 할 듯
-
-							_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
-
-							_vector vHitPos = vStart + u * vEdge;
-
-							// 교차점 좌표로 보정
-							*pOutPos = vHitPos;
-							return true;
-						}
-					}
-				}
-
-			}
-		}
-		// 3-2-2
-		if (vecFindIndex.size() >= 1)
-		{
-			// 조건이 2개인데 위에서 처리되지 않으면 에러 발생
-			if (vecFindIndex.size() >= 2)
-				assert(false);
-
-			
-			m_iCurrentCellIndex = vecFindIndex[0];	
-			std::cout << "Moved to Other Cells. when sliding." << std::endl;
-			// 교차 좌표 구하기
-			_float u = (XMVectorGetZ(vOutsideNormal) * XMVectorGetX(vDiff) - XMVectorGetX(vOutsideNormal) * XMVectorGetZ(vDiff)) / det;
-
-			_vector vHitPos = vStart + u * vEdge;
-
-			// 교차점 좌표로 보정
-			*pOutPos = vHitPos;
-			return true;
-		}
-		
-	
-
-		if (XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vStart)) < XMVectorGetX(XMVector3LengthSq(vLocalDestPos - vEnd)))
-			*pOutPos = vStart;
-		else
-			*pOutPos = vEnd;
-
-		std::cout << "Edge Point." << std::endl;
-		return true;
-	}
-
-	
-	
-	
-	*/
-#pragma endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 _vector CNavigation::Compute_OnCell(_fvector vPosition)
@@ -477,6 +237,33 @@ _vector CNavigation::Compute_OnCell(_fvector vPosition)
 	vLocalPos = XMVectorSetY(vLocalPos, fHeight);
 
 	return XMVector3TransformCoord(vLocalPos, XMLoadFloat4x4(&m_WorldMatrix));
+}
+
+_float CNavigation::Calc_NearistDist(_vector vLineStart, _vector vLineEnd, _vector vPoint, _vector* vNearPointOut)
+{
+    _vector AB = XMVectorSubtract(vLineEnd, vLineStart);
+	_vector AP = XMVectorSubtract(vPoint, vLineStart);
+
+    _float ab_ab = XMVectorGetX(XMVector3Dot(AB, AB));
+    _float ap_ab = XMVectorGetX(XMVector3Dot(AP, AB));
+
+	_float t = ap_ab / ab_ab;
+
+    if (t < 0.0f) {
+        // A가 가장 가까움
+		*vNearPointOut = vLineStart;
+        return XMVectorGetX(XMVector3Length(XMVectorSubtract(vPoint, vLineStart)));
+    }
+    else if (t > 1.0f) {
+        // B가 가장 가까움
+		*vNearPointOut = vLineEnd;
+        return XMVectorGetX(XMVector3Length(XMVectorSubtract(vPoint, vLineEnd)));
+    }
+    else {
+        // 선분 위에 교점 존재
+		*vNearPointOut = XMVectorAdd(vLineStart, XMVectorScale(AB, t));
+        return XMVectorGetX(XMVector3Length(XMVectorSubtract(vPoint, *vNearPointOut)));
+    }
 }
 
 #ifdef _DEBUG

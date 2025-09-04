@@ -25,6 +25,9 @@ public:
 	_bool isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPos);
 	_vector Compute_OnCell(_fvector vPosition);
 
+private:
+	_float Calc_NearistDist(_vector vLineStart, _vector vLineEnd, _vector vPoint, _vector* vNearPointOut);
+
 #ifdef _DEBUG
 
 public:
