@@ -66,13 +66,17 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 			return false;
 		}
 	}
-
 	// 5번
 	return true;
 }
 
 _bool CCell::isNear_onSlide(_fvector vPosition, _int* pNeighborIndex)
 {
+	// 1. 현재 이 Cell 이 오차범위 이내로 가까운 점을 포함하는지 검증
+	// 2-1 (포함O) true 반환
+	// 2-2 (포함X) isIn 호출로 플레이어와 가까운 Cell로 이동.. 을 의도했으나 이를 통해 반환되는 인덱스는 이웃 Cell이 없는 선분이므로 대부분 -1이 반환됨
+
+
 	const _float EPS = 0.3f; // 오차 허용 범위
 
 	// 겹치는 점이 있다면, 해당 점을 포함한 이웃 셀을 현재 cell로.

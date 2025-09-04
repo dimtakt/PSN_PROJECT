@@ -262,14 +262,17 @@ _bool CNavigation::isMove(_fvector vDestPos, _vector vOriginPos, _vector* pOutPo
 	{
 		// ===== test
 		
-
+		// isNear_onSlide 주석 참고
+		// 
+		// 
+		// 
 
 
 
 		_bool	isFind_NearCell = false;
 		
 
-		if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex, true)) // 현재위치 그대로임
+		if (true == m_Cells[m_iCurrentCellIndex]->isNear_onSlide(vLocalDestPos, &iNeighborIndex)) // 현재위치 그대로임
 			isFind_NearCell = true;
 		
 		else
