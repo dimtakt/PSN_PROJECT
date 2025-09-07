@@ -71,8 +71,9 @@ void CPlayer::Update(_float fTimeDelta)
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_UPPER);
 
-
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+			collider->Update(m_pTransformCom->Get_WorldMatrix());
 
 	__super::Update(fTimeDelta);
 }
@@ -84,6 +85,18 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+
+#ifdef _DEBUG
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+		{
+			if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
+			return;
+		}
+
+	if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
+		return;
+#endif
 
 	__super::Late_Update(fTimeDelta);
 }
@@ -111,9 +124,6 @@ HRESULT CPlayer::Render()
 	}
 	m_pGameInstance->Render_Font_End(strFontTag);
 
-
-	m_pColliderCom->Render();
-	m_pNavigationCom->Render();
 
 #endif // _DEBUG
 
@@ -193,10 +203,15 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
-	
+
+
+	CCollider* tmpColCom = nullptr;
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
 		return E_FAIL;
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
+
+
 
 	//CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
 	////AABBDesc.vAngles = _float3(0.f, 0.f, 0.f);
@@ -229,16 +244,16 @@ HRESULT CPlayer::Bind_ShaderResources()
 	if (nullptr == pLightDesc)
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -468,7 +483,9 @@ void CPlayer::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+			Safe_Release(collider);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

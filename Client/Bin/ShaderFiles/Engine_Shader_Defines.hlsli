@@ -5,6 +5,14 @@ sampler DefaultSampler = sampler_state
     AddressV = wrap;
 };
 
+sampler PointSampler = sampler_state
+{
+    filter = min_mag_mip_point;
+    AddressU = wrap;
+    AddressV = wrap;
+};
+
+
 
 RasterizerState RS_Default
 {
@@ -14,8 +22,8 @@ RasterizerState RS_Default
 };
 
 RasterizerState RS_Cull_CW
-{    
-    CullMode = front;    
+{
+    CullMode = front;
 };
 
 DepthStencilState DSS_Default
@@ -44,5 +52,5 @@ BlendState BS_AlphaBlend
 
     SrcBlend = SRC_ALPHA;
     DestBlend = INV_SRC_ALPHA;
-    BlendOp = Add;    
+    BlendOp = Add;
 };

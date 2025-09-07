@@ -6,12 +6,12 @@ vector g_vColor = 1.f;
 
 struct VS_IN
 {
-    float3 vPosition : POSITION;    
+    float3 vPosition : POSITION;
 };
 
 struct VS_OUT
 {
-    float4 vPosition : SV_POSITION;    
+    float4 vPosition : SV_POSITION;
 };
 
 VS_OUT VS_MAIN(VS_IN In)
@@ -61,6 +61,7 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 

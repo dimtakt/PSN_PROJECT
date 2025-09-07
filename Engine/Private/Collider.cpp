@@ -99,6 +99,7 @@ HRESULT CCollider::Render()
 
 #endif
 
+
 CCollider* CCollider::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, COLLIDERTYPE eType)
 {
 	CCollider* pInstance = new CCollider(pDevice, pContext);

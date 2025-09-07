@@ -22,7 +22,7 @@ public:
 
 	}PLAYER_DESC;
 public:
-	typedef struct tAnimArgDesc
+	typedef struct tAnimArgDesc	// 상하체 애니메이션 별도로 굴리기 위해 편의성으로 만든 구조체.
 	{
 		_uint iAnimIndex = {};
 		_bool isAnimLoop = false;
@@ -57,11 +57,12 @@ private:
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	CNavigation*	m_pNavigationCom = { nullptr };
+	CNavigation*		m_pNavigationCom = { nullptr };
 
-	CShader*		m_pShaderCom = { nullptr };
-	CModel*			m_pModelCom = { nullptr };
-	CCollider*		m_pColliderCom = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
+	CModel*				m_pModelCom = { nullptr };
+
+	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 
 
 private:

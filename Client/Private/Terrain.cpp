@@ -41,6 +41,12 @@ void CTerrain::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
+        return;
+#endif // _DEBUG
+
 }
 
 HRESULT CTerrain::Render()
@@ -54,9 +60,6 @@ HRESULT CTerrain::Render()
 
     m_pVIBufferCom->Render();
 
-#ifdef _DEBUG
-    m_pNavigationCom->Render();
-#endif
     return S_OK;
 }
 
@@ -90,8 +93,6 @@ HRESULT CTerrain::Ready_Components()
 
 HRESULT CTerrain::Bind_ShaderResources()
 {
-    // m_WorldMatrix 를 m_pShaderCom 에 Bind_Matrix 함.
-    // m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_WorldMatrix)
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
@@ -101,24 +102,12 @@ HRESULT CTerrain::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    // 인자로 받은 key 값과 index 값을 통해 특정 텍스쳐를 Bind_SRV 함.
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
-        return E_FAIL;
-
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+    //if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTexture")))
+    //    return E_FAIL;
+    //if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
+    //    return E_FAIL;
+    //if (FAILED(m_pTextureCom[TEXTURE_BRUSH]->Bind_Shader_Resource(m_pShaderCom, "g_BrushTexture", 0)))
+    //    return E_FAIL;
 
     return S_OK;
 }
