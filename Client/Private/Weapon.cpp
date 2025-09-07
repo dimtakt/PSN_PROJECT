@@ -27,8 +27,8 @@ HRESULT CWeapon::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    if (FAILED(Ready_Components()))
-        return E_FAIL;
+    //if (FAILED(Ready_Components()))
+    //    return E_FAIL;
 
     m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
@@ -39,7 +39,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CWeapon::Update(_float fTimeDelta)
@@ -55,6 +55,7 @@ void CWeapon::Update(_float fTimeDelta)
         BoneMatrix *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    __super::Update(fTimeDelta);
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
@@ -85,20 +86,20 @@ HRESULT CWeapon::Render()
     return S_OK;
 }
 
-HRESULT CWeapon::Ready_Components()
-{
-    _uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
-
-    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-        return E_FAIL;
-
-    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Model_"/* // ksta : 이 부분 사용할 모델 부분으로 수정 필요 */),
-        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-        return E_FAIL;
-
-    return S_OK;
-}
+//HRESULT CWeapon::Ready_Components()
+//{
+//    _uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+//
+//    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
+//        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+//        return E_FAIL;
+//
+//    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Model_"/* // ksta : 이 부분 사용할 모델 부분으로 수정 필요 */),
+//        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+//        return E_FAIL;
+//
+//    return S_OK;
+//}
 
 HRESULT CWeapon::Bind_ShaderResources()
 {
@@ -111,49 +112,49 @@ HRESULT CWeapon::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+    //const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    //if (nullptr == pLightDesc)
+    //    return E_FAIL;
+    //
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+    //    return E_FAIL;
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+    //    return E_FAIL;
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+    //    return E_FAIL;
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+    //    return E_FAIL;
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    //    return E_FAIL;
 
     return S_OK;
 }
 
-CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
-    CWeapon* pInstance = new CWeapon(pDevice, pContext);
+//CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+//{
+//    CWeapon* pInstance = new CWeapon(pDevice, pContext);
+//
+//    if (FAILED(pInstance->Initialize_Prototype()))
+//    {
+//        MSG_BOX(TEXT("Failed to Created : CWeapon"));
+//        Safe_Release(pInstance);
+//    }
+//
+//    return pInstance;
+//}
 
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX(TEXT("Failed to Created : CWeapon"));
-        Safe_Release(pInstance);
-    }
-
-    return pInstance;
-}
-
-CGameObject* CWeapon::Clone(void* pArg)
-{
-    CWeapon* pInstance = new CWeapon(*this);
-
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX(TEXT("Failed to Created : CWeapon"));
-        Safe_Release(pInstance);
-    }
-
-    return pInstance;
-}
+//CGameObject* CWeapon::Clone(void* pArg)
+//{
+//    CWeapon* pInstance = new CWeapon(*this);
+//
+//    if (FAILED(pInstance->Initialize(pArg)))
+//    {
+//        MSG_BOX(TEXT("Failed to Created : CWeapon"));
+//        Safe_Release(pInstance);
+//    }
+//
+//    return pInstance;
+//}
 
 void CWeapon::Free()
 {

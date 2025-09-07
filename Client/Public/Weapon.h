@@ -34,13 +34,13 @@ public:
 	virtual HRESULT Render();
 
 private:
-	_uint			m_iGameObjType = { };
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
+	_uint				m_iGameObjType = { };
+	CShader*			m_pShaderCom = { nullptr };
+	CModel*				m_pModelCom = { nullptr };
 
 private:
-	const _float4x4* m_pSocketMatrix = { nullptr };
-	_uint* m_pParentState = { nullptr };
+	const _float4x4*	m_pSocketMatrix = { nullptr };
+	_uint*				m_pParentState = { nullptr };
 
 private:
 	HRESULT Ready_Components();
