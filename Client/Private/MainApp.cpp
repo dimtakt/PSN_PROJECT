@@ -19,6 +19,9 @@
 #include "Weapon_Pistol.h"
 #include "Weapon_Shotgun.h"
 
+// Bullet
+#include "Bullet.h"
+
 // UI
 #include "UI_Crosshair.h"
 
@@ -107,6 +110,13 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Shotgun"),
 		CWeapon_Shotgun::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	
+	/* GameObject : Bullet */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"),
+		CBullet::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	
 
 
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),
@@ -186,9 +196,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Shotgun_Fixed.datmodel", PreTransformMatrix))))
 		return E_FAIL;
 	/* Bullet */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Bullet"),
-	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Bullet_Fixed.datmodel", PreTransformMatrix))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Bullet"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Bullet_Fixed.datmodel", PreTransformMatrix))))
+		return E_FAIL;
 
 
 

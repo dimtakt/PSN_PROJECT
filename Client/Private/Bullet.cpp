@@ -19,9 +19,9 @@ HRESULT CBullet::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
-
 
 
 	return S_OK;
@@ -58,6 +58,25 @@ HRESULT CBullet::Render()
 HRESULT CBullet::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+	if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+		return E_FAIL;
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Bullet"),
+		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+		return E_FAIL;
+
+
+	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
+	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

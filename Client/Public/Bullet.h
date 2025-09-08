@@ -2,6 +2,14 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "GameInstance.h"
+
+NS_BEGIN(Client)
+
+class CCollider;
+
+NS_END
+
 
 NS_BEGIN(Client)
 
@@ -36,6 +44,11 @@ private:
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	_uint			m_iGameObjType = { };
+
+	CCollider*		m_pColliderCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	CModel*			m_pModelCom	= { nullptr };
+
 
 
 public:
