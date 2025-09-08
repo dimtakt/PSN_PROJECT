@@ -289,6 +289,7 @@ HRESULT CPlayer::Ready_PartObjects()
 
 	CWeapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pState = &m_iState;
+	//WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
 	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 

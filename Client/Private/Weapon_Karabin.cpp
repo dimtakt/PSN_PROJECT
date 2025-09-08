@@ -34,7 +34,7 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     _matrix matScale = XMMatrixScaling(1.f, 1.f, 1.f);
     _matrix matRot1 = XMMatrixRotationX(TO_RAD(-90));
     _matrix matRot2 = XMMatrixRotationZ(TO_RAD(180));
-    _matrix matPos = XMMatrixTranslation(-0.1f, 0.f, -1.5f);
+    _matrix matPos = XMMatrixTranslation(-0.2f, -0.6f, -1.5f);
 
     _matrix matTransform = matScale * matRot1 * matRot2 * matPos;
     m_pTransformCom->Set_WorldMatrix(matTransform);
