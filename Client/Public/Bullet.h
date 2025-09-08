@@ -36,7 +36,6 @@ private:
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	_uint			m_iGameObjType = { };
-	_int			m_iHp = {};
 
 
 public:
