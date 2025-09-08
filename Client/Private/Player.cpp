@@ -289,7 +289,7 @@ HRESULT CPlayer::Ready_PartObjects()
 
 	CWeapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pState = &m_iState;
-	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("MachinegunSocket");
+	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
 	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))

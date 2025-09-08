@@ -177,7 +177,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	/* Prototype_Component_Model_NonAnim Weapons (Bin) */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Karabin"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Shotgun_Fixed.datmodel", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Karabin_Fixed.datmodel", PreTransformMatrix))))
 		return E_FAIL;
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Pistol"),
 	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Pistol_Fixed.datmodel", PreTransformMatrix))))

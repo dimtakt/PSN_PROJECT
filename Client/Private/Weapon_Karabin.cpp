@@ -31,9 +31,18 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
         return E_FAIL;
 
     // 초기 트랜스폼 설정
-    m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));
+    _matrix matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+    _matrix matRot1 = XMMatrixRotationX(TO_RAD(-90));
+    _matrix matRot2 = XMMatrixRotationZ(TO_RAD(180));
+    _matrix matPos = XMMatrixTranslation(-0.1f, 0.f, -1.5f);
+
+    _matrix matTransform = matScale * matRot1 * matRot2 * matPos;
+    m_pTransformCom->Set_WorldMatrix(matTransform);
+
+
+    //m_pTransformCom->Scaling(_float3(1.f, 1.f, 1.f));
+    //m_pTransformCom->Rotation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMConvertToRadians(180.0f));
+    //m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 0.f, -1.5f, 1.f));
 
     m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN);
 
