@@ -2,7 +2,14 @@
 #include "GameInstance.h"
 
 #include "Body_Player.h"
-#include "Weapon.h"
+
+//#include "Weapon.h"
+#include "Weapon_Karabin.h"
+#include "Weapon_Pistol.h"
+#include "Weapon_Shotgun.h"
+
+
+
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject (pDevice, pContext)
@@ -41,8 +48,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 
 
-	//if (FAILED(Ready_PartObjects()))
-	//	return E_FAIL;
+	if (FAILED(Ready_PartObjects()))
+		return E_FAIL;
 
 
 	m_iMaxHp	= 1;
@@ -74,6 +81,13 @@ void CPlayer::Update(_float fTimeDelta)
 	for (auto& vecColliders : m_vecCollidersCom)
 		for (auto& collider : vecColliders)
 			collider->Update(m_pTransformCom->Get_WorldMatrix());
+
+
+	// 어떤 무기냐에 따라 소체 활성화 여부, 애니메이션, 공격 방식 등에 차이를 둘 예정
+	//CPartObject* pWeapon = Find_PartObject(TEXT("Part_Weapon"));
+	//pWeapon->Get_ObjType();
+	//
+
 
 	__super::Update(fTimeDelta);
 }
@@ -260,21 +274,36 @@ HRESULT CPlayer::Bind_ShaderResources()
 
 HRESULT CPlayer::Ready_PartObjects()
 {
-	CBody_Player::BODY_DESC         BodyDesc{};
-	BodyDesc.pState = &m_iState;
-	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Body_Player"), &BodyDesc)))
+	//CBody_Player::BODY_DESC     BodyDesc{};
+	//BodyDesc.pState = &m_iState;
+	//BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+	//if (FAILED(__super::Add_PartObject(TEXT("Part_Body"), iDestLevel, TEXT("Prototype_GameObject_Body_Player"), &BodyDesc)))
+	//	return E_FAIL;
+
+	//CPartObject* pBody = Find_PartObject(TEXT("Part_Body"));
+	//if (nullptr == pBody)
+	//	return E_FAIL;
+
+	CWeapon::WEAPON_DESC		WeaponDesc{};
+	WeaponDesc.pState = &m_iState;
+	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("MachinegunSocket");
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
 		return E_FAIL;
-
+	
 	return S_OK;
+
 }
 
 void CPlayer::Update_Transform(_float fTimeDelta)
 {
 	_float fTmpSpeed = 1.5f * fTimeDelta;
 
-
+	
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 	{
 		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);

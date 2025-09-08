@@ -18,12 +18,12 @@ HRESULT CPartObject::Initialize_Prototype()
 
 HRESULT CPartObject::Initialize(void* pArg)
 {
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
 	PARTOBJECT_DESC* pDesc = static_cast<PARTOBJECT_DESC*>(pArg);
 
 	m_pParentMatrix = pDesc->pParentMatrix;
-
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
 
 	return S_OK;
 }

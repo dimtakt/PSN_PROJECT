@@ -20,19 +20,24 @@ HRESULT CWeapon::Initialize_Prototype()
 
 HRESULT CWeapon::Initialize(void* pArg)
 {
-    WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
-    m_pParentState = pDesc->pState;
-    m_pSocketMatrix = pDesc->pSocketMatrix;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+
+    //WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
+    //m_pParentState = pDesc->pState;
+    //m_pSocketMatrix = pDesc->pSocketMatrix;
+    //
+    //if (FAILED(__super::Initialize(pArg)))
+    //    return E_FAIL;
+
     //if (FAILED(Ready_Components()))
     //    return E_FAIL;
 
-    m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));
+    //m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
+    //m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
+    //m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));
 
     return S_OK;
 }
@@ -55,6 +60,10 @@ void CWeapon::Update(_float fTimeDelta)
         BoneMatrix *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            collider->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
     __super::Update(fTimeDelta);
 }
 
@@ -62,6 +71,13 @@ void CWeapon::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
+
+#ifdef _DEBUG
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
+                return;
+#endif
 }
 
 HRESULT CWeapon::Render()
@@ -112,21 +128,6 @@ HRESULT CWeapon::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    //const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    //if (nullptr == pLightDesc)
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    //    return E_FAIL;
-
     return S_OK;
 }
 
@@ -160,6 +161,9 @@ void CWeapon::Free()
 {
     __super::Free();
 
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            Safe_Release(collider);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

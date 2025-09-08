@@ -1,10 +1,9 @@
 #pragma once
 #include "Weapon.h"
 
-
-
 class CWeapon_Gun abstract : public CWeapon
 {
+protected:
 	CWeapon_Gun(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWeapon_Gun(const CWeapon_Gun& Prototype);
 	virtual ~CWeapon_Gun() = default;

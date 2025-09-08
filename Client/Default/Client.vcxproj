@@ -159,8 +159,12 @@
     <ClInclude Include="..\public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\public\Level_Stage.h" />
-    <ClInclude Include="..\Public\Props_Fotel.h" />
-    <ClInclude Include="..\Public\Props_Pot.h" />
+    <ClInclude Include="..\Public\Props_Fotel.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\Props_Pot.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\public\Level_Editor.h" />
     <ClInclude Include="..\public\Enemy.h" />
     <ClInclude Include="..\Public\ImGui_Manager.h" />
@@ -170,8 +174,12 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\public\Player.h" />
-    <ClInclude Include="..\public\Props_ServerRack1.h" />
-    <ClInclude Include="..\Public\Props_ServerRack2.h" />
+    <ClInclude Include="..\public\Props_ServerRack1.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\Props_ServerRack2.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\public\Skybox.h" />
     <ClInclude Include="..\public\Stage_Test1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
@@ -202,8 +210,12 @@
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Player.cpp" />
     <ClCompile Include="..\private\Level_Stage.cpp" />
-    <ClCompile Include="..\Private\Props_Fotel.cpp" />
-    <ClCompile Include="..\Private\Props_Pot.cpp" />
+    <ClCompile Include="..\Private\Props_Fotel.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\Props_Pot.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\private\Level_Editor.cpp" />
     <ClCompile Include="..\private\Enemy.cpp" />
     <ClCompile Include="..\Private\ImGui_Manager.cpp" />
@@ -213,8 +225,12 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
-    <ClCompile Include="..\private\Props_ServerRack1.cpp" />
-    <ClCompile Include="..\Private\Props_ServerRack2.cpp" />
+    <ClCompile Include="..\private\Props_ServerRack1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\Props_ServerRack2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\private\Skybox.cpp" />
     <ClCompile Include="..\private\Stage_Test1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />

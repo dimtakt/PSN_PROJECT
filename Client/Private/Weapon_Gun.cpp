@@ -38,7 +38,7 @@ void CWeapon_Gun::Update(_float fTimeDelta)
 
 void CWeapon_Gun::Late_Update(_float fTimeDelta)
 {
-
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CWeapon_Gun::Render()

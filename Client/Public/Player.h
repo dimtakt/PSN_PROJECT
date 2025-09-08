@@ -70,6 +70,7 @@ private:
 	_int			m_iHp = {};
 
 	_uint			m_iState = { };
+	_uint			m_iHandWeapon = { };
 
 	_float			m_fMouseSensor = { .1f };
 

@@ -148,7 +148,7 @@ namespace Client
 
 		// 총들
 		WEAPON_RANGED_PISTOL,
-		WEAPON_RANGED_RIFLE,
+		WEAPON_RANGED_KARABIN,
 		WEAPON_RANGED_SHOTGUN,
 
 		// 근접 무기들

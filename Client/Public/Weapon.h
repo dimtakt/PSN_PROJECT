@@ -12,7 +12,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CWeapon /*abstract*/ : public CPartObject
+class CWeapon abstract : public CPartObject
 {
 public:
 	typedef struct tagWeaponDesc : public CPartObject::PARTOBJECT_DESC
@@ -20,7 +20,7 @@ public:
 		const _float4x4* pSocketMatrix = { nullptr };
 		_uint* pState = { nullptr };
 	}WEAPON_DESC;
-private:
+protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWeapon(const CWeapon& Prototype);
 	virtual ~CWeapon() = default;
@@ -33,22 +33,24 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-private:
+protected:
 	_uint				m_iGameObjType = { };
+
+	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 	CShader*			m_pShaderCom = { nullptr };
 	CModel*				m_pModelCom = { nullptr };
 
-private:
+protected:
 	const _float4x4*	m_pSocketMatrix = { nullptr };
 	_uint*				m_pParentState = { nullptr };
 
-private:
-	HRESULT Ready_Components();
+//protected:
+//	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 
 public:
 	static CWeapon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
 };
 

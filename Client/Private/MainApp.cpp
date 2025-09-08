@@ -9,10 +9,15 @@
 #include "Player.h"
 
 #include "Enemy.h"
-#include "Props_Pot.h"
-#include "Props_Fotel.h"
-#include "Props_ServerRack1.h"
-#include "Props_ServerRack2.h"
+//#include "Props_Pot.h"
+//#include "Props_Fotel.h"
+//#include "Props_ServerRack1.h"
+//#include "Props_ServerRack2.h"
+
+// Weapons
+#include "Weapon_Karabin.h"
+#include "Weapon_Pistol.h"
+#include "Weapon_Shotgun.h"
 
 // UI
 #include "UI_Crosshair.h"
@@ -91,19 +96,34 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CPlayer::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),
-		CProps_Pot::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"),
-		CProps_Fotel::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"),
-		CProps_ServerRack1::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"),
-		CProps_ServerRack2::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
+	/* GameObject : Weapon Prototypes */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"),
+		CWeapon_Karabin::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Pistol"),
+	//	CWeapon_Pistol::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Shotgun"),
+	//	CWeapon_Shotgun::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),
+	//	CProps_Pot::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Fotel"),
+	//	CProps_Fotel::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack1"),
+	//	CProps_ServerRack1::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_ServerRack2"),
+	//	CProps_ServerRack2::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+
+	/* Colliders */
 
 	/* Prototype_Component_Collider_AABB */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
@@ -122,6 +142,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 
 
+
+	/* Models */
+
 	// 모델의 방향을 올바르게 로드하기 위해 사전에 변환용 벡터 정의
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -138,23 +161,37 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 
+	/* Prototype_Component_Model_NonAnim Props */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Pot"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/pot/pot.fbx", PreTransformMatrix))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Fotel"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/fotel/fotel.fbx", PreTransformMatrix))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_ServerRack1"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/ServerRack/ServerRack1.fbx", PreTransformMatrix))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_ServerRack2"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/ServerRack/ServerRack2.fbx", PreTransformMatrix))))
+	//	return E_FAIL;
+
+	/* Prototype_Component_Model_NonAnim Weapons (Bin) */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Karabin"),
+		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Shotgun_Fixed.datmodel", PreTransformMatrix))))
+		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Pistol"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Pistol_Fixed.datmodel", PreTransformMatrix))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Shotgun"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Shotgun_Fixed.datmodel", PreTransformMatrix))))
+	//	return E_FAIL;
+	/* Bullet */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Bullet"),
+	//	CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Bullet_Fixed.datmodel", PreTransformMatrix))))
+	//	return E_FAIL;
 
 
-	/* Prototype_Component_Model_NonAnim Things */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Pot"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/pot/pot.fbx", PreTransformMatrix))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_Fotel"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/fotel/fotel.fbx", PreTransformMatrix))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_ServerRack1"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/ServerRack/ServerRack1.fbx", PreTransformMatrix))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Props_ServerRack2"),
-		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/Models/Props/ServerRack/ServerRack2.fbx", PreTransformMatrix))))
-		return E_FAIL;
 
-	
 
 	/* Texture */
 
