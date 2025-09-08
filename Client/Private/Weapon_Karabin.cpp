@@ -31,10 +31,14 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
         return E_FAIL;
 
     // 초기 트랜스폼 설정
-    _matrix matScale = XMMatrixScaling(1.f, 1.f, 1.f);
-    _matrix matRot1 = XMMatrixRotationX(TO_RAD(-90));
-    _matrix matRot2 = XMMatrixRotationZ(TO_RAD(180));
-    _matrix matPos = XMMatrixTranslation(-0.2f, -0.6f, -1.5f);
+    _matrix matId = XMMatrixIdentity();
+    _matrix matScale = matId, matRot1 = matId, matRot2 = matId, matPos = matId;
+
+    // matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+    // matRot1 = XMMatrixRotationX(TO_RAD(-90));
+    // matRot2 = XMMatrixRotationZ(TO_RAD(180));
+    // matPos = XMMatrixTranslation(-0.2f, -0.6f, -1.5f);
+    matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
 
     _matrix matTransform = matScale * matRot1 * matRot2 * matPos;
     m_pTransformCom->Set_WorldMatrix(matTransform);
@@ -43,6 +47,7 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     //m_pTransformCom->Scaling(_float3(1.f, 1.f, 1.f));
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMConvertToRadians(180.0f));
     //m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 0.f, -1.5f, 1.f));
+
 
     m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN);
 
@@ -58,7 +63,33 @@ void CWeapon_Karabin::Priority_Update(_float fTimeDelta)
 void CWeapon_Karabin::Update(_float fTimeDelta)
 {
     // weapon.cpp 에서 기본 업데이트 도는 중
-    __super::Update(fTimeDelta);
+    //__super::Update(fTimeDelta);
+
+
+    // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
+
+    const _float4x4* matCam = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
+    m_CombinedWorldMatrix;
+    XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(matCam));
+
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            collider->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
+
+    //_float3 pos;
+    //XMStoreFloat3(&pos, m_pTransformCom->Get_State(STATE::POSITION));
+    //
+    //_float3 rot;
+    //rot = m_pTransformCom->Get_RotationEuler_Store();
+
+    // combonedWorldMatrix 가 최종 반영된 Transform임에 유의
+
+    m_CombinedWorldMatrix;
+    m_CombinedWorldMatrix;
+    m_pTransformCom;
+
+    return;
 
 
     // 여기에서 업데이트 동작 진행.. (총알 발사 등)
