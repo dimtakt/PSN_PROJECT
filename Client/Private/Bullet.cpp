@@ -1,4 +1,5 @@
 #include "Bullet.h"
+#include "GameInstance.h"
 
 CBullet::CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject(pDevice, pContext)
@@ -23,6 +24,10 @@ HRESULT CBullet::Initialize(void* pArg)
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
 
+	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
+	pDesc->vMoveDir = m_vMoveDir;
+	pDesc->iGameObjType = m_iGameObjType;	// 플레이어 총알인지, 적 총알인지에 따라 판정 다르게?
+	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);
 
 	return S_OK;
 }
@@ -45,12 +50,34 @@ void CBullet::Update(_float fTimeDelta)
 
 void CBullet::Late_Update(_float fTimeDelta)
 {
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+		return;
+
 	__super::Late_Update(fTimeDelta);
+
+#ifdef _DEBUG
+	if (m_pColliderCom != nullptr)
+		if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+			return;
+#endif
 }
 
 HRESULT CBullet::Render()
 {
-	// 렌더
+	if (FAILED(__super::Render()))
+		return E_FAIL;
+
+	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
+		m_pShaderCom->Begin(0);
+
+		m_pModelCom->Render(i);
+	}
 
 	return S_OK;
 }
@@ -110,4 +137,8 @@ CBullet* CBullet::Clone(void* pArg)
 void CBullet::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pModelCom);
 }

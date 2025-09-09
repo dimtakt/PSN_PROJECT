@@ -89,6 +89,18 @@ void CPlayer::Update(_float fTimeDelta)
 	//
 
 
+	// ksta : 총알 소환 테스트
+	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+	{
+		CPartObject* pPartWeaponGun = Find_PartObject(TEXT("Part_Weapon"));
+		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(pPartWeaponGun);
+
+		pWeaponGun->Shot(XMVectorSet(0.f, 0.f, 0.f, 0.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+	}
+
+
+
+
 	__super::Update(fTimeDelta);
 }
 
@@ -292,8 +304,9 @@ HRESULT CPlayer::Ready_PartObjects()
 	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
 	//WeaponDesc.pSocketMatrix = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Pistol"), &WeaponDesc)))
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -372,7 +385,6 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 	{
 		m_iState &= ~ENUM_CLASS(PLAYER_STATE::MOVE);
 	}
-
 
 
 

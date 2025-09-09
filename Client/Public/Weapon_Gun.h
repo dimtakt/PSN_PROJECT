@@ -17,6 +17,9 @@ public:
 	virtual HRESULT Render();
 
 public:
+	virtual void Shot(_vector vDir, _uint iObjTypeIndex) = 0;
+
+public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
 };

@@ -2,9 +2,8 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-#include "GameInstance.h"
 
-NS_BEGIN(Client)
+NS_BEGIN(Engine)
 
 class CCollider;
 
@@ -18,7 +17,8 @@ class CBullet final : public CGameObject
 public:
 	typedef struct tagBulletDesc : public GAMEOBJECT_DESC
 	{
-
+		_matrix matSpawnTransform;
+		_vector vMoveDir;
 	}Bullet_DESC;
 private:
 	CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -44,6 +44,7 @@ private:
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	_uint			m_iGameObjType = { };
+	_vector			m_vMoveDir = { };
 
 	CCollider*		m_pColliderCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };

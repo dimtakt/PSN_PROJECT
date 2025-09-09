@@ -1,5 +1,6 @@
 #include "Weapon_Karabin.h"
 #include "GameInstance.h"
+#include "Bullet.h"
 
 CWeapon_Karabin::CWeapon_Karabin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon_Gun{ pDevice, pContext }
@@ -23,6 +24,7 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
     m_pParentState = pDesc->pState;
     m_pSocketMatrix = pDesc->pSocketMatrix;
+    m_pParentTarget = pDesc->pParentTarget;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -121,6 +123,33 @@ HRESULT CWeapon_Karabin::Render()
     }
 
     return S_OK;
+}
+
+void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
+{
+    // 총알 생성..
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+    CBullet::Bullet_DESC bulletDesc = {};
+    bulletDesc.vMoveDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+    bulletDesc.fSpeedPerSec = 0.f;
+    bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    bulletDesc.iGameObjType = iObjTypeIndex;
+
+    //if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+    //    bulletDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET);
+    //else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+    //    bulletDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET);
+    //else
+    //{
+    //    std::cout << "[Weapon] Warn :: Parent Object of Weapon is Empty." << std::endl;
+    //    MSG_BOX(L"[Weapon] 무기의 부모 오브젝트 타겟이 할당되지 않음.");
+    //}
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))
+        MSG_BOX(L"총알 생성 실패");
+        
+
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()

@@ -16,6 +16,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta)			override;
 	virtual HRESULT Render()							override;
 
+public:
+	virtual void Shot(_vector vDir, _uint iObjTypeIndex) override;
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();

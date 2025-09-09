@@ -19,6 +19,8 @@ public:
 	{
 		const _float4x4* pSocketMatrix = { nullptr };
 		_uint* pState = { nullptr };
+
+		CGameObject* pParentTarget = { nullptr };
 	}WEAPON_DESC;
 protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -43,6 +45,7 @@ protected:
 protected:
 	const _float4x4*	m_pSocketMatrix = { nullptr };
 	_uint*				m_pParentState = { nullptr };
+	CGameObject*		m_pParentTarget = { nullptr };
 
 //protected:
 //	HRESULT Ready_Components();

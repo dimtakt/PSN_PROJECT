@@ -123,6 +123,10 @@ HRESULT CWeapon_Pistol::Render()
     return S_OK;
 }
 
+void CWeapon_Pistol::Shot(_vector vDir, _uint iObjTypeIndex)
+{
+}
+
 HRESULT CWeapon_Pistol::Ready_Components()
 {
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();

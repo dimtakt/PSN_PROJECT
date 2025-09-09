@@ -20,7 +20,6 @@ public:
 		_uint			iCustomLoadLevelIndex = UINT_MAX;
 
 		_uint			iGameObjType;
-
 	}GAMEOBJECT_DESC;
 protected:
 	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
