@@ -64,10 +64,31 @@ void CEnemy::Update(_float fTimeDelta)
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 
+	Update_BoneColliders();
 
-	for (auto& vecColliders : m_vecCollidersCom)
-		for (auto& collider : vecColliders)
-			collider->Update(m_pTransformCom->Get_WorldMatrix());
+
+	//for (auto& vecColliders : m_vecCollidersCom)
+	//	for (auto& collider : vecColliders)
+	//	{
+	//		collider->Update(m_pTransformCom->Get_WorldMatrix());
+	//	}
+
+	// 테스트용
+	static _float fMoveTimeDelta = 0.f;
+	static _bool isGoStraight = true;
+
+	fMoveTimeDelta += fTimeDelta;
+	if (fMoveTimeDelta >= 3.f)
+	{
+		fMoveTimeDelta = 0;
+		isGoStraight = !isGoStraight;
+	}
+
+	if (isGoStraight)
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+	else	
+		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
+	
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)
@@ -147,17 +168,44 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 		return E_FAIL;
 
 
+
+
+
+
+	// ===== Colliders =====
+
+    CCollider* tmpColCom = nullptr;
+
+    CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
+    SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+    // s1. For Head / Zero / 0.08f
+	// s2. For LeftHand / Zero / 0.08f
+	// s3. For RightHand / Zero / 0.08f
+	_wstring strNameTag[3] = { L"Head", L"LeftHand", L"RightHand" };
+	_float	fRad[3] = { 0.12f, 0.09f, 0.09f };
+	for (_uint i = 0; i < 3; i++)
+	{
+		SphereDesc.fRadius = fRad[i];
+		if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+			TEXT("Com_Collider_") + strNameTag[i], reinterpret_cast<CComponent**>(&tmpColCom), &SphereDesc)))
+			return E_FAIL;
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpColCom);
+	}
+
 	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
+	OBBDesc.vExtents = _float3(0.15f, 0.75f, 0.10f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
-
-	CCollider* tmpColCom = nullptr;
+	// o1. Fol BodyAll (Not Specific Bone) / Zero / .1 .82 .1 / 0 .82 0 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
+		TEXT("Com_Collider_BodyAll"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
 		return E_FAIL;
 	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
+
+
+
 
 	return S_OK;
 }
@@ -216,13 +264,42 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
 {
-	m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
-	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
+	m_pModelCom->Set_Animation(ENEMY_ANIMINDEX::MOVE_U_RUNNING, PART_UPPER, true);
+	m_pModelCom->Set_Animation(MOVE_L_RUNNING, PART_LOWER, true);
 }
 
 void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 {
 
+}
+
+void CEnemy::Update_BoneColliders()
+{
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][0], "Head");
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][1], "LeftHand");
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][2], "RightHand");
+
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
+}
+
+void CEnemy::Update_BoneCollider(CCollider* pCollider, const _char* szBoneName)
+{
+	// 객체 자체의 월드 행렬과, 본 자체의 로컬 행렬을 가져옴.
+	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+	_matrix matTargetBone = XMLoadFloat4x4(m_pModelCom->Get_BoneMatrix(szBoneName));
+
+	// 본 행렬 분리
+	_vector vPos, vQuat, vSca;
+	XMMatrixDecompose(&vSca, &vQuat, &vPos, matTargetBone);
+
+	// 본 분리한걸 다시 각각의 요소별 행렬화
+	_matrix matWorldPos = XMMatrixTranslationFromVector(vPos);
+	_matrix matWorldRot = XMMatrixRotationQuaternion(vQuat);
+
+	// 재조립 ( 크기는 1로 할 것이라 제외 - "자" - "이" - "공"..)
+	_matrix matWorld_Calced = matWorldRot * matWorldPos * matWorld;
+
+	pCollider->Update(matWorld_Calced);
 }
 
 CEnemy* CEnemy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

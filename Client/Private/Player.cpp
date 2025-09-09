@@ -75,7 +75,11 @@ void CPlayer::Update(_float fTimeDelta)
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
 
-	Update_TimeControl(fTimeDelta);
+	//Update_TimeControl(fTimeDelta);
+#ifdef _DEBUG
+	m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
+#endif // _DEBUG
+
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);

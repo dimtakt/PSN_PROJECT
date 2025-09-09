@@ -48,6 +48,12 @@ private:
 	void		Update_Transform(_float fTimeDelta);		// AI 행동에 의한 "Transform" 제어
 	void		Update_AnimationState(_float fTimeDelta);	// AI 행동에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// AI 행동에 의한 "애니메이션" 제어
+	
+	void		Update_BoneColliders();
+
+private:
+	void		Update_BoneCollider(CCollider* pCollider, const _char* szBoneName);
+
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
