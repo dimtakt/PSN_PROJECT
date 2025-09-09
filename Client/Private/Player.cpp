@@ -17,7 +17,7 @@ CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CPlayer::CPlayer(const CPlayer& Prototype)
-	: CContainerObject { Prototype }
+	: CContainerObject( Prototype )
 {
 }
 
@@ -29,15 +29,16 @@ HRESULT CPlayer::Initialize_Prototype()
 HRESULT CPlayer::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC         Desc{};
-	Desc.fSpeedPerSec = 10.f;
+	Desc.fSpeedPerSec = 15.f;
 	Desc.fRotationPerSec = XMConvertToRadians(180.0f);
-
 
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
+
+	m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::PLAYER);
 
 	m_pModelCom->Add_Animation();
 	m_pModelCom->Set_Animation(MOVE_U_IDLE, PART_UPPER, true);
@@ -92,14 +93,25 @@ void CPlayer::Update(_float fTimeDelta)
 	// ksta : 총알 소환 테스트
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
 	{
-		CPartObject* pPartWeaponGun = Find_PartObject(TEXT("Part_Weapon"));
-		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(pPartWeaponGun);
+		if (m_pPart_Weapon != nullptr)
+		{
+			CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
-		pWeaponGun->Shot(XMVectorSet(0.f, 0.f, 0.f, 0.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+			// 날아갈 방향 계산
+			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+
+			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+			_vector vCameraLook = matCameraview.r[2];
+			vDir = vCameraLook;
+
+			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
+			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
+			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
+			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
+
+			pWeaponGun->Shot(XMVectorSetW(vDir, 1.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+		}
 	}
-
-
-
 
 	__super::Update(fTimeDelta);
 }
@@ -153,8 +165,9 @@ HRESULT CPlayer::Render()
 
 #endif // _DEBUG
 
-	// 신체는 공격 중에만 렌더할 것임.
-	if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	// 신체는 주먹 공격 중에만 렌더할 것임.
+	if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) ||
+		(m_pPart_Weapon != nullptr)) // 공격 상태가 아니거나, 무기가 있으면 return
 		return S_OK;
 
 
@@ -209,6 +222,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
 		return E_FAIL;
+	Set_BufferRef(m_pModelCom);
 
 	CNavigation::NAVIGATION_DESC        NaviDesc{};
 
@@ -249,7 +263,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	//	TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 	//	return E_FAIL;
 
-	Set_BufferRef(m_pModelCom);
+
 
 
 	return S_OK;
@@ -266,10 +280,9 @@ HRESULT CPlayer::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
+	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	//if (nullptr == pLightDesc)
+	//	return E_FAIL;
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
 	//	return E_FAIL;
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
@@ -291,10 +304,10 @@ HRESULT CPlayer::Ready_PartObjects()
 	//CBody_Player::BODY_DESC     BodyDesc{};
 	//BodyDesc.pState = &m_iState;
 	//BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-
+	//
 	//if (FAILED(__super::Add_PartObject(TEXT("Part_Body"), iDestLevel, TEXT("Prototype_GameObject_Body_Player"), &BodyDesc)))
 	//	return E_FAIL;
-
+	//
 	//CPartObject* pBody = Find_PartObject(TEXT("Part_Body"));
 	//if (nullptr == pBody)
 	//	return E_FAIL;
@@ -308,14 +321,16 @@ HRESULT CPlayer::Ready_PartObjects()
 
 	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
 		return E_FAIL;
+
+	m_pPart_Weapon = Find_PartObject(L"Part_Weapon");
 	
 	return S_OK;
-
-}
+} // Remove도 만들기?
 
 void CPlayer::Update_Transform(_float fTimeDelta)
 {
-	_float fTmpSpeed = 1.5f * fTimeDelta;
+	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+	_float fTmpSpeed = fRawTimeDelta;
 
 	
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
@@ -449,42 +464,51 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 
 	//_float fFistComboExistTime = 0.2f;
 
-	if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && !isFistPlaying)		// 시작
+	if (m_pPart_Weapon == nullptr) // 총을 들고 있지 않다면
 	{
-		isFistPlaying = true;
-
-		iRandFistIndex = static_cast<_uint>(m_pGameInstance->Rand(1, 3));
-		iPastFistIndex = iRandFistIndex;
-
-		fFistTimeDelta = 0.f;
-
-		switch (iRandFistIndex)
+		if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && !isFistPlaying)		// 시작
 		{
-		default:
-		//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
-		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
-		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
-		//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+			isFistPlaying = true;
+
+			iRandFistIndex = static_cast<_uint>(m_pGameInstance->Rand(1, 3));
+			iPastFistIndex = iRandFistIndex;
+
+			fFistTimeDelta = 0.f;
+
+			switch (iRandFistIndex)
+			{
+			default:
+				//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+			case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
+			case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
+				//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+			}
+
+			isFistPlaying = true;
+
 		}
-
-		isFistPlaying = true;
-		
-	}
-	else if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)		// 진행중
-	{
-		fFistTimeDelta += fTimeDelta;
-
-		switch (iRandFistIndex)
+		else if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)		// 진행중
 		{
-		default:
-		//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
-		case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
-		case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
-		//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
-		}
+			fFistTimeDelta += fTimeDelta;
 
+			switch (iRandFistIndex)
+			{
+			default:
+				//case 0:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_01 , false };  break;
+			case 1:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02 , false };  break;
+			case 2:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03 , false };  break;
+				//case 3:		tAnimDesc[PART_UPPER] = { MELEE_U_FIST_04 , false };  break;
+			}
+
+		}
+		else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)	// 종료
+		{
+			fFistTimeDelta += fTimeDelta;
+			isFistPlaying = false;
+			iRandFistIndex = {};
+		}
 	}
-	else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)	// 종료
+	else	// 총을 들고 있다면
 	{
 		fFistTimeDelta += fTimeDelta;
 		isFistPlaying = false;

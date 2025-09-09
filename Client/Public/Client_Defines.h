@@ -45,7 +45,7 @@ namespace Client
 		
 		//ATK_MELEE			= (1 << 3),		// 공격
 		//ATK_WEAPON_BLUNT	= (1 << 4),		// 공격
-		//ATK_WEAPON_GUN		= (1 << 5),		// 공격
+		//ATK_WEAPON_GUN	= (1 << 5),		// 공격
 
 		PLAYER_STATE_END
 	};

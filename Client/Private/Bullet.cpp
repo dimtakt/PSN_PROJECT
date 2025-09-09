@@ -28,6 +28,9 @@ HRESULT CBullet::Initialize(void* pArg)
 	m_vMoveDir = pDesc->vMoveDir;
 	m_iGameObjType = pDesc->iGameObjType;	// 플레이어 총알인지, 적 총알인지에 따라 판정 다르게?
 	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);
+	
+	_float fScaled = 2.f;
+	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
 
 	return S_OK;
 }
@@ -42,8 +45,14 @@ void CBullet::Priority_Update(_float fTimeDelta)
 void CBullet::Update(_float fTimeDelta)
 {
 	// 얘는 콜라이더 잘 붙여주고
-	// 충돌 콜러이더 매니저에서 잘 만들어주고
+	// 충돌 콜라이더 매니저에서 잘 만들어주고
 	// 앞으로 잘 날아가기만 하면 됨
+	_float fMoveSpeed = 50.f;
+
+	_vector vBulletPos = m_pTransformCom->Get_Position();
+	vBulletPos += (fTimeDelta * m_vMoveDir * fMoveSpeed);
+
+	m_pTransformCom->Set_Position_Direct(vBulletPos);
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 

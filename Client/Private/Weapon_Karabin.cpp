@@ -130,26 +130,23 @@ void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
     // 총알 생성..
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
     CBullet::Bullet_DESC bulletDesc = {};
-    bulletDesc.vMoveDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+    bulletDesc.vMoveDir = vDir;
+    //bulletDesc.vMoveDir = vDir;
     bulletDesc.fSpeedPerSec = 0.f;
-    bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
     bulletDesc.iGameObjType = iObjTypeIndex;
 
-    //if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
-    //    bulletDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET);
-    //else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
-    //    bulletDesc.iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET);
-    //else
-    //{
-    //    std::cout << "[Weapon] Warn :: Parent Object of Weapon is Empty." << std::endl;
-    //    MSG_BOX(L"[Weapon] 무기의 부모 오브젝트 타겟이 할당되지 않음.");
-    //}
+    // 주체가 플레이어면 카메라에서 나가도록
+    // 적이라면 무기좌표에서 나가도록
+    bulletDesc.matSpawnTransform;
+    if      (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+        bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+    else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
+        bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
 
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
         ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))
         MSG_BOX(L"총알 생성 실패");
-        
-
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()

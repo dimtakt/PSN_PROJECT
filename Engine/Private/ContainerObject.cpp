@@ -26,8 +26,6 @@ CComponent* CContainerObject::Get_Component(const _wstring& strPartTag, const _w
 
 HRESULT CContainerObject::Initialize_Prototype()
 {
-        
-
     return S_OK;
 }
 

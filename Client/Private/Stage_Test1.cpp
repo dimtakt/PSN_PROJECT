@@ -117,8 +117,8 @@ HRESULT CStage_Test1::Ready_Layer_Player(const _wstring& strLayerTag)
 		return E_FAIL;
 	CGameObject* pPlayer = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag);
 
-	_float3 pPos = {86.f, 0.f, 60.f};
-	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat3(&pPos));
+	_float4 pPos = {86.f, 0.f, 60.f, 1.f};
+	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
 
 	return S_OK;
 }
@@ -137,9 +137,15 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 	GameObjDesc.fRotationPerSec = XMConvertToRadians(90.f);
 	GameObjDesc.fSpeedPerSec = 1.f;
 
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
-	//	ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
+		return E_FAIL;
+	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag);
+
+	_float4 pPos = { 86.f, 0.f, 80.f ,1.f };
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(180));
+
 
 	return S_OK;
 }

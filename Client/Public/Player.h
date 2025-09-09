@@ -21,13 +21,7 @@ public:
 	{
 
 	}PLAYER_DESC;
-public:
-	typedef struct tAnimArgDesc	// 상하체 애니메이션 별도로 굴리기 위해 편의성으로 만든 구조체.
-	{
-		_uint iAnimIndex = {};
-		_bool isAnimLoop = false;
-		_float fTransitionTime = 0.2f;
-	}ANIMARG_DESC;
+
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& Prototype);
@@ -57,20 +51,16 @@ private:
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	CNavigation*		m_pNavigationCom = { nullptr };
-
-	CShader*			m_pShaderCom = { nullptr };
-	CModel*				m_pModelCom = { nullptr };
+	CShader*			m_pShaderCom		= { nullptr };
+	CModel*				m_pModelCom			= { nullptr };
+	CNavigation*		m_pNavigationCom	= { nullptr };
 
 	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 
+	CPartObject*		m_pPart_Weapon		= { nullptr };
 
 private:
-	_uint			m_iGameObjType = { };
-	_int			m_iHp = {};
-
 	_uint			m_iState = { };
-	_uint			m_iHandWeapon = { };
 
 	_float			m_fMouseSensor = { .1f };
 
