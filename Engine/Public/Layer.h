@@ -40,8 +40,13 @@ public:
 public:
 	CGameObject* Get_LastGameObject();
 
+
+	void Remove_DeadObjects();
+
 private:
 	list<class CGameObject*>			m_GameObjects;
+	vector<class CGameObject*>			m_vecDeadObjects;
+
 
 public:
 	static CLayer* Create();

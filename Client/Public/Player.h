@@ -38,6 +38,7 @@ public:
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
+	vector<CCollider*>* Get_Colliders() { return m_vecCollidersCom; };
 
 private:
 	// 로컬 함수들 (기능 분리)
@@ -49,6 +50,13 @@ private:
 	void		Update_AnimationState(_float fTimeDelta);	// 조작 등에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// 조작 등에 의한 "애니메이션" 제어
 	void		Update_TimeControl(_float fTimeDelta);
+
+	void		Update_BoneColliders();
+
+private:
+	void		Update_BoneCollider(CCollider* pCollider, const _char* szBoneName);
+
+	HRESULT		Ready_Colliders(void* pArg);
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)

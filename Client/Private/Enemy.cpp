@@ -167,44 +167,8 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
 		return E_FAIL;
 
-
-
-
-
-
-	// ===== Colliders =====
-
-    CCollider* tmpColCom = nullptr;
-
-    CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
-    SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
-
-    // s1. For Head / Zero / 0.08f
-	// s2. For LeftHand / Zero / 0.08f
-	// s3. For RightHand / Zero / 0.08f
-	_wstring strNameTag[3] = { L"Head", L"LeftHand", L"RightHand" };
-	_float	fRad[3] = { 0.12f, 0.09f, 0.09f };
-	for (_uint i = 0; i < 3; i++)
-	{
-		SphereDesc.fRadius = fRad[i];
-		if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
-			TEXT("Com_Collider_") + strNameTag[i], reinterpret_cast<CComponent**>(&tmpColCom), &SphereDesc)))
-			return E_FAIL;
-		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpColCom);
-	}
-
-	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(0.15f, 0.75f, 0.10f);
-	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
-
-	// o1. Fol BodyAll (Not Specific Bone) / Zero / .1 .82 .1 / 0 .82 0 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider_BodyAll"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
+	if (FAILED(Ready_Colliders(pArg)))
 		return E_FAIL;
-	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
-
-
 
 
 	return S_OK;
@@ -300,6 +264,42 @@ void CEnemy::Update_BoneCollider(CCollider* pCollider, const _char* szBoneName)
 	_matrix matWorld_Calced = matWorldRot * matWorldPos * matWorld;
 
 	pCollider->Update(matWorld_Calced);
+}
+
+HRESULT CEnemy::Ready_Colliders(void* pArg)
+{	// ===== Colliders =====
+
+	CCollider* tmpColCom = nullptr;
+
+	CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
+	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	// s1. For Head / Zero / 0.08f
+	// s2. For LeftHand / Zero / 0.08f
+	// s3. For RightHand / Zero / 0.08f
+	_wstring strNameTag[3] = { L"Head", L"LeftHand", L"RightHand" };
+	_float	fRad[3] = { 0.12f, 0.09f, 0.09f };
+	for (_uint i = 0; i < 3; i++)
+	{
+		SphereDesc.fRadius = fRad[i];
+		if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+			TEXT("Com_Collider_") + strNameTag[i], reinterpret_cast<CComponent**>(&tmpColCom), &SphereDesc)))
+			return E_FAIL;
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpColCom);
+	}
+
+	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(0.15f, 0.75f, 0.10f);
+	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+
+	// o1. Fol BodyAll (Not Specific Bone) / Zero / .1 .82 .1 / 0 .82 0 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider_BodyAll"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
+		return E_FAIL;
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
+
+	return S_OK;
 }
 
 CEnemy* CEnemy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

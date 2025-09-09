@@ -42,15 +42,20 @@ private:
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
 
+	_bool		Check_Collision(_uint iTargetType);
+	void		Check_Destroy(_float fTimeDelta);
+
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	_uint			m_iGameObjType = { };
-	_vector			m_vMoveDir = { };
+	_uint				m_iGameObjType = { };
+	_vector				m_vMoveDir = { };
 
-	CCollider*		m_pColliderCom = { nullptr };
-	CShader*		m_pShaderCom = { nullptr };
-	CModel*			m_pModelCom	= { nullptr };
+	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 
+	CShader*			m_pShaderCom = { nullptr };
+	CModel*				m_pModelCom	= { nullptr };
+
+	_float				m_fElapsedTime = 0.f;
 
 
 public:

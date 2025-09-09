@@ -1,6 +1,11 @@
 #include "Bullet.h"
 #include "GameInstance.h"
 
+#include "ContainerObject.h"
+#include "Player.h"
+#include "Enemy.h"
+
+
 CBullet::CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject(pDevice, pContext)
 {
@@ -45,8 +50,12 @@ void CBullet::Priority_Update(_float fTimeDelta)
 void CBullet::Update(_float fTimeDelta)
 {
 	// 얘는 콜라이더 잘 붙여주고
-	// 충돌 콜라이더 매니저에서 잘 만들어주고
+	// 충돌 확인 진행 잘 되고
 	// 앞으로 잘 날아가기만 하면 됨
+
+
+
+	// 날아가게끔
 	_float fMoveSpeed = 50.f;
 
 	_vector vBulletPos = m_pTransformCom->Get_Position();
@@ -54,8 +63,26 @@ void CBullet::Update(_float fTimeDelta)
 
 	m_pTransformCom->Set_Position_Direct(vBulletPos);
 
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
+
+	// 콜라이더 위치 업데이트
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+			collider->Update(m_pTransformCom->Get_WorldMatrix());
+
+
+	// 콜리젼 타겟과 충돌 여부 확인
+	_uint iTargetType = UINT_MAX;
+	
+	if		(m_iGameObjType == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+		iTargetType = ENUM_CLASS(GAMEOBJ_TYPE::ENEMY);
+	else if (m_iGameObjType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
+		iTargetType = ENUM_CLASS(GAMEOBJ_TYPE::PLAYER);
+	else
+		MSG_BOX(L"[CBullet::Update] Type of Bullet is undefined. Collision Checking Failed.");
+
+	Check_Collision(iTargetType);
+	Check_Destroy(fTimeDelta);
 }
 
 void CBullet::Late_Update(_float fTimeDelta)
@@ -66,9 +93,13 @@ void CBullet::Late_Update(_float fTimeDelta)
 	__super::Late_Update(fTimeDelta);
 
 #ifdef _DEBUG
-	if (m_pColliderCom != nullptr)
-		if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
-			return;
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+		{
+			if (collider != nullptr)
+				if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
+					return;
+		}
 #endif
 }
 
@@ -112,9 +143,11 @@ HRESULT CBullet::Ready_Components(void* pArg)
 	SphereDesc.fRadius = 0.01f;
 	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
+	CCollider* tmpCol = {};
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&tmpCol), &SphereDesc)))
 		return E_FAIL;
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpCol);
 
 	return S_OK;
 }
@@ -131,6 +164,87 @@ HRESULT CBullet::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_bool CBullet::Check_Collision(_uint iTargetType)
+{
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	_bool isIntersect = false;
+
+	vector<CContainerObject*> vecTargets = {};
+	_wstring strLayerTag = {};
+
+	switch (iTargetType)		//
+	{
+	case ENUM_CLASS(GAMEOBJ_TYPE::PLAYER):
+		strLayerTag = TEXT("Layer_Player");
+		break;
+	case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
+		strLayerTag = TEXT("Layer_Monster");
+		break;
+	}
+
+	_uint iIndex = 0;
+	while (true)
+	{
+		CContainerObject* pTarget = dynamic_cast<CContainerObject*>(m_pGameInstance->Find_GameObject(iDestLevel, strLayerTag, iIndex++));
+		if (pTarget == nullptr) break;
+		vecTargets.push_back(pTarget);
+	}
+
+	if (vecTargets.empty())
+		return false;
+
+
+	vector<vector<CCollider*>*> pVecColliders = {};
+	for (auto& target : vecTargets) //
+	{
+		if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+		{
+			CPlayer* pTarget = dynamic_cast<CPlayer*>(target);
+			auto pColliders = pTarget->Get_Colliders(); 
+			for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
+				pVecColliders.push_back(&pColliders[i]);
+		}
+		else if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+		{
+			CEnemy* pTarget = dynamic_cast<CEnemy*>(target);
+			auto pColliders = pTarget->Get_Colliders();
+			for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
+				pVecColliders.push_back(&pColliders[i]);
+		}
+	}
+
+
+	for (auto& vecTargetsColliders : pVecColliders)
+	{
+		for (auto& vecTargetCollider : *vecTargetsColliders)
+		{
+			CCollider* pTargetCollider = vecTargetCollider;
+
+			for (auto& vecColliders : m_vecCollidersCom)
+				for (auto& collider : vecColliders)
+					if (collider->Intersect(pTargetCollider))
+						isIntersect = true;
+		}
+	}
+
+
+	if (isIntersect)
+		int i = 10;
+
+
+	return isIntersect;
+}
+
+void CBullet::Check_Destroy(_float fTimeDelta)
+{
+	m_fElapsedTime += fTimeDelta;
+
+	const _float fDestroyTime = 5.f;
+
+	if (m_fElapsedTime >= fDestroyTime)
+		m_isDead = true;
 }
 
 CBullet* CBullet::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -163,7 +277,9 @@ void CBullet::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+			Safe_Release(collider);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

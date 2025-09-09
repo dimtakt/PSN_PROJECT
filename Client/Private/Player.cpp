@@ -83,11 +83,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
-	//m_pModelCom->Play_Animation(fTimeDelta, PART_UPPER);
 
-	for (auto& vecColliders : m_vecCollidersCom)
-		for (auto& collider : vecColliders)
-			collider->Update(m_pTransformCom->Get_WorldMatrix());
+	Update_BoneColliders();
 
 
 	// 어떤 무기냐에 따라 소체 활성화 여부, 애니메이션, 공격 방식 등에 차이를 둘 예정
@@ -251,26 +248,16 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
 
-	CCollider* tmpColCom = nullptr;
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
-		return E_FAIL;
-	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
-
-
-
-	//CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-	////AABBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	//AABBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
-	//AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
-	//AABBDesc.isFix = true;
-	//
-	//if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
-	//	TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+	//CCollider* tmpColCom = nullptr;
+	//if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+	//	TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
 	//	return E_FAIL;
+	//m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
 
 
 
+	if (FAILED(Ready_Colliders(pArg)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -561,6 +548,72 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 	}
 
 	std::cout << "[CPlayer::Update_TimeControl] Current Time Multiplier : " << m_pGameInstance->Get_TimeSpeed() << std::endl;
+}
+
+void CPlayer::Update_BoneColliders()
+{
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][0], "Head");
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][1], "LeftHand");
+	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][2], "RightHand");
+
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
+}
+
+void CPlayer::Update_BoneCollider(CCollider* pCollider, const _char* szBoneName)
+{
+	// 객체 자체의 월드 행렬과, 본 자체의 로컬 행렬을 가져옴.
+	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+	_matrix matTargetBone = XMLoadFloat4x4(m_pModelCom->Get_BoneMatrix(szBoneName));
+
+	// 본 행렬 분리
+	_vector vPos, vQuat, vSca;
+	XMMatrixDecompose(&vSca, &vQuat, &vPos, matTargetBone);
+
+	// 본 분리한걸 다시 각각의 요소별 행렬화
+	_matrix matWorldPos = XMMatrixTranslationFromVector(vPos);
+	_matrix matWorldRot = XMMatrixRotationQuaternion(vQuat);
+
+	// 재조립 ( 크기는 1로 할 것이라 제외 - "자" - "이" - "공"..)
+	_matrix matWorld_Calced = matWorldRot * matWorldPos * matWorld;
+
+	pCollider->Update(matWorld_Calced);
+}
+
+HRESULT CPlayer::Ready_Colliders(void* pArg)
+{
+	// ===== Colliders =====
+
+	CCollider* tmpColCom = nullptr;
+
+	CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
+	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	// s1. For Head / Zero / 0.08f
+	// s2. For LeftHand / Zero / 0.08f
+	// s3. For RightHand / Zero / 0.08f
+	_wstring strNameTag[3] = { L"Head", L"LeftHand", L"RightHand" };
+	_float	fRad[3] = { 0.10f, 0.08f, 0.08f };
+	for (_uint i = 0; i < 3; i++)
+	{
+		SphereDesc.fRadius = fRad[i];
+		if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+			TEXT("Com_Collider_") + strNameTag[i], reinterpret_cast<CComponent**>(&tmpColCom), &SphereDesc)))
+			return E_FAIL;
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpColCom);
+	}
+
+	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(0.13f, 0.75f, 0.10f);
+	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+
+	// o1. Fol BodyAll (Not Specific Bone) / Zero / .1 .82 .1 / 0 .82 0 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider_BodyAll"), reinterpret_cast<CComponent**>(&tmpColCom), &OBBDesc)))
+		return E_FAIL;
+	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)].push_back(tmpColCom);
+
+	return S_OK;
 }
 
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

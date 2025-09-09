@@ -101,7 +101,11 @@ void CObject_Manager::Late_Update(_float fTimeDelta)
 		for (auto& Pair : m_pLayers[i])
 		{
 			if (nullptr != Pair.second)
+			{
 				Pair.second->Late_Update(fTimeDelta);
+				Pair.second->Remove_DeadObjects();
+			}
+
 		}
 	}
 }
