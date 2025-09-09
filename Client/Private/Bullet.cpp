@@ -25,8 +25,8 @@ HRESULT CBullet::Initialize(void* pArg)
 		return E_FAIL;
 
 	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
-	pDesc->vMoveDir = m_vMoveDir;
-	pDesc->iGameObjType = m_iGameObjType;	// 플레이어 총알인지, 적 총알인지에 따라 판정 다르게?
+	m_vMoveDir = pDesc->vMoveDir;
+	m_iGameObjType = pDesc->iGameObjType;	// 플레이어 총알인지, 적 총알인지에 따라 판정 다르게?
 	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);
 
 	return S_OK;
@@ -45,6 +45,7 @@ void CBullet::Update(_float fTimeDelta)
 	// 충돌 콜러이더 매니저에서 잘 만들어주고
 	// 앞으로 잘 날아가기만 하면 됨
 
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 }
 
@@ -64,8 +65,10 @@ void CBullet::Late_Update(_float fTimeDelta)
 
 HRESULT CBullet::Render()
 {
-	if (FAILED(__super::Render()))
+	// 렌더
+	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
+
 
 	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -103,6 +106,20 @@ HRESULT CBullet::Ready_Components(void* pArg)
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CBullet::Bind_ShaderResources()
+{
+	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
 	return S_OK;

@@ -40,6 +40,7 @@ public:
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
+	HRESULT		Bind_ShaderResources();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
