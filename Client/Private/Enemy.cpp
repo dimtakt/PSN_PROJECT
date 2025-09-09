@@ -72,10 +72,25 @@ void CEnemy::Update(_float fTimeDelta)
 
 void CEnemy::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
+	m_pTransformCom->Set_State(Engine::STATE::POSITION,
+		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(Engine::STATE::POSITION)));
 
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+
+#ifdef _DEBUG
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+		{
+			if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
+				return;
+		}
+
+	if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
+		return;
+#endif
+
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CEnemy::Render()
@@ -240,6 +255,10 @@ void CEnemy::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pModelCom);
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+			Safe_Release(collider);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pNavigationCom);
 }

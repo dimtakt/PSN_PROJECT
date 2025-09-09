@@ -10,6 +10,7 @@ class ENGINE_DLL CTimeSpeed_Manager final : public CBase
     // 중요도가 높은 글로벌 변수를 제어하기 위한 매니저
 
     // 제어 요청을 받아 시간 경과에 따라 보간하여 제어되도록 의도
+    // 사용 방식? : 플레이어 행동 시 force change, 이후 정상화 과정에는 req 사용..
 private:
     CTimeSpeed_Manager() = default;
     virtual ~CTimeSpeed_Manager() = default;
@@ -32,11 +33,11 @@ public:
     _float Get_TimeSpeed()                              {   return fTimeSpeed_Multiplier;   }
 
 private:
-    _float fTimeSpeed_Multiplier = 1.f;
-    _float fTimeSpeed_ReqTarget = 1.f;
+    _float fTimeSpeed_Multiplier = 0.01f;     // 현재 수치
+    _float fTimeSpeed_ReqTarget = 0.01f;      // 목표 수치
 
-    _float fTimeSpeed_Min = 0.025f;
-    _float fTimeSpeed_Max = 1.f;
+    const _float fTimeSpeed_Min = 0.01f;
+    const _float fTimeSpeed_Max = 1.f;
 
 public:
     static CTimeSpeed_Manager* Create()                 { return new CTimeSpeed_Manager(); }

@@ -75,6 +75,8 @@ void CPlayer::Update(_float fTimeDelta)
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
 
+	Update_TimeControl(fTimeDelta);
+
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_UPPER);
@@ -330,29 +332,28 @@ HRESULT CPlayer::Ready_PartObjects()
 void CPlayer::Update_Transform(_float fTimeDelta)
 {
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
-	_float fTmpSpeed = fRawTimeDelta;
 
 	
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_S))
 	{
-		m_pTransformCom->Go_Backward(fTmpSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fRawTimeDelta, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_A))
 	{
-		m_pTransformCom->Go_Left(fTmpSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Left(fRawTimeDelta, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_D))
 	{
-		m_pTransformCom->Go_Right(fTmpSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Right(fRawTimeDelta, m_pNavigationCom);
 	}
 	if (m_pGameInstance->Get_IsKeyPressing(DIK_W))
 	{
-		m_pTransformCom->Go_Straight(fTmpSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Straight(fRawTimeDelta, m_pNavigationCom);
 	}
 
 	_int iMouseMove;
 	if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fRawTimeDelta * iMouseMove * m_fMouseSensor);
 }
 
 void CPlayer::Update_AnimationState(_float fTimeDelta)
@@ -517,6 +518,45 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 
 	m_pModelCom->Set_Animation(tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, tAnimDesc[PART_UPPER].isAnimLoop, tAnimDesc[PART_UPPER].fTransitionTime);
 	m_pModelCom->Set_Animation(tAnimDesc[PART_LOWER].iAnimIndex, PART_LOWER, tAnimDesc[PART_LOWER].isAnimLoop, tAnimDesc[PART_LOWER].fTransitionTime);
+}
+
+void CPlayer::Update_TimeControl(_float fTimeDelta)
+{
+	// 특정 키를 누르는 동안에는 시간 속도를 고정,
+	// 그 외의 경우 원래 속도(느린)대로 정상화
+
+	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+
+	static _float fStackedTimeDelta = 0.f;
+	static _bool isPressed = false;
+	const _float fDuration = 0.05f;						// 잠시동안 속도가 유지될 시간
+
+	if (
+		m_pGameInstance->Get_IsKeyPressing(DIK_W) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
+		m_pGameInstance->Get_IsKeyPressing(DIK_D) ||
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) ||
+		false)										// 조작을 하는 동안 시간 강제로 빠르게
+	{
+		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+		fStackedTimeDelta = 0;
+		isPressed = true;
+	}
+	else if ((fStackedTimeDelta < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
+	{
+		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+		fStackedTimeDelta += fRawTimeDelta;
+	}
+
+	else if (fStackedTimeDelta >= fDuration)	// 조작하지 않은 지 일정 시간 지나면 시간 정상화 요청
+	{
+		m_pGameInstance->Req_EditTimeSpeed(0.01f);
+		fStackedTimeDelta = 0;
+		isPressed = false;
+	}
+
+	std::cout << "[CPlayer::Update_TimeControl] Current Time Multiplier : " << m_pGameInstance->Get_TimeSpeed() << std::endl;
 }
 
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

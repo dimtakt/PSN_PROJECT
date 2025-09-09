@@ -578,9 +578,12 @@ HRESULT CGameInstance::Render_RT_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuff
 
 #pragma region TIMESPEED_MANAGER
 
-void CGameInstance::Req_EditTimeSpeed(_float fEditValue)
+void CGameInstance::Req_EditTimeSpeed(_float fEditValue, _bool isForceChange)
 {
-	m_pTimeSpeed_Manager->Req_EditTimeSpeed(fEditValue);
+	if (!isForceChange)
+		m_pTimeSpeed_Manager->Req_EditTimeSpeed(fEditValue);
+	else
+		m_pTimeSpeed_Manager->Set_EditTimeSpeed(fEditValue);
 }
 
 _float CGameInstance::Get_TimeSpeed()

@@ -188,7 +188,7 @@ public:
 #pragma region TIMESPEED_MANAGER
 
 public:
-	void Req_EditTimeSpeed(_float fEditValue);
+	void Req_EditTimeSpeed(_float fEditValue, _bool isForceChange = false);
 	_float Get_TimeSpeed();
 
 #pragma endregion

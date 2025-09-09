@@ -21,6 +21,16 @@ public:
 
 		_uint			iGameObjType;
 	}GAMEOBJECT_DESC;
+
+public:
+	typedef struct tAnimArgDesc	// 상하체 애니메이션 별도로 굴리기 위해 편의성으로 만든 구조체.
+	{
+		_uint iAnimIndex = {};
+		_bool isAnimLoop = false;
+		_float fTransitionTime = 0.2f;
+	}ANIMARG_DESC;
+
+
 protected:
 	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGameObject(const CGameObject& Prototype);

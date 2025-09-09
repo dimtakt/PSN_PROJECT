@@ -30,6 +30,8 @@ HRESULT CCamera_Player::Initialize(void* pArg)
 
 void CCamera_Player::Priority_Update(_float fTimeDelta)
 {
+    _float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+
     // * 키보드 WASD 에 의한 카메라 이동
     
     if (m_pGameInstance->Get_IsKeyDown(DIK_TAB))
@@ -39,13 +41,13 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     if (m_isFreeMode)
     {
         if (m_pGameInstance->Get_IsKeyPressing(DIK_UP))
-            m_pTransformCom->Go_Straight(fTimeDelta);
+            m_pTransformCom->Go_Straight(fRawTimeDelta);
         if (m_pGameInstance->Get_IsKeyPressing(DIK_DOWN))
-            m_pTransformCom->Go_Backward(fTimeDelta);
+            m_pTransformCom->Go_Backward(fRawTimeDelta);
         if (m_pGameInstance->Get_IsKeyPressing(DIK_LEFT))
-            m_pTransformCom->Go_Left(fTimeDelta);
+            m_pTransformCom->Go_Left(fRawTimeDelta);
         if (m_pGameInstance->Get_IsKeyPressing(DIK_RIGHT))
-            m_pTransformCom->Go_Right(fTimeDelta);
+            m_pTransformCom->Go_Right(fRawTimeDelta);
     }
 
     else
@@ -66,13 +68,13 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
     // 항시 글로벌 Y축에 따라 회전해야 하므로 Y축을 고정적인 회전 기준점으로 둠
     if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * iMouseMove * m_fMouseSensor);
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fRawTimeDelta * iMouseMove * m_fMouseSensor);
 
     // Y축 회전값에 따라 변하는, 로컬 X축을 기준으로 회전해야 하므로
     // Get_State로 RIGHT 값을 받아와 사용
     if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
     {
-        m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * iMouseMove * m_fMouseSensor);
+        m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fRawTimeDelta * iMouseMove * m_fMouseSensor);
 
         const _float3 vRot = m_pTransformCom->Get_RotationEuler_Store(); 
         _float fAngleLimit = 80.f;      // 상하 회전 각도제한
