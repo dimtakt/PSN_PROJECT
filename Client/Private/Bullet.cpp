@@ -99,13 +99,12 @@ HRESULT CBullet::Ready_Components(void* pArg)
 		return E_FAIL;
 
 
-	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(0.1f, 0.82f, 0.1f);
-	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+	CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
+	SphereDesc.fRadius = 0.01f;
+	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
 	return S_OK;
