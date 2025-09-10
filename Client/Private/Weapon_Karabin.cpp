@@ -36,11 +36,24 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     _matrix matId = XMMatrixIdentity();
     _matrix matScale = matId, matRot1 = matId, matRot2 = matId, matPos = matId;
 
+
+    if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+    {
+        matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
+    }
+    else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+    {
+        matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+        matRot1 = XMMatrixRotationX(TO_RAD(100));
+        matRot2 = XMMatrixRotationZ(TO_RAD(215));
+        matPos = XMMatrixTranslation(-0.15f, +0.15f, +0.1f);  // 오-뒤 - 왼-앞 - 위
+    }
+
     // matScale = XMMatrixScaling(1.f, 1.f, 1.f);
     // matRot1 = XMMatrixRotationX(TO_RAD(-90));
     // matRot2 = XMMatrixRotationZ(TO_RAD(180));
     // matPos = XMMatrixTranslation(-0.2f, -0.6f, -1.5f);
-    matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
+    //matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
 
     _matrix matTransform = matScale * matRot1 * matRot2 * matPos;
     m_pTransformCom->Set_WorldMatrix(matTransform);
@@ -70,28 +83,29 @@ void CWeapon_Karabin::Update(_float fTimeDelta)
 
     // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
 
-    const _float4x4* matCam = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
-    m_CombinedWorldMatrix;
-    XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(matCam));
+    if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+    {
+        const _float4x4* matCam = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
+        XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(matCam));
+
+
+    }
+    
+    else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+    {
+        _matrix     BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);
+
+        for (size_t i = 0; i < 3; i++)
+            BoneMatrix.r[i] = XMVector3Normalize(BoneMatrix.r[i]);
+
+        XMStoreFloat4x4(&m_CombinedWorldMatrix,
+            m_pTransformCom->Get_WorldMatrix() * BoneMatrix * XMLoadFloat4x4(m_pParentMatrix));
+    }
+
 
     for (auto& vecColliders : m_vecCollidersCom)
         for (auto& collider : vecColliders)
             collider->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
-
-
-    //_float3 pos;
-    //XMStoreFloat3(&pos, m_pTransformCom->Get_State(STATE::POSITION));
-    //
-    //_float3 rot;
-    //rot = m_pTransformCom->Get_RotationEuler_Store();
-
-    // combonedWorldMatrix 가 최종 반영된 Transform임에 유의
-
-    m_CombinedWorldMatrix;
-    m_CombinedWorldMatrix;
-    m_pTransformCom;
-
-    return;
 
 
     // 여기에서 업데이트 동작 진행.. (총알 발사 등)

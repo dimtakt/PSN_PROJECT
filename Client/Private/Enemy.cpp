@@ -74,21 +74,22 @@ void CEnemy::Update(_float fTimeDelta)
 	//	}
 
 	// 테스트용
-	static _float fMoveTimeDelta = 0.f;
-	static _bool isGoStraight = true;
+	//static _float fMoveTimeDelta = 0.f;
+	//static _bool isGoStraight = true;
 
-	fMoveTimeDelta += fTimeDelta;
-	if (fMoveTimeDelta >= 3.f)
-	{
-		fMoveTimeDelta = 0;
-		isGoStraight = !isGoStraight;
-	}
+	//fMoveTimeDelta += fTimeDelta;
+	//if (fMoveTimeDelta >= 3.f)
+	//{
+	//	fMoveTimeDelta = 0;
+	//	isGoStraight = !isGoStraight;
+	//}
 
-	if (isGoStraight)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
-	else	
-		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
+	//if (isGoStraight)
+	//	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+	//else	
+	//	m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 	
+	__super::Update(fTimeDelta);
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)
@@ -185,20 +186,6 @@ HRESULT CEnemy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	//if (nullptr == pLightDesc)
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 
@@ -208,33 +195,182 @@ HRESULT CEnemy::Ready_PartObjects()
 
 	CWeapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pState = &m_iState;
-	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
+	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHand");
 	//WeaponDesc.pSocketMatrix = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
 		return E_FAIL;
 	
+	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Enemy");
+
 	return S_OK;
 }
 
 void CEnemy::Update_Transform(_float fTimeDelta)
 {
-	_float fTmpSpeed = 1.5f * fTimeDelta;
 
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
+	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
 
+	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
+
+	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+
+	_bool isNearExistWeapon = false;
+
+	
+	if (!(m_iState & ENUM_CLASS(ENEMY_STATE::IDLE) &&
+		(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))))
+	{
+		_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK); // 현재 바라보는 방향
+		_vector vTargetDir = XMVector3Normalize(pPlayerTransformCom->Get_Position() - m_pTransformCom->Get_State(STATE::POSITION)); // 목표 위치 방향
+	
+		_float vDeg = TO_DEG(acosf(XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir))));
+	
+		_vector vCross = XMVector3Cross(vCurrentLook, vTargetDir);
+		_float fDir = (XMVectorGetY(vCross) >= 0.f) ? +1.f : -1.f;
+	
+		if (vDeg > 20)
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDir * fTimeDelta);
+	
+		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
+			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f);
+	}
+
+	m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
+
+	// 반댓 방향일 때에 돌게도
 }
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
 {
-	m_pModelCom->Set_Animation(ENEMY_ANIMINDEX::MOVE_U_RUNNING, PART_UPPER, true);
-	m_pModelCom->Set_Animation(MOVE_L_RUNNING, PART_LOWER, true);
+	// 상태 추가 (켜기) → |=
+	// 상태 제거 (끄기) → &= ~
+	// 
+	// 상태 토글 (반전) → ^=
+	// 상태 확인 (켜져 있는지 검사) → &
+
+
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
+	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
+
+	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
+
+	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+
+	_bool isNearExistWeapon = false;
+
+
+
+	// 근접 공격을 받는 경우도..
+
+
+
+	if (pWeaponGun != nullptr)		// 총 무기 들고 있음
+	{
+		if (fDist >= 50.f)
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
+			m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+		}
+		else if (IS_BETWEEN(fDist, 30.f, 50.f))
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
+			m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
+		}
+		else if (IS_BETWEEN(fDist, 0.f, 30.f))
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
+			m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+		}
+	}
+	else							// 든 무기 없음
+	{
+		if (isNearExistWeapon)
+			m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON);
+		else
+		{
+			if (fDist >= 20.f)
+			{
+				m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
+				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+			}
+			else if (IS_BETWEEN(fDist, 10.f, 40.f))
+			{
+				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
+				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
+			}
+			else if (IS_BETWEEN(fDist, 0.0f, 10.f))
+			{
+				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_MELEE);
+				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+			}
+		}
+	}
+
+
+
+	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
+	{
+		if (pWeaponGun != nullptr && m_fElapsedShot > 1.f)
+		{
+			// 날아갈 방향 계산
+			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
+			_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
+			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
+			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
+			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
+
+			pWeaponGun->Shot(XMVectorSetW(vDir, 1.f), ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+			m_fElapsedShot = 0.f;
+		}
+		else
+			m_fElapsedShot += fTimeDelta;
+	}
+
+
+
 }
 
 void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 {
+	if  (m_iState & ENUM_CLASS(ENEMY_STATE::IDLE))
+	{
+		m_tAnimDesc[PART_UPPER] = { MOVE_U_IDLE, true };
+		m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true };
+		
+		//m_pModelCom->Set_Animation(GUN_U_RIFLE_AIM_IDLE, PART_UPPER, true);
+		//m_pModelCom->Set_Animation(GUN_L_RIFLE_AIM_IDLE, PART_LOWER, true);
+	}
+	else if (m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))
+	{
+		m_tAnimDesc[PART_UPPER] = { MOVE_U_RUNNING, true };
+		m_tAnimDesc[PART_LOWER] = { MOVE_L_RUNNING, true };
+	}
 
+
+
+	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_MELEE))
+	{
+		m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02, true };
+		//m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03, true };
+	}
+	else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
+	{
+		m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };
+
+		if (!(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE)))
+			m_tAnimDesc[PART_LOWER] = { GUN_L_RIFLE_AIM_IDLE , true };
+	}
+
+
+	m_pModelCom->Set_Animation(m_tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, m_tAnimDesc[PART_UPPER].isAnimLoop, m_tAnimDesc[PART_UPPER].fTransitionTime);
+	m_pModelCom->Set_Animation(m_tAnimDesc[PART_LOWER].iAnimIndex, PART_LOWER, m_tAnimDesc[PART_LOWER].isAnimLoop, m_tAnimDesc[PART_LOWER].fTransitionTime);
 }
 
 void CEnemy::Update_BoneColliders()

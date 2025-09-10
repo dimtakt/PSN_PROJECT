@@ -22,7 +22,7 @@ public:
 	}Bullet_DESC;
 private:
 	CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CBullet(const CGameObject& Prototype);
+	CBullet(const CBullet& Prototype);
 	virtual ~CBullet() = default;
 
 public:
@@ -56,6 +56,9 @@ private:
 	CModel*				m_pModelCom	= { nullptr };
 
 	_float				m_fElapsedTime = 0.f;
+
+
+
 
 
 public:

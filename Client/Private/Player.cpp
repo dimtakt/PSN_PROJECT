@@ -70,18 +70,19 @@ void CPlayer::Update(_float fTimeDelta)
 {
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
+	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
 
 	Update_Transform(fTimeDelta);
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
 
-	//Update_TimeControl(fTimeDelta);
+	Update_TimeControl(fTimeDelta);
 #ifdef _DEBUG
-	m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
+	//m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
 #endif // _DEBUG
 
 
-	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
+	m_pModelCom->Play_Animation_AllLayer(fRawTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
 
 	Update_BoneColliders();
@@ -96,10 +97,10 @@ void CPlayer::Update(_float fTimeDelta)
 	// ksta : 총알 소환 테스트
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
 	{
-		if (m_pPart_Weapon != nullptr)
-		{
-			CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
+		if (pWeaponGun != nullptr)
+		{
 			// 날아갈 방향 계산
 			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 
@@ -195,13 +196,7 @@ HRESULT CPlayer::Render()
 	//if (nullptr == pBody)
 	//	return E_FAIL;
 
-	//CWeapon::WEAPON_DESC                 WeaponDesc{};
-	//WeaponDesc.pState = &m_iState;
-	//WeaponDesc.pSocketMatrix = dynamic_cast<CBody_Player*>(pBody)->Get_BoneMatrix("SWORD");
-	//WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-
-	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc)))
-	//	return E_FAIL;
+	
 
 
 
@@ -312,10 +307,10 @@ HRESULT CPlayer::Ready_PartObjects()
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Player"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
 		return E_FAIL;
 
-	m_pPart_Weapon = Find_PartObject(L"Part_Weapon");
+	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Player");
 	
 	return S_OK;
 } // Remove도 만들기?
@@ -355,7 +350,7 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 	
-
+	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
 
 	// 공격 상태 제어
 
@@ -363,7 +358,7 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 	_float fFistPlayTime = 1.0f;
 
 	if (m_iState & ENUM_CLASS(PLAYER_STATE::ATK))
-		fFistProgressTime += fTimeDelta;
+		fFistProgressTime += fRawTimeDelta;
 
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) &&
 		!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
@@ -410,6 +405,9 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 	// 변수화를 하여 중간에 Set_Animation 중복 호출을 방지
 	// (중복 호출 시 내부적으로 Prev Animation 이 바뀌어 문제 발생
 	
+	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+
+
 	static ANIMARG_DESC tAnimDesc[PART_END] = {};
 
 	// ==============================
@@ -481,7 +479,7 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		}
 		else if ((m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)		// 진행중
 		{
-			fFistTimeDelta += fTimeDelta;
+			fFistTimeDelta += fRawTimeDelta;
 
 			switch (iRandFistIndex)
 			{
@@ -495,14 +493,14 @@ void CPlayer::Update_AnimationIndex(_float fTimeDelta)
 		}
 		else if (!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) && isFistPlaying)	// 종료
 		{
-			fFistTimeDelta += fTimeDelta;
+			fFistTimeDelta += fRawTimeDelta;
 			isFistPlaying = false;
 			iRandFistIndex = {};
 		}
 	}
 	else	// 총을 들고 있다면
 	{
-		fFistTimeDelta += fTimeDelta;
+		fFistTimeDelta += fRawTimeDelta;
 		isFistPlaying = false;
 		iRandFistIndex = {};
 	}
@@ -547,7 +545,7 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		isPressed = false;
 	}
 
-	std::cout << "[CPlayer::Update_TimeControl] Current Time Multiplier : " << m_pGameInstance->Get_TimeSpeed() << std::endl;
+	//std::cout << "[CPlayer::Update_TimeControl] Current Time Multiplier : " << m_pGameInstance->Get_TimeSpeed() << std::endl;
 }
 
 void CPlayer::Update_BoneColliders()

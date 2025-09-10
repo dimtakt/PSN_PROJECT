@@ -11,7 +11,7 @@ CBullet::CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 }
 
-CBullet::CBullet(const CGameObject& Prototype)
+CBullet::CBullet(const CBullet& Prototype)
 	: CGameObject(Prototype)
 {
 }
@@ -28,6 +28,7 @@ HRESULT CBullet::Initialize(void* pArg)
 
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
+
 
 	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
 	m_vMoveDir = pDesc->vMoveDir;
@@ -82,7 +83,7 @@ void CBullet::Update(_float fTimeDelta)
 		MSG_BOX(L"[CBullet::Update] Type of Bullet is undefined. Collision Checking Failed.");
 
 	Check_Collision(iTargetType);
-	Check_Destroy(fTimeDelta);
+	//Check_Destroy(fTimeDelta);
 }
 
 void CBullet::Late_Update(_float fTimeDelta)
@@ -239,12 +240,17 @@ _bool CBullet::Check_Collision(_uint iTargetType)
 
 void CBullet::Check_Destroy(_float fTimeDelta)
 {
+	std::cout << m_fElapsedTime << std::endl;
+
 	m_fElapsedTime += fTimeDelta;
 
 	const _float fDestroyTime = 5.f;
 
 	if (m_fElapsedTime >= fDestroyTime)
+	{
+		m_fElapsedTime = 0;
 		m_isDead = true;
+	}
 }
 
 CBullet* CBullet::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

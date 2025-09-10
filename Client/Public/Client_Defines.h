@@ -11,24 +11,28 @@ namespace Client
 
 	enum class ENEMY_STATE {
 		IDLE		= (1 << 0),
-		
+		MOVE		= (1 << 1),
+		PICKUP		= (1 << 2),
+		DMGD_U		= (1 << 3),
+		DMGD_L		= (1 << 4),
+
 		// 타겟 추적하여 접근
-		TRACK_WEAPON_RUN,	// 근처의 무기 탐색
-		TRACK_PLAYER_RUN,	// 무기가 없을 시 플레이어 탐색
+		TRACK_WEAPON = (1 << 5),	// 근처의 무기 탐색
+		TRACK_PLAYER = (1 << 6),	// 무기가 없을 시 플레이어 탐색
 
 		// 픽업중
-		PICKUP_GROUND,
-		PICKUP_MID,
+		PICKUP_GROUND = (1 << 7),
+		PICKUP_MID = (1 << 8),
 
 		// 조건 만족시 공격
-		ATK_MELEE,
-		ATK_WEAPON_BLUNT,
-		ATK_WEAPON_GUN,
+		ATK_MELEE = (1 << 9),
+		ATK_WEAPON_BLUNT = (1 << 10),
+		ATK_WEAPON_GUN = (1 << 11),
 
 		// 
 
 
-		ENEMY_STATE_END
+		ENEMY_STATE_END = (1 << 12)
 	};
 
 	enum class PLAYER_STATE {

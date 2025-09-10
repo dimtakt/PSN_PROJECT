@@ -43,6 +43,8 @@ public:
 		return m_vecCollidersCom; 
 	};
 
+
+
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
@@ -71,6 +73,10 @@ private:
 
 	CPartObject*		m_pPart_Weapon		= { nullptr };
 
+	ANIMARG_DESC		m_tAnimDesc[PART_END] = {};
+
+
+	_float				m_fElapsedShot = 1.f;
 
 private:
 	_uint			m_iState			= { };
