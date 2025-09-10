@@ -221,7 +221,7 @@ _bool CBullet::Check_Collision(_uint iTargetType)
 	{
 		for (auto& vecTargetCollider : *vecTargetsColliders)
 		{
-			CCollider* pTargetCollider = vecTargetCollider;
+			CCollider* pTargetCollider = vecTargetCollider;	
 
 			for (auto& vecColliders : m_vecCollidersCom)
 				for (auto& collider : vecColliders)
@@ -229,6 +229,59 @@ _bool CBullet::Check_Collision(_uint iTargetType)
 						isIntersect = true;
 		}
 	}
+	
+	
+	
+	
+	
+	//for (auto& target : vecTargets) //
+	//{
+	//	if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+	//	{
+	//		CPlayer* pTarget = dynamic_cast<CPlayer*>(target);
+	//		vector<CCollider*>* pColliders = pTarget->Get_Colliders();
+	//		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
+	//		{
+	//
+	//
+	//			for (_uint j = 0; j < pColliders->size(); j++)
+	//			{
+	//				CCollider* pTargetCollider = pColliders[i][j];
+	//
+	//				for (auto& vecColliders : m_vecCollidersCom)
+	//					for (auto& collider : vecColliders)
+	//						if (collider->Intersect(pTargetCollider))
+	//							isIntersect = true;
+	//			}
+	//
+	//
+	//		}
+	//	}
+	//	else if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+	//	{
+	//		CEnemy* pTarget = dynamic_cast<CEnemy*>(target);
+	//		vector<CCollider*>* pColliders = pTarget->Get_Colliders();
+	//		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
+	//		{
+	//
+	//
+	//			for (_uint j = 0; j < pColliders->size(); j++)
+	//			{
+	//				CCollider* pTargetCollider = pColliders[i][j];
+	//
+	//				for (auto& vecColliders : m_vecCollidersCom)
+	//					for (auto& collider : vecColliders)
+	//						if (collider->Intersect(pTargetCollider))
+	//							isIntersect = true;
+	//			}
+	//
+	//
+	//		}
+	//	}
+	//}
+
+
+
 
 
 	if (isIntersect)

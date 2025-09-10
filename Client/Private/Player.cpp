@@ -49,8 +49,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 
 
-	if (FAILED(Ready_PartObjects()))
-		return E_FAIL;
+	//if (FAILED(Ready_PartObjects()))
+	//	return E_FAIL;
 
 
 	m_iMaxHp	= 1;
@@ -68,6 +68,24 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 
 void CPlayer::Update(_float fTimeDelta)
 {
+#ifdef _DEBUG	// ksta : 테스트 후 삭제
+
+	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+
+	if (pWeaponGun == nullptr)
+		if (m_pGameInstance->Get_IsKeyDown(DIK_O))
+			if (FAILED(Ready_PartObjects()))
+				return;
+
+#endif // _DEBUG
+
+
+
+
+
+
+
+
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());

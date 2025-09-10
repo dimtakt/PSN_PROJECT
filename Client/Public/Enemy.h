@@ -76,7 +76,7 @@ private:
 	ANIMARG_DESC		m_tAnimDesc[PART_END] = {};
 
 
-	_float				m_fElapsedShot = 1.f;
+	_float				m_fElapsedShot		= 1.f;
 
 private:
 	_uint			m_iState			= { };

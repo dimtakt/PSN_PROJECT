@@ -262,12 +262,11 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
-	_bool isNearExistWeapon = false;
+	_bool isNearExistWeapon = false;	// 추후 조건추가
 
 
 
 	// 근접 공격을 받는 경우도..
-
 
 
 	if (pWeaponGun != nullptr)		// 총 무기 들고 있음
