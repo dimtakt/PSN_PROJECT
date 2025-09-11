@@ -29,7 +29,8 @@ public:
     };
 
     void Req_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue;  };
-    void Set_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_Multiplier = fEditValue; };
+    void Set_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue; 
+                                                            fTimeSpeed_Multiplier = fEditValue; };
     _float Get_TimeSpeed()                              {   return fTimeSpeed_Multiplier;   }
 
 private:
