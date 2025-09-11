@@ -54,6 +54,8 @@ private:
 	void		Update_Transform(_float fTimeDelta);		// AI 행동에 의한 "Transform" 제어
 	void		Update_AnimationState(_float fTimeDelta);	// AI 행동에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// AI 행동에 의한 "애니메이션" 제어
+
+	void		Update_LogicInterval(_float fTimeDelta);	// AI 행동의 갱신 주기 별도 관리
 	
 	void		Update_BoneColliders();
 
@@ -78,8 +80,14 @@ private:
 
 	_float				m_fElapsedShot		= 1.f;
 
+
+
+	_float				m_fLogic_ElapsedTime = 0.f;
+	_float				m_fLogic_ResetIntervalTime = .5f;
+	_trigger			m_isLogicTriggered = false;
+
 private:
-	_uint			m_iState			= { };
+	_uint				m_iState			= { };
 
 
 public:

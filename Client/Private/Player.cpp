@@ -534,32 +534,45 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
 
-	static _float fStackedTimeDelta = 0.f;
+	static _float fElapsedTime = 0.f;
 	static _bool isPressed = false;
-	const _float fDuration = 0.05f;						// 잠시동안 속도가 유지될 시간
+	static _float fDuration = 0.05f;						// 잠시동안 속도가 유지될 시간
 
 	if (
 		m_pGameInstance->Get_IsKeyPressing(DIK_W) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_A) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_S) ||
 		m_pGameInstance->Get_IsKeyPressing(DIK_D) ||
-		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) ||
 		false)										// 조작을 하는 동안 시간 강제로 빠르게
 	{
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
-		fStackedTimeDelta = 0;
+		fElapsedTime = 0;
 		isPressed = true;
+		fDuration = 0.05f;
 	}
-	else if ((fStackedTimeDelta < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
+	else if (
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) ||
+		false
+		)
 	{
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
-		fStackedTimeDelta += fRawTimeDelta;
+		fElapsedTime = 0;
+		isPressed = true;
+		fDuration = 0.20f;
+	}
+	else if ((fElapsedTime < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
+	{
+		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+		fElapsedTime += fRawTimeDelta;
 	}
 
-	else if (fStackedTimeDelta >= fDuration)	// 조작하지 않은 지 일정 시간 지나면 시간 정상화 요청
+
+
+
+	else if (fElapsedTime >= fDuration)	// 조작하지 않은 지 일정 시간 지나면 시간 정상화 요청
 	{
 		m_pGameInstance->Req_EditTimeSpeed(0.01f);
-		fStackedTimeDelta = 0;
+		fElapsedTime = 0;
 		isPressed = false;
 	}
 

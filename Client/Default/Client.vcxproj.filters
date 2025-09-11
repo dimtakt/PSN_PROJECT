@@ -127,6 +127,9 @@
     <Filter Include="02.GameObject\_PartObject\Weapon\Thrown">
       <UniqueIdentifier>{e650a5da-a7f6-4cd9-aea9-76b370f8ff0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\_NonAnimObject\_Pickupable">
+      <UniqueIdentifier>{bf8724f1-39bd-407b-b439-fc38bf9b0ccf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -255,6 +258,9 @@
     <ClInclude Include="..\public\Weapon_Gun.h">
       <Filter>02.GameObject\_PartObject\Weapon\Gun</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CustomObj_Pickupable.h">
+      <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -380,6 +386,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Weapon_Gun.cpp">
       <Filter>02.GameObject\_PartObject\Weapon\Gun</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomObj_Pickupable.cpp">
+      <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

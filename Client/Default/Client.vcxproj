@@ -158,6 +158,7 @@
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\public\CustomObj_Pickupable.h" />
     <ClInclude Include="..\public\Level_Stage.h" />
     <ClInclude Include="..\Public\Props_Fotel.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -209,6 +210,7 @@
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Player.cpp" />
+    <ClCompile Include="..\private\CustomObj_Pickupable.cpp" />
     <ClCompile Include="..\private\Level_Stage.cpp" />
     <ClCompile Include="..\Private\Props_Fotel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

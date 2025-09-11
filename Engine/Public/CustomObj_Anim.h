@@ -11,9 +11,9 @@ NS_END
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL CCustomObj_Anim final : public CCustomObj
+class ENGINE_DLL CCustomObj_Anim : public CCustomObj
 {
-private:
+protected:
 	CCustomObj_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCustomObj_Anim(const CGameObject& Prototype);
 	virtual ~CCustomObj_Anim() = default;
@@ -26,11 +26,11 @@ public:
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
 
-private:
+protected:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
-private:
+protected:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	CShader*		m_pShaderCom	= { nullptr };
 	CModel*			m_pModelCom		= { nullptr };

@@ -34,8 +34,8 @@ public:
     _float Get_TimeSpeed()                              {   return fTimeSpeed_Multiplier;   }
 
 private:
-    _float fTimeSpeed_Multiplier = 0.01f;     // 현재 수치
-    _float fTimeSpeed_ReqTarget = 0.01f;      // 목표 수치
+    _float fTimeSpeed_Multiplier = 1.f;     // 현재 수치
+    _float fTimeSpeed_ReqTarget = 1.f;      // 목표 수치
 
     const _float fTimeSpeed_Min = 0.01f;
     const _float fTimeSpeed_Max = 1.f;

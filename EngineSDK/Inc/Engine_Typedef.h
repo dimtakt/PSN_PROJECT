@@ -45,6 +45,9 @@ namespace Engine
 	
 
 
+	/* д©╫╨ер */
+	typedef		bool						_trigger;
+
 }
 
 #endif // Engine_Typedef_h__

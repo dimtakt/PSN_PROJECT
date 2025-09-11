@@ -42,7 +42,10 @@ HRESULT CEnemy::Initialize(void* pArg)
 
 	m_iMaxHp	= 3;
 	m_iHp		= 3;	// ksta : 일정 시간 공격받지 않으면 다시 최대 체력으로 회복되어야 함.
+	
 
+
+	m_fLogic_ElapsedTime = m_pGameInstance->Rand(0.f, m_fLogic_ResetIntervalTime);
 
 	return S_OK;
 }
@@ -57,6 +60,8 @@ void CEnemy::Update(_float fTimeDelta)
 {
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
+
+
 
 	Update_Transform(fTimeDelta);
 	Update_AnimationState(fTimeDelta);
@@ -88,7 +93,9 @@ void CEnemy::Update(_float fTimeDelta)
 	//	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 	//else	
 	//	m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
-	
+
+
+	Update_LogicInterval(fTimeDelta);
 	__super::Update(fTimeDelta);
 }
 
@@ -221,21 +228,21 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 
 	_bool isNearExistWeapon = false;
 
-	
+
 	if (!(m_iState & ENUM_CLASS(ENEMY_STATE::IDLE) &&
 		(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))))
 	{
 		_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK); // 현재 바라보는 방향
 		_vector vTargetDir = XMVector3Normalize(pPlayerTransformCom->Get_Position() - m_pTransformCom->Get_State(STATE::POSITION)); // 목표 위치 방향
-	
+
 		_float vDeg = TO_DEG(acosf(XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir))));
-	
+
 		_vector vCross = XMVector3Cross(vCurrentLook, vTargetDir);
 		_float fDir = (XMVectorGetY(vCross) >= 0.f) ? +1.f : -1.f;
-	
+
 		if (vDeg > 20)
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDir * fTimeDelta);
-	
+
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
 			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f);
 	}
@@ -268,49 +275,56 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 	// 근접 공격을 받는 경우도..
 
+	if (m_isLogicTriggered)
+	{
 
-	if (pWeaponGun != nullptr)		// 총 무기 들고 있음
-	{
-		if (fDist >= 50.f)
+
+		if (pWeaponGun)		// [총]		무기 들고 있음
 		{
-			m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
-			m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-		}
-		else if (IS_BETWEEN(fDist, 30.f, 50.f))
-		{
-			m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
-			m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
-		}
-		else if (IS_BETWEEN(fDist, 0.f, 30.f))
-		{
-			m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
-			m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-		}
-	}
-	else							// 든 무기 없음
-	{
-		if (isNearExistWeapon)
-			m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON);
-		else
-		{
-			if (fDist >= 20.f)
+			if (fDist >= 50.f)								// [Idle]	멀리 있음 
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
 				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
 			}
-			else if (IS_BETWEEN(fDist, 10.f, 40.f))
+			else if (IS_BETWEEN(fDist, 30.f, 50.f))			// [Track]	적당히 가까이 있음
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
 				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
 			}
-			else if (IS_BETWEEN(fDist, 0.0f, 10.f))
+			else if (IS_BETWEEN(fDist, 0.f, 30.f))			// [Aiming]	가까이 있음
 			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_MELEE);
+				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
 				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
 			}
 		}
-	}
+		else if (false)		// [근접]	무기 들고 있음
+		{
 
+		}
+		else				// [ X ]	든 무기 없음
+		{
+			if (isNearExistWeapon)
+				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON);
+			else
+			{
+				if (fDist >= 20.f)
+				{
+					m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
+					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+				}
+				else if (IS_BETWEEN(fDist, 10.f, 40.f))
+				{
+					m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
+					m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
+				}
+				else if (IS_BETWEEN(fDist, 0.0f, 10.f))
+				{
+					m_iState = ENUM_CLASS(ENEMY_STATE::ATK_MELEE);
+					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+				}
+			}
+		}
+	}
 
 
 	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
@@ -319,6 +333,7 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 		{
 			// 날아갈 방향 계산
 			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
+
 			_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
 			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
@@ -338,38 +353,59 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 {
-	if  (m_iState & ENUM_CLASS(ENEMY_STATE::IDLE))
+	if (m_isLogicTriggered)
 	{
-		m_tAnimDesc[PART_UPPER] = { MOVE_U_IDLE, true };
-		m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true };
+
+		if  (m_iState & ENUM_CLASS(ENEMY_STATE::IDLE))
+		{
+			m_tAnimDesc[PART_UPPER] = { MOVE_U_IDLE, true };
+			m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true };
 		
-		//m_pModelCom->Set_Animation(GUN_U_RIFLE_AIM_IDLE, PART_UPPER, true);
-		//m_pModelCom->Set_Animation(GUN_L_RIFLE_AIM_IDLE, PART_LOWER, true);
-	}
-	else if (m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))
-	{
-		m_tAnimDesc[PART_UPPER] = { MOVE_U_RUNNING, true };
-		m_tAnimDesc[PART_LOWER] = { MOVE_L_RUNNING, true };
-	}
+			//m_pModelCom->Set_Animation(GUN_U_RIFLE_AIM_IDLE, PART_UPPER, true);
+			//m_pModelCom->Set_Animation(GUN_L_RIFLE_AIM_IDLE, PART_LOWER, true);
+		}
+		else if (m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))
+		{
+			m_tAnimDesc[PART_UPPER] = { MOVE_U_RUNNING, true };
+			m_tAnimDesc[PART_LOWER] = { MOVE_L_RUNNING, true };
+		}
 
 
 
-	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_MELEE))
-	{
-		m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02, true };
-		//m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03, true };
-	}
-	else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
-	{
-		m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };
+		if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_MELEE))
+		{
+			m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02, true };
+			//m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03, true };
+		}
+		else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
+		{
+			m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };
 
-		if (!(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE)))
-			m_tAnimDesc[PART_LOWER] = { GUN_L_RIFLE_AIM_IDLE , true };
+			if (!(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE)))
+				m_tAnimDesc[PART_LOWER] = { GUN_L_RIFLE_AIM_IDLE , true };
+		}
 	}
 
 
 	m_pModelCom->Set_Animation(m_tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, m_tAnimDesc[PART_UPPER].isAnimLoop, m_tAnimDesc[PART_UPPER].fTransitionTime);
 	m_pModelCom->Set_Animation(m_tAnimDesc[PART_LOWER].iAnimIndex, PART_LOWER, m_tAnimDesc[PART_LOWER].isAnimLoop, m_tAnimDesc[PART_LOWER].fTransitionTime);
+}
+
+void CEnemy::Update_LogicInterval(_float fTimeDelta)
+{
+	m_fLogic_ElapsedTime += fTimeDelta;
+	m_isLogicTriggered = false;
+
+	if (m_fLogic_ElapsedTime >= m_fLogic_ResetIntervalTime)
+	{
+		m_fLogic_ElapsedTime = 0.f;
+		m_isLogicTriggered = true;
+
+		_float fIntervalRange[2] = { 0.4f, 0.6f };
+		m_fLogic_ResetIntervalTime = m_pGameInstance->Rand(fIntervalRange[0], fIntervalRange[1]);
+
+		std::cout << "[Enemy::Update_LogicInterval] Logic Triggered!" << std::endl;
+	}
 }
 
 void CEnemy::Update_BoneColliders()
