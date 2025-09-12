@@ -23,18 +23,20 @@ HRESULT CBullet::Initialize_Prototype()
 
 HRESULT CBullet::Initialize(void* pArg)
 {
+	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
+	m_iGameObjType = pDesc->iGameObjType;	// 컴포넌트 생성에 필요해서 앞으로 옮김
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(this->Ready_Components(pArg)))
 		return E_FAIL;
 
-
-	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
 	m_vMoveDir = pDesc->vMoveDir;
-	m_iGameObjType = pDesc->iGameObjType;	// 플레이어 총알인지, 적 총알인지에 따라 판정 다르게?
-	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);
+	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);	// 컴포넌트 생성 이후에 호출돼야 함
 	
+
+
 	_float fScaled = 2.f;
 	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
 
@@ -151,7 +153,7 @@ HRESULT CBullet::Ready_Components(void* pArg)
 		colDesc = {
 			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
 			ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
-			false, this
+			true, this
 		};
 		break;
 
@@ -159,11 +161,12 @@ HRESULT CBullet::Ready_Components(void* pArg)
 		colDesc = {
 			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
 			ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
-			false, this
+			true, this
 		};
 		break;
 
 	default:
+		std::cout << "[CBullet::Ready_Components] Type of Bullet is undefined. Collision Checking Failed." << std::endl;
 		break;
 	}
 	

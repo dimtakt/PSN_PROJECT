@@ -28,7 +28,7 @@ public:
 
 
 private:
-	vector<CCollider*>		m_vecColliders = { nullptr };
+	vector<CCollider*>		m_vecColliders = { };
 
 	class CGameInstance*	m_pGameInstance = { nullptr };
 	_uint					m_iNumLevels = {};

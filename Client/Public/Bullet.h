@@ -50,8 +50,6 @@ private:
 	_uint				m_iGameObjType = { };
 	_vector				m_vMoveDir = { };
 
-	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
-
 	CShader*			m_pShaderCom = { nullptr };
 	CModel*				m_pModelCom	= { nullptr };
 
