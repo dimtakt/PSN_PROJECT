@@ -1,8 +1,10 @@
 #include "Layer.h"
-
+#include "GameInstance.h"
 #include "GameObject.h"
 
+
 CLayer::CLayer()
+	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 
 }
@@ -76,6 +78,8 @@ void CLayer::Remove_DeadObjects()
 {
 	for (auto& obj : m_vecDeadObjects)
 		Remove_GameObject(obj);
+		
+	m_vecDeadObjects.clear();
 }
 
 CLayer* CLayer::Create()
@@ -90,6 +94,7 @@ void CLayer::Free()
 	for (auto& pGameObject : m_GameObjects)
 		Safe_Release(pGameObject);
 
+	Safe_Release(m_pGameInstance);
 	m_GameObjects.clear();
 	
 }

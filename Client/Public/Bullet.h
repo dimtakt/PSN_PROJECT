@@ -42,7 +42,6 @@ private:
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
 
-	//_bool		Check_Collision(_uint iTargetType);
 	void		Check_Destroy(_float fTimeDelta);
 
 private:
@@ -55,7 +54,7 @@ private:
 
 	_float				m_fElapsedTime = 0.f;
 
-
+	_uint				m_iIndex = 0;	// tmp
 
 
 

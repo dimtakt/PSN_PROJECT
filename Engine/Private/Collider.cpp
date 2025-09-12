@@ -61,6 +61,9 @@ HRESULT CCollider::Initialize(void* pArg)
 	case COLLIDERTYPE::SPHERE:
 		m_pBounding = CBounding_Sphere::Create(m_pDevice, m_pContext, pDesc);
 		break;
+	default:
+		MSG_BOX(L"Collider Initialize Failed.");
+		break;
 	}	
 
 	return S_OK;

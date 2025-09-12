@@ -23,6 +23,14 @@ HRESULT CBullet::Initialize_Prototype()
 
 HRESULT CBullet::Initialize(void* pArg)
 {
+	// tmp
+	static _uint iIndex = 0;
+	m_iIndex = iIndex;
+
+	iIndex++;
+
+
+
 	Bullet_DESC* pDesc = static_cast<Bullet_DESC*>(pArg);
 	m_iGameObjType = pDesc->iGameObjType;	// 컴포넌트 생성에 필요해서 앞으로 옮김
 
@@ -39,6 +47,8 @@ HRESULT CBullet::Initialize(void* pArg)
 
 	_float fScaled = 2.f;
 	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
+
+	std::cout << "[CBullet::Initialize]BulletIndex " << m_iIndex << " Created!" << std::endl;
 
 	return S_OK;
 }
@@ -84,8 +94,7 @@ void CBullet::Update(_float fTimeDelta)
 	else
 		MSG_BOX(L"[CBullet::Update] Type of Bullet is undefined. Collision Checking Failed.");
 
-	//Check_Collision(iTargetType);
-	//Check_Destroy(fTimeDelta);
+	Check_Destroy(fTimeDelta);
 }
 
 void CBullet::Late_Update(_float fTimeDelta)
@@ -195,135 +204,9 @@ HRESULT CBullet::Bind_ShaderResources()
 	return S_OK;
 }
 
-/*
-_bool CBullet::Check_Collision(_uint iTargetType)
-{
-	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
-	_bool isIntersect = false;
-
-	vector<CContainerObject*> vecTargets = {};
-	_wstring strLayerTag = {};
-
-	switch (iTargetType)		//
-	{
-	case ENUM_CLASS(GAMEOBJ_TYPE::PLAYER):
-		strLayerTag = TEXT("Layer_Player");
-		break;
-	case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
-		strLayerTag = TEXT("Layer_Monster");
-		break;
-	}
-
-	_uint iIndex = 0;
-	while (true)
-	{
-		CContainerObject* pTarget = dynamic_cast<CContainerObject*>(m_pGameInstance->Find_GameObject(iDestLevel, strLayerTag, iIndex++));
-		if (pTarget == nullptr) break;
-		vecTargets.push_back(pTarget);
-	}
-
-	if (vecTargets.empty())
-		return false;
-
-
-	vector<vector<CCollider*>*> pVecColliders = {};
-	for (auto& target : vecTargets) //
-	{
-		if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
-		{
-			CPlayer* pTarget = dynamic_cast<CPlayer*>(target);
-			auto pColliders = pTarget->Get_Colliders(); 
-			for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
-				pVecColliders.push_back(&pColliders[i]);
-		}
-		else if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
-		{
-			CEnemy* pTarget = dynamic_cast<CEnemy*>(target);
-			auto pColliders = pTarget->Get_Colliders();
-			for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
-				pVecColliders.push_back(&pColliders[i]);
-		}
-	}
-
-
-	for (auto& vecTargetsColliders : pVecColliders)
-	{
-		for (auto& vecTargetCollider : *vecTargetsColliders)
-		{
-			CCollider* pTargetCollider = vecTargetCollider;	
-
-			for (auto& vecColliders : m_vecCollidersCom)
-				for (auto& collider : vecColliders)
-					if (collider->Intersect(pTargetCollider))
-						isIntersect = true;
-		}
-	}
-	
-	
-	
-	
-	
-	//for (auto& target : vecTargets) //
-	//{
-	//	if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
-	//	{
-	//		CPlayer* pTarget = dynamic_cast<CPlayer*>(target);
-	//		vector<CCollider*>* pColliders = pTarget->Get_Colliders();
-	//		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
-	//		{
-	//
-	//
-	//			for (_uint j = 0; j < pColliders->size(); j++)
-	//			{
-	//				CCollider* pTargetCollider = pColliders[i][j];
-	//
-	//				for (auto& vecColliders : m_vecCollidersCom)
-	//					for (auto& collider : vecColliders)
-	//						if (collider->Intersect(pTargetCollider))
-	//							isIntersect = true;
-	//			}
-	//
-	//
-	//		}
-	//	}
-	//	else if (iTargetType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
-	//	{
-	//		CEnemy* pTarget = dynamic_cast<CEnemy*>(target);
-	//		vector<CCollider*>* pColliders = pTarget->Get_Colliders();
-	//		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); ++i)
-	//		{
-	//
-	//
-	//			for (_uint j = 0; j < pColliders->size(); j++)
-	//			{
-	//				CCollider* pTargetCollider = pColliders[i][j];
-	//
-	//				for (auto& vecColliders : m_vecCollidersCom)
-	//					for (auto& collider : vecColliders)
-	//						if (collider->Intersect(pTargetCollider))
-	//							isIntersect = true;
-	//			}
-	//
-	//
-	//		}
-	//	}
-	//}
-
-
-
-
-
-	if (isIntersect)
-		int i = 10;
-
-
-	return isIntersect;
-}
-*/
-
 void CBullet::Check_Destroy(_float fTimeDelta)
 {
-	std::cout << m_fElapsedTime << std::endl;
+	//std::cout << "[CBullet::Check_Destroy][BulletIndex " << m_iIndex << "] ElapsedTime : " << m_fElapsedTime << std::endl;
 
 	m_fElapsedTime += fTimeDelta;
 
@@ -331,7 +214,7 @@ void CBullet::Check_Destroy(_float fTimeDelta)
 
 	if (m_fElapsedTime >= fDestroyTime)
 	{
-		m_fElapsedTime = 0;
+		//m_fElapsedTime = 0;
 		m_isDead = true;
 	}
 }
@@ -364,11 +247,16 @@ CBullet* CBullet::Clone(void* pArg)
 
 void CBullet::Free()
 {
-	__super::Free();
 
 	for (auto& vecColliders : m_vecCollidersCom)
 		for (auto& collider : vecColliders)
+		{
+			m_pGameInstance->Remove_Collider(collider);
+			std::cout << "[CBullet::Free] BulletIndex " << m_iIndex << " Destroyed" << std::endl;
 			Safe_Release(collider);
+		}
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
+
+	__super::Free();
 }

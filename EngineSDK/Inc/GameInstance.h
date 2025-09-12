@@ -199,7 +199,8 @@ public:
 
 public:
 	HRESULT Add_Collider(CCollider* pCollider);
-	HRESULT Remove_Collider(CCollider* pCollider);
+	// 콜라이더 매니저 내에 보관된 주소를 제거합니다.
+	HRESULT Remove_Collider(CCollider* pCollider);	
 	void Update_Collision();
 
 #pragma endregion

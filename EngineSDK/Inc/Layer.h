@@ -47,6 +47,7 @@ private:
 	list<class CGameObject*>			m_GameObjects;
 	vector<class CGameObject*>			m_vecDeadObjects;
 
+	class CGameInstance*				m_pGameInstance = nullptr;
 
 public:
 	static CLayer* Create();

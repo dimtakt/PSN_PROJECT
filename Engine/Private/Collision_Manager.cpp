@@ -55,6 +55,8 @@ HRESULT CCollision_Manager::Remove_Collider(CCollider* pCollider)
 	}
 
 	return E_FAIL;
+
+	return S_OK;
 }
 
 _bool CCollision_Manager::Check_Collision(CCollider* pColAtk, CCollider* pColHit)
