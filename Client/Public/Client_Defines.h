@@ -175,6 +175,20 @@ namespace Client
 		END
 	};
 
+	enum class COLLISION_LAYER {
+		PLAYER_ATK	= (1 << 0),
+		ENEMY_ATK	= (1 << 1),
+
+		PLAYER_HIT	= (1 << 2),
+		ENEMY_HIT	= (1 << 3),
+
+		BULLET_ATK	= (1 << 4),
+
+
+		END			= (1 << 5)
+	};
+
+
 }
 
 extern HWND g_hWnd;

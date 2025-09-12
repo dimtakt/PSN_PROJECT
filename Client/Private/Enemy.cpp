@@ -444,6 +444,7 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 
 	CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
 	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	COLLISION_DESC colDesc = {};
 
 	// s1. For Head / Zero / 0.08f
 	// s2. For LeftHand / Zero / 0.08f
@@ -452,6 +453,26 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 	_float	fRad[3] = { 0.12f, 0.09f, 0.09f };
 	for (_uint i = 0; i < 3; i++)
 	{
+		if (strNameTag[i] == L"Head")
+		{
+			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
+				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK),
+				true, this
+			};
+			SphereDesc.tColDesc = colDesc;
+		}
+		else if (strNameTag[i] == L"LeftHand" ||
+			strNameTag[i] == L"RightHand")
+		{
+			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
+				ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK) & ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+				ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
+				false, this
+			};
+			SphereDesc.tColDesc = colDesc;
+		}
+
 		SphereDesc.fRadius = fRad[i];
 		if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
 			TEXT("Com_Collider_") + strNameTag[i], reinterpret_cast<CComponent**>(&tmpColCom), &SphereDesc)))
@@ -463,6 +484,12 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(0.15f, 0.75f, 0.10f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+	colDesc = {
+		ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+		ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK),
+		true, this
+	};
+	OBBDesc.tColDesc = colDesc;
 
 	// o1. Fol BodyAll (Not Specific Bone) / Zero / .1 .82 .1 / 0 .82 0 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
@@ -472,6 +499,34 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 
 	return S_OK;
 }
+
+
+void CEnemy::Update_ToggleColliders()
+{
+	_bool isFistPlaying = false;
+
+	CModel::MODEL_ANIM_DESC tCurAnimDesc = m_pModelCom->Get_PlayingAnimDesc(PART_UPPER);
+	if (tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_01 ||
+		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_02 ||
+		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_03 ||
+		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_04)
+
+		isFistPlaying = true;
+
+	// 주먹이 나가는 중이라면
+	if (isFistPlaying && (m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	{
+		// isActive 끄고, 콜라이더 내에서 isActive off 시 충돌 처리 안하도록 로직 제작
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][1]->Set_isActive(true);			// LeftHand
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][2]->Set_isActive(true);			// RightHand
+	}
+	else
+	{
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][1]->Set_isActive(false);		// LeftHand
+		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][2]->Set_isActive(false);		// RightHand
+	}
+}
+
 
 CEnemy* CEnemy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

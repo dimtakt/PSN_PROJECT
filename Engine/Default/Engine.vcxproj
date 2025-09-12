@@ -157,6 +157,7 @@
     <ClCompile Include="..\private\Cell.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\private\Collider.cpp" />
+    <ClCompile Include="..\private\Collision_Manager.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\private\ContainerObject.cpp" />
     <ClCompile Include="..\private\CustomObj.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="..\public\Cell.h" />
     <ClInclude Include="..\public\Channel.h" />
     <ClInclude Include="..\public\Collider.h" />
+    <ClInclude Include="..\public\Collision_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\public\ContainerObject.h" />
     <ClInclude Include="..\public\CustomObj.h" />

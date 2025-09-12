@@ -42,7 +42,7 @@ private:
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
 
-	_bool		Check_Collision(_uint iTargetType);
+	//_bool		Check_Collision(_uint iTargetType);
 	void		Check_Destroy(_float fTimeDelta);
 
 private:

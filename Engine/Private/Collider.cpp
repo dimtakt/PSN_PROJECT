@@ -48,6 +48,7 @@ HRESULT CCollider::Initialize_Prototype(COLLIDERTYPE eType)
 HRESULT CCollider::Initialize(void* pArg)
 {
 	CBounding::BOUNDING_DESC* pDesc = static_cast<CBounding::BOUNDING_DESC*>(pArg);
+	m_tColDesc = pDesc->tColDesc;
 
 	switch (m_eType)
 	{
@@ -72,6 +73,9 @@ void CCollider::Update(_fmatrix WorldMatrix)
 
 _bool CCollider::Intersect(CCollider* pTarget)
 {
+	if (!(m_tColDesc.isActive))
+		return S_OK;
+
 	return m_isColl = m_pBounding->Intersect(pTarget->m_eType, pTarget->m_pBounding);
 }
 
@@ -79,6 +83,9 @@ _bool CCollider::Intersect(CCollider* pTarget)
 
 HRESULT CCollider::Render()
 {
+	if (!(m_tColDesc.isActive))
+		return S_OK;
+
 	m_pContext->GSSetShader(nullptr, nullptr, 0);
 
 	m_pEffect->SetWorld(XMMatrixIdentity());

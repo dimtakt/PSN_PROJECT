@@ -55,11 +55,39 @@ HRESULT CObject_Manager::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _w
 	else
 		pLayer->Add_GameObject(pGameObject);
 
+	
+	// 콜라이더 추가
+	vector<CCollider*> vecColliders[ENUM_CLASS(COLLIDERTYPE::END)];
+	for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
+	{
+		vector<CCollider*> vecTypeColliders = (pGameObject->Get_Colliders())[i];
+		for (auto& collider : vecTypeColliders)
+		{
+			if (FAILED(m_pGameInstance->Add_Collider(collider)))
+				return E_FAIL;
+		}
+	}
+	
+
 	return S_OK;
 }
 
 HRESULT CObject_Manager::Remove_GameObject_FromLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, CGameObject* pObject)
 {
+	// 콜라이더 제거
+	vector<CCollider*> vecColliders[ENUM_CLASS(COLLIDERTYPE::END)];
+	for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
+	{
+		vector<CCollider*> vecTypeColliders = (pObject->Get_Colliders())[i];
+		for (auto& collider : vecTypeColliders)
+		{
+			if (FAILED(m_pGameInstance->Remove_Collider(collider)))
+				return E_FAIL;
+		}
+	}
+
+
+	return S_OK;
 	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
 		return E_FAIL;
@@ -67,7 +95,6 @@ HRESULT CObject_Manager::Remove_GameObject_FromLayer(_uint iLayerLevelIndex, con
 	if (FAILED(pLayer->Remove_GameObject(pObject)))
 		return E_FAIL;
 
-	return S_OK;
 }
 
 void CObject_Manager::Priority_Update(_float fTimeDelta)

@@ -21,6 +21,13 @@ public:
 
 public:
 	_bool Intersect(CCollider* pTarget);
+	COLLISION_DESC Get_ColDesc() { return m_tColDesc; };
+	void Set_ColDesc(COLLISION_DESC desc) { m_tColDesc = desc; };
+
+	void Set_isActive(_bool isActive)	{ m_tColDesc.isActive = isActive; }
+	void Set_LayerIndex(_uint iLayer)	{ m_tColDesc.iLayerIndex = iLayer; }
+	void Set_LayerMask(_uint iMask)		{ m_tColDesc.iMask = iMask; }
+
 
 #ifdef _DEBUG
 	virtual HRESULT Render() override;
@@ -33,12 +40,13 @@ private:
 	class CBounding*		m_pBounding = { nullptr };
 	_bool					m_isColl = { false };
 
+	COLLISION_DESC			m_tColDesc = {};
+
 #ifdef _DEBUG
 private:
 	PrimitiveBatch<VertexPositionColor>*		m_pBatch = { nullptr };
 	BasicEffect*								m_pEffect = { nullptr };
 	ID3D11InputLayout*							m_pInputLayout = { nullptr };
-
 #endif
 
 public:

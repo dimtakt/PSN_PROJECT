@@ -195,6 +195,17 @@ public:
 
 	// ==============================
 
+#pragma region COLLISION_MANAGER
+
+public:
+	HRESULT Add_Collider(CCollider* pCollider);
+	HRESULT Remove_Collider(CCollider* pCollider);
+	void Update_Collision();
+
+#pragma endregion
+
+	// ==============================
+
 
 
 private:
@@ -211,6 +222,7 @@ private:
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
 	class CTimeSpeed_Manager*	m_pTimeSpeed_Manager = { nullptr };
+	class CCollision_Manager*	m_pCollision_Manager = { nullptr };
 
 public:
 	void Release_Engine();

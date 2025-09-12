@@ -38,11 +38,6 @@ public:
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
-	vector<CCollider*>* Get_Colliders() 
-	{ 
-		return m_vecCollidersCom; 
-	};
-
 
 
 private:
@@ -65,13 +60,14 @@ private:
 	HRESULT		Ready_Colliders(void* pArg);
 
 private:
+	void		Update_ToggleColliders();
+
+private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 
 	CShader*			m_pShaderCom		= { nullptr };	
 	CModel*				m_pModelCom			= { nullptr };
 	CNavigation*		m_pNavigationCom	= { nullptr };
-
-	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 
 	CPartObject*		m_pPart_Weapon		= { nullptr };
 

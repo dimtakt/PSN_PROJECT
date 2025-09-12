@@ -166,11 +166,14 @@
     <Filter Include="01.Utility\03.Component\Collider\Bounding\OBB">
       <UniqueIdentifier>{973cba8b-be6e-4794-956d-dd845955695f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\05. RenderTargets">
+    <Filter Include="01.Utility\05.RenderTargets">
       <UniqueIdentifier>{03e5eae4-5fdb-438a-9f49-550829559b43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\05. RenderTargets\Manager">
+    <Filter Include="01.Utility\05.RenderTargets\Manager">
       <UniqueIdentifier>{46f9a9fb-4cda-4423-8a31-38d79bb51576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Collider\Manager">
+      <UniqueIdentifier>{67a11ce0-8a93-4e3d-acaa-c91568515980}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -322,10 +325,13 @@
       <Filter>01.Utility\03.Component\Collider\Bounding\Sphere</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RenderTarget.cpp">
-      <Filter>01.Utility\05. RenderTargets</Filter>
+      <Filter>01.Utility\05.RenderTargets</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Target_Manager.cpp">
-      <Filter>01.Utility\05. RenderTargets\Manager</Filter>
+      <Filter>01.Utility\05.RenderTargets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collision_Manager.cpp">
+      <Filter>01.Utility\03.Component\Collider\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -498,10 +504,13 @@
       <Filter>01.Utility\03.Component\Collider\Bounding\Sphere</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RenderTarget.h">
-      <Filter>01.Utility\05. RenderTargets</Filter>
+      <Filter>01.Utility\05.RenderTargets</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Target_Manager.h">
-      <Filter>01.Utility\05. RenderTargets\Manager</Filter>
+      <Filter>01.Utility\05.RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Collision_Manager.h">
+      <Filter>01.Utility\03.Component\Collider\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

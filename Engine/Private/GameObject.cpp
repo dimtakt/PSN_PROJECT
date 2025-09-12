@@ -53,7 +53,7 @@ HRESULT CGameObject::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CGameObject::Priority_Update(_float fTimeDelta)
+void CGameObject::Priority_Update(_float fTimeDelta) 
 {
 }
 
@@ -68,6 +68,11 @@ void CGameObject::Late_Update(_float fTimeDelta)
 HRESULT CGameObject::Render()
 {
 	return S_OK;
+}
+
+void CGameObject::OnCollision(CGameObject* pCollisionHitBy, _vector* vCollideDir)
+{
+	std::cout << "[CGameObject::OnCollision] Collision Detected!" << std::endl;
 }
 
 _bool CGameObject::isPicked(_float3* pOut, _bool bReturnAll, std::vector<_float3>* vecOut)

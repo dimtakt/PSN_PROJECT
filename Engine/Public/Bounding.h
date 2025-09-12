@@ -11,6 +11,8 @@ public:
 	typedef struct tagBoundingDesc
 	{
 		_float3			vCenter;
+
+		COLLISION_DESC  tColDesc;
 	}BOUNDING_DESC;
 protected:
 	CBounding(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

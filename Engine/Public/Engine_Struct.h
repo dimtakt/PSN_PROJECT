@@ -273,6 +273,21 @@ namespace Engine
 
 
 
+#pragma region Component : Collision Description
+	typedef struct tagCollisionDesc
+	{
+		unsigned int		iLayerIndex;	// 비트연산자로 콜라이더 대상이 무슨 타입인지 정의
+		unsigned int		iMask;			// 비트연산자로 충돌할 레이어 정의
+		bool				isActive	= true;
+
+		class CGameObject*	pOwner		= { nullptr };
+
+	} COLLISION_DESC;
+#pragma endregion
+
+	
+
+
 }
 
 

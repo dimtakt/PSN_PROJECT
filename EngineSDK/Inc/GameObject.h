@@ -48,6 +48,9 @@ public:
 	virtual HRESULT Render();
 
 public:
+	virtual void OnCollision(CGameObject* pCollisionHitBy, _vector* vCollideDir = nullptr);
+
+public:
 	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요
 	_bool isPicked(
 		_float3* pOut = nullptr,
@@ -60,6 +63,9 @@ public:
 	_uint Get_ObjType() { return m_iGameObjType; }
 	void Set_ObjType(_uint iObjType) { m_iGameObjType = iObjType; }
 	_bool Get_isDead() { return m_isDead; }
+
+	vector<class CCollider*>* Get_Colliders() { return m_vecCollidersCom; };
+
 
 protected:
 	// 이를 부모로 갖는 자식 오브젝트 생성시, 버퍼 정보가 있다면 반드시 할당해야 함.
@@ -77,7 +83,9 @@ protected:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
+
 	class CTransform*			m_pTransformCom = { nullptr };
+	vector<CCollider*>			m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 
 	map<const _wstring, class CComponent*>		m_Components;
 

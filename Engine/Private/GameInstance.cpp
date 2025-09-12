@@ -13,8 +13,7 @@
 #include "Picking.h"
 #include "Target_Manager.h"
 #include "TimeSpeed_Manager.h"
-
-
+#include "Collision_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -84,6 +83,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pTimeSpeed_Manager)
 		return E_FAIL;
 
+	m_pCollision_Manager = CCollision_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pCollision_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -103,6 +106,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	m_pPicking->Update();
 	m_pPipeLine->Update();
 
+	m_pCollision_Manager->Update();
 	m_pObject_Manager->Update(fCalcedTimeDelta);
 	m_pObject_Manager->Late_Update(fCalcedTimeDelta);
 
@@ -594,11 +598,33 @@ _float CGameInstance::Get_TimeSpeed()
 #pragma endregion
 
 // ==============================
+// || [CUSTOM] COLLISION_MANAGER
+// ==============================
+
+HRESULT CGameInstance::Add_Collider(CCollider* pCollider)
+{
+	return m_pCollision_Manager->Add_Collider(pCollider);
+}
+
+HRESULT CGameInstance::Remove_Collider(CCollider* pCollider)
+{
+	return m_pCollision_Manager->Remove_Collider(pCollider);
+}
+
+void CGameInstance::Update_Collision()
+{
+	m_pCollision_Manager->Update();
+}
+
+
+
+// ==============================
 
 void CGameInstance::Release_Engine()
 {
 	Release();
 
+	Safe_Release(m_pCollision_Manager);
 	Safe_Release(m_pTimeSpeed_Manager);
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFont_Manager);

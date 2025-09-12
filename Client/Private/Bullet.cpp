@@ -82,7 +82,7 @@ void CBullet::Update(_float fTimeDelta)
 	else
 		MSG_BOX(L"[CBullet::Update] Type of Bullet is undefined. Collision Checking Failed.");
 
-	Check_Collision(iTargetType);
+	//Check_Collision(iTargetType);
 	//Check_Destroy(fTimeDelta);
 }
 
@@ -143,6 +143,31 @@ HRESULT CBullet::Ready_Components(void* pArg)
 	CBounding_Sphere::BOUNDING_SPHERE_DESC  SphereDesc{};
 	SphereDesc.fRadius = 0.01f;
 	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	COLLISION_DESC colDesc = {};
+
+	switch (m_iGameObjType)
+	{
+	case ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET):
+		colDesc = {
+			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
+			ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+			false, this
+		};
+		break;
+
+	case ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET):
+		colDesc = {
+			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
+			ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
+			false, this
+		};
+		break;
+
+	default:
+		break;
+	}
+	
+	SphereDesc.tColDesc = colDesc;
 
 	CCollider* tmpCol = {};
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
@@ -167,6 +192,7 @@ HRESULT CBullet::Bind_ShaderResources()
 	return S_OK;
 }
 
+/*
 _bool CBullet::Check_Collision(_uint iTargetType)
 {
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
@@ -290,6 +316,7 @@ _bool CBullet::Check_Collision(_uint iTargetType)
 
 	return isIntersect;
 }
+*/
 
 void CBullet::Check_Destroy(_float fTimeDelta)
 {
