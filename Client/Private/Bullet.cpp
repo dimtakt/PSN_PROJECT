@@ -251,7 +251,7 @@ void CBullet::Free()
 	for (auto& vecColliders : m_vecCollidersCom)
 		for (auto& collider : vecColliders)
 		{
-			//m_pGameInstance->Remove_Collider(collider);
+			m_pGameInstance->Remove_Collider(collider);
 			std::cout << "[CBullet::Free] BulletIndex " << m_iIndex << " Destroyed" << std::endl;
 			Safe_Release(collider);
 		}

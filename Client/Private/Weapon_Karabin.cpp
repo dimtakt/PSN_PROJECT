@@ -178,8 +178,8 @@ HRESULT CWeapon_Karabin::Ready_Components()
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
     OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-    OBBDesc.vExtents = _float3(1.0f, 1.5f, 2.f);
-    OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+    OBBDesc.vExtents = _float3(.05f, .15f, .5f);
+    OBBDesc.vCenter = _float3(0.f, -(OBBDesc.vExtents.y * 0.65f), 0.f);
 
     CCollider* tmpColCom = nullptr;
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
