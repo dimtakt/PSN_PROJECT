@@ -14,13 +14,17 @@ private:
 public:
 	HRESULT Initialize(_uint iNumLevels);
 	void Update();
+	void Clear();
 	
 public:
 	HRESULT Add_Collider(CCollider* pCollider);
 	HRESULT Remove_Collider(CCollider* pCollider);
 
+	_bool Check_RayCollisions(RAYCOLLISION_DESC* pRayDesc, CGameObject*& OutIntersectObj, _float& fOutDistance);
+
 private:
 	_bool Check_Collision(CCollider* pColAtk, CCollider* pColHit);
+	_bool Check_RayCollision(RAYCOLLISION_DESC* pRayDesc, CCollider* pColTarget, _float& fOutDistance);
 
 public:
 	static CCollision_Manager* Create(_uint iNumLevels);

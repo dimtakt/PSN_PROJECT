@@ -21,6 +21,8 @@ public:
 
 public:
 	_bool Intersect(CCollider* pTarget);
+	_bool Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist);
+
 	COLLISION_DESC Get_ColDesc() { return m_tColDesc; };
 	void Set_ColDesc(COLLISION_DESC desc) { m_tColDesc = desc; };
 

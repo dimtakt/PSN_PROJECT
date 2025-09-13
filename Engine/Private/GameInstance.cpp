@@ -120,6 +120,8 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 
 	m_pObject_Manager->Clear(iClearLevelID);
 
+	//m_pCollision_Manager->Clear();
+
 	return S_OK;
 }
 
@@ -608,7 +610,10 @@ HRESULT CGameInstance::Add_Collider(CCollider* pCollider)
 
 HRESULT CGameInstance::Remove_Collider(CCollider* pCollider)
 {
-	return m_pCollision_Manager->Remove_Collider(pCollider);
+	if (m_pCollision_Manager)
+		return m_pCollision_Manager->Remove_Collider(pCollider);
+	else
+		return S_OK;
 }
 
 void CGameInstance::Update_Collision()
@@ -616,6 +621,10 @@ void CGameInstance::Update_Collision()
 	m_pCollision_Manager->Update();
 }
 
+_bool CGameInstance::Check_RayCollisions(RAYCOLLISION_DESC* pRayDesc, CGameObject*& OutIntersectObj, _float& fOutDistance)
+{
+	return m_pCollision_Manager->Check_RayCollisions(pRayDesc, OutIntersectObj, fOutDistance);
+}
 
 
 // ==============================
@@ -624,8 +633,9 @@ void CGameInstance::Release_Engine()
 {
 	Release();
 
-	Safe_Release(m_pCollision_Manager);
+	
 	Safe_Release(m_pTimeSpeed_Manager);
+	Safe_Release(m_pCollision_Manager);
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pPipeLine);

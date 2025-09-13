@@ -185,7 +185,10 @@ namespace Client
 		BULLET_ATK	= (1 << 4),
 
 
-		END			= (1 << 5)
+		PICKUPABLE	= (1 << 5),
+
+
+		END			= (1 << 6)
 	};
 
 

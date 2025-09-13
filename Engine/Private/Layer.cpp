@@ -6,7 +6,7 @@
 CLayer::CLayer()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
-
+	Safe_AddRef(m_pGameInstance);
 }
 
 CComponent* CLayer::Get_Component(const _wstring& strComponentTag, _uint iIndex)

@@ -22,6 +22,7 @@ public:
 	virtual HRESULT Initialize();
 	virtual void Update(_fmatrix WorldMatrix) {}
 	virtual _bool Intersect(COLLIDERTYPE eType, CBounding* pTarget) = 0;
+	virtual _bool Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist) = 0;
 
 
 

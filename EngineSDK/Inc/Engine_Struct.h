@@ -283,6 +283,13 @@ namespace Engine
 		class CGameObject*	pOwner		= { nullptr };
 
 	} COLLISION_DESC;
+
+	typedef struct tagRayCollisionDesc : public COLLISION_DESC
+	{
+		XMVECTOR			vRayPos;
+		XMVECTOR			vRayDir;
+
+	} RAYCOLLISION_DESC;
 #pragma endregion
 
 	

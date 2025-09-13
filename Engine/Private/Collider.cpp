@@ -77,9 +77,17 @@ void CCollider::Update(_fmatrix WorldMatrix)
 _bool CCollider::Intersect(CCollider* pTarget)
 {
 	if (!(m_tColDesc.isActive))
-		return S_OK;
+		return false;
 
 	return m_isColl = m_pBounding->Intersect(pTarget->m_eType, pTarget->m_pBounding);
+}
+
+_bool CCollider::Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist)
+{
+	if (!(m_tColDesc.isActive))
+		return false;
+
+	return m_pBounding->Intersect_Ray(vRayPos, vRayDir, fOutDist);
 }
 
 #ifdef _DEBUG

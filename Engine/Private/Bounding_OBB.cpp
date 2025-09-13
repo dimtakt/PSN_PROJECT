@@ -49,6 +49,11 @@ _bool CBounding_OBB::Intersect(COLLIDERTYPE eType, CBounding* pTarget)
 	return isColl;
 }
 
+_bool CBounding_OBB::Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist)
+{
+	return m_pDesc->Intersects(vRayPos, vRayDir, fOutDist);
+}
+
 #ifdef _DEBUG
 
 HRESULT CBounding_OBB::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor)

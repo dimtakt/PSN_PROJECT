@@ -18,7 +18,7 @@ HRESULT CCamera_Player::Initialize_Prototype()
 
 HRESULT CCamera_Player::Initialize(void* pArg)
 {
-    Camera_Player_DESC* pDesc = static_cast<Camera_Player_DESC*>(pArg);
+    CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
 
     m_fMouseSensor = pDesc->fMouseSensor;
 

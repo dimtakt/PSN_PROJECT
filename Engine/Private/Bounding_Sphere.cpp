@@ -41,8 +41,12 @@ _bool CBounding_Sphere::Intersect(COLLIDERTYPE eType, CBounding* pTarget)
 		break;
 	}
 
-
 	return isColl;
+}
+
+_bool CBounding_Sphere::Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist)
+{
+	return m_pDesc->Intersects(vRayPos, vRayDir, fOutDist);
 }
 
 #ifdef _DEBUG

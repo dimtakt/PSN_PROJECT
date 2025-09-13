@@ -202,6 +202,8 @@ public:
 	// 콜라이더 매니저 내에 보관된 주소를 제거합니다.
 	HRESULT Remove_Collider(CCollider* pCollider);	
 	void Update_Collision();
+	// 메뉴얼로 레이 정보를 전달하여 레이와 현존하는 콜라이더들과의 겹칩 검사를 진행합니다.
+	_bool Check_RayCollisions(RAYCOLLISION_DESC* pRayDesc, CGameObject*& OutIntersectObj, _float& fOutDistance);
 
 #pragma endregion
 

@@ -25,6 +25,7 @@ public:
 	HRESULT Initialize(const CBounding::BOUNDING_DESC* pDesc);
 	virtual void Update(_fmatrix WorldMatrix) override;
 	virtual _bool Intersect(COLLIDERTYPE eType, CBounding* pTarget) override;
+	virtual _bool Intersect_Ray(_vector vRayPos, _vector vRayDir, _float& fOutDist) override;
 
 #ifdef _DEBUG
 public:

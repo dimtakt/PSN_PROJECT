@@ -12,7 +12,7 @@ public:
 	typedef struct tagCameraFreeDesc : public CCamera::CAMERA_DESC
 	{
 		_float			fMouseSensor;
-	}Camera_Player_DESC;
+	}CAMERA_PLAYER_DESC;
 
 private:
 	CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
