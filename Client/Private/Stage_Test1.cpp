@@ -35,6 +35,10 @@ HRESULT CStage_Test1::Initialize()
 	if (FAILED(Load_BinaryMap(&strLoadPath)))
 		return E_FAIL;
 
+	// 맵 데이터를 통해 로드된 오브젝트들을 참고하여, 픽업 오브젝트로써 재정의 (로드 후 기존 것 삭제)
+	if (FAILED(Ready_Pickup_Objects(TEXT("Layer_Pickup"))))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -155,6 +159,37 @@ HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
 
 	return S_OK;
 }
+
+HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
+{
+	_wstring strLoadedTag = L"Layer_Loaded_Object";		// 로드된 오브젝트들이 담긴 레이어 태그
+
+	_uint iIndex = 0;
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	while (true)
+	{
+		CGameObject* pTargetObject = m_pGameInstance->Find_GameObject(iDestLevel, strLayerTag, iIndex);
+		if (pTargetObject == nullptr)
+			break;
+
+		_uint iObjType = pTargetObject->Get_ObjType();
+		switch (iObjType)
+		{
+			// 여기서 1. 새로 pickupobj 추가, 2. pickupobj의 모티브가 됐던 오브젝트 제거 구현할 것
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):		break;
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):		break;
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):		break;
+
+		default:													break;
+			
+		}
+		
+
+
+		iIndex++;
+	}
+}
+
 
 CStage_Test1* CStage_Test1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
