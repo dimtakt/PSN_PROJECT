@@ -70,7 +70,7 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
-void CGameObject::OnCollision(CGameObject* pCollisionHitBy, _vector* vCollideDir)
+void CGameObject::OnCollision(CGameObject* pCollisionHitBy)
 {
 	std::cout << "[CGameObject::OnCollision] Collision Detected!" << std::endl;
 }

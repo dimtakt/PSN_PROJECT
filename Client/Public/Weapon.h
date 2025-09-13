@@ -38,7 +38,6 @@ public:
 protected:
 	_uint				m_iGameObjType = { };
 
-	vector<CCollider*>	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::END)] = { };
 	CShader*			m_pShaderCom = { nullptr };
 	CModel*				m_pModelCom = { nullptr };
 

@@ -324,6 +324,8 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 				}
 			}
 		}
+
+
 	}
 
 

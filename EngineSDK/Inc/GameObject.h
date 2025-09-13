@@ -48,7 +48,7 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual void OnCollision(CGameObject* pCollisionHitBy, _vector* vCollideDir = nullptr);
+	virtual void OnCollision(CGameObject* pCollisionHitBy);
 
 public:
 	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요
@@ -98,9 +98,10 @@ protected:
 
 	_wstring		m_strModelName	=	{};
 
-	_uint			m_iGameObjType = { };
+	_uint			m_iGameObjType	= { };
 
 	_bool			m_isDead		= false;
+	
 	
 	
 protected:
