@@ -86,8 +86,6 @@ HRESULT CObject_Manager::Remove_GameObject_FromLayer(_uint iLayerLevelIndex, con
 		}
 	}
 
-
-	return S_OK;
 	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
 		return E_FAIL;
@@ -95,6 +93,7 @@ HRESULT CObject_Manager::Remove_GameObject_FromLayer(_uint iLayerLevelIndex, con
 	if (FAILED(pLayer->Remove_GameObject(pObject)))
 		return E_FAIL;
 
+	return S_OK;
 }
 
 void CObject_Manager::Priority_Update(_float fTimeDelta)

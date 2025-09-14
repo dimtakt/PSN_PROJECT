@@ -115,6 +115,7 @@ _bool CCollision_Manager::Check_RayCollisions(RAYCOLLISION_DESC* pRayDesc, CGame
 	if (pNearestCol)
 	{
 		OutIntersectObj = pNearestCol->Get_ColDesc().pOwner;
+		//OutIntersectObj->OnCollisionRay();	// 나중에 플레이어 단계에서 실행
 		fOutDistance = fNearestDist;
 		return true;
 	}

@@ -49,6 +49,7 @@ public:
 
 public:
 	virtual void OnCollision(CGameObject* pCollisionHitBy);
+	virtual void OnCollisionRay() {};
 
 public:
 	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요

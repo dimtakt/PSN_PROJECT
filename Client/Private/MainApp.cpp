@@ -8,6 +8,8 @@
 // Static Models
 #include "Player.h"
 
+#include "CustomObj_Pickupable.h"
+
 #include "Enemy.h"
 //#include "Props_Pot.h"
 //#include "Props_Fotel.h"
@@ -198,6 +200,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Bullet */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Weapon_Bullet"),
 		CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, "../Bin/Resources/_SUPERHOT/_BinaryModels/Weapon_Bullet_Fixed.datmodel", PreTransformMatrix))))
+		return E_FAIL;
+
+
+	/* Pickupable Objects */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Pickupable"),
+		CCustomObj_Pickupable::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

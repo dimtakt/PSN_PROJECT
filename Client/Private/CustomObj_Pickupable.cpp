@@ -21,6 +21,7 @@ HRESULT CCustomObj_Pickupable::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
+
     if (FAILED(this->Ready_Components(pArg)))
         return E_FAIL;
 
@@ -34,6 +35,9 @@ void CCustomObj_Pickupable::Priority_Update(_float fTimeDelta)
 
 void CCustomObj_Pickupable::Update(_float fTimeDelta)
 {
+
+
+    m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
 }
 
 void CCustomObj_Pickupable::Late_Update(_float fTimeDelta)
@@ -73,30 +77,70 @@ HRESULT CCustomObj_Pickupable::Render()
     return S_OK;
 }
 
+void CCustomObj_Pickupable::OnCollisionRay()
+{
+    // 플레이어가 클릭 시 플레이어쪽으로 다가오며 사라지도록 할 것
+    // 이게 무슨 오브젝트인지의 정보를 플레이어 단계에서 알아야 함
+
+}
+
 HRESULT CCustomObj_Pickupable::Ready_Components(void* pArg)
 {
-    CUSTOMOBJ_DESC* pDesc = reinterpret_cast<CUSTOMOBJ_DESC*>(pArg);
+#pragma region old
 
-    _wstring strPrototypeName = pDesc->strModelComPrototypeTag;
-    m_iGameObjType = pDesc->iGameObjType;
+    /*
+   
+    // 부모 오브젝트에서 이미 이루어짐
 
-    _uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+    //CUSTOMOBJ_DESC* pDesc = reinterpret_cast<CUSTOMOBJ_DESC*>(pArg);
+    //
+    //_wstring strPrototypeName = pDesc->strModelComPrototypeTag;
+    //m_iGameObjType = pDesc->iGameObjType;
+    //
+    //_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+    //
+    //if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
+    //    TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    //    return E_FAIL;
+    //
+    //
+    //if (FAILED(CGameObject::Add_Component(iDestLevelIndex, strPrototypeName,
+    //    TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+    //    return E_FAIL;
+    //Set_BufferRef(m_pModelCom);
 
-    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Shader_VtxMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-        return E_FAIL;
+    */
 
-    
-    if (FAILED(CGameObject::Add_Component(iDestLevelIndex, strPrototypeName,
-        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-        return E_FAIL;
-    Set_BufferRef(m_pModelCom);
+#pragma endregion
 
+    // 콜라이더 추가..
+    // 이게 일반 NonAnim과 Pickupable의 다른점 중 하나. 이를 통해 ray 인식이 가능하도록 함
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-    OBBDesc.vExtents = _float3(0.13f, 0.75f, 0.10f);
-    OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+
+    switch (m_iGameObjType)
+    {
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+        OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+        OBBDesc.vExtents = _float3(.05f, .15f, .5f);
+        OBBDesc.vCenter = _float3(0.f, -(OBBDesc.vExtents.y * 0.65f), 0.f);
+        break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+        OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+        OBBDesc.vExtents = _float3(.03f, .10f, .15f);
+        OBBDesc.vCenter = _float3(0.f, 0.f, +(OBBDesc.vExtents.z * 0.4f));
+        break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+        OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+        OBBDesc.vExtents = _float3(.05f, .15f, .7f);
+        OBBDesc.vCenter = _float3(0.f, -(OBBDesc.vExtents.y * 0.2f), +(OBBDesc.vExtents.z * 0.4f));
+        break;
+    default:
+        break;
+    }
+
+
+    m_iGameObjType;
 
     CCollider* tmpColCom = nullptr;
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
@@ -154,6 +198,7 @@ void CCustomObj_Pickupable::Free()
 {
     __super::Free();
 
-    //Safe_Release(m_pModelCom);
-    //Safe_Release(m_pShaderCom);
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            Safe_Release(collider);
 }
