@@ -560,9 +560,6 @@ void CEnemy::Free()
 {
 	__super::Free();
 
-	for (auto& vecColliders : m_vecCollidersCom)
-		for (auto& collider : vecColliders)
-			Safe_Release(collider);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pNavigationCom);

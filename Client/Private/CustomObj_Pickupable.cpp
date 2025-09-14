@@ -82,6 +82,7 @@ void CCustomObj_Pickupable::OnCollisionRay()
     // 플레이어가 클릭 시 플레이어쪽으로 다가오며 사라지도록 할 것
     // 이게 무슨 오브젝트인지의 정보를 플레이어 단계에서 알아야 함
 
+    std::cout << "[CustomObj_Pickupable::OnCollisionRay] CollisionRay Event Called!" << std::endl;
 }
 
 HRESULT CCustomObj_Pickupable::Ready_Components(void* pArg)
@@ -117,6 +118,7 @@ HRESULT CCustomObj_Pickupable::Ready_Components(void* pArg)
     // 이게 일반 NonAnim과 Pickupable의 다른점 중 하나. 이를 통해 ray 인식이 가능하도록 함
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    COLLISION_DESC colDesc = {};
 
     switch (m_iGameObjType)
     {
@@ -139,8 +141,14 @@ HRESULT CCustomObj_Pickupable::Ready_Components(void* pArg)
         break;
     }
 
+    colDesc = {
+        ENUM_CLASS(COLLISION_LAYER::PICKUPABLE),
+        0,
+        true, this
+    };
+    OBBDesc.tColDesc = colDesc;
 
-    m_iGameObjType;
+
 
     CCollider* tmpColCom = nullptr;
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
@@ -197,8 +205,4 @@ CCustomObj_Pickupable* CCustomObj_Pickupable::Clone(void* pArg)
 void CCustomObj_Pickupable::Free()
 {
     __super::Free();
-
-    for (auto& vecColliders : m_vecCollidersCom)
-        for (auto& collider : vecColliders)
-            Safe_Release(collider);
 }

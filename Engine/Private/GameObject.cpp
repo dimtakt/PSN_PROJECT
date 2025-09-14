@@ -139,6 +139,13 @@ void CGameObject::Free()
 {
 	__super::Free();
 
+	for (auto& vecColliders : m_vecCollidersCom)
+		for (auto& collider : vecColliders)
+		{
+			m_pGameInstance->Remove_Collider(collider);
+			Safe_Release(collider);
+		}
+
 	for (auto& Pair : m_Components)
 		Safe_Release(Pair.second);
 	m_Components.clear();

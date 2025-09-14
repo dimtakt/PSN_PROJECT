@@ -49,6 +49,7 @@ private:
 	void		Update_AnimationState(_float fTimeDelta);	// 조작 등에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// 조작 등에 의한 "애니메이션" 제어
 	void		Update_TimeControl(_float fTimeDelta);
+	void		Update_Interact(_float fTimeDelta);
 
 	void		Update_BoneColliders();
 

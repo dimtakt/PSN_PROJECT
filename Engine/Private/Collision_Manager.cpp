@@ -134,7 +134,7 @@ _bool CCollision_Manager::Check_RayCollision(RAYCOLLISION_DESC* pRayDesc, CColli
 	_bool isBothActive = pRayDesc->isActive && pColTarget->Get_ColDesc().isActive;
 
 	if ((pRayDesc->iMask & pColTarget->Get_ColDesc().iLayerIndex) && isBothActive)
-		return pColTarget->Intersect_Ray(pRayDesc->vRayDir, pRayDesc->vRayPos, fOutDistance);
+		return pColTarget->Intersect_Ray(pRayDesc->vRayPos, pRayDesc->vRayDir, fOutDistance);
 	else
 		return false;
 }

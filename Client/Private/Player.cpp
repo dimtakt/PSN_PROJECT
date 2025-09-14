@@ -81,11 +81,6 @@ void CPlayer::Update(_float fTimeDelta)
 
 
 
-
-
-
-
-
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
@@ -94,45 +89,20 @@ void CPlayer::Update(_float fTimeDelta)
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
 
+	Update_Interact(fTimeDelta);
 	Update_TimeControl(fTimeDelta);
 #ifdef _DEBUG
 	//m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
 #endif // _DEBUG
 
-
 	m_pModelCom->Play_Animation_AllLayer(fRawTimeDelta);
 	//m_pModelCom->Play_Animation(fTimeDelta, PART_LOWER);
-
 	Update_BoneColliders();
 
-	// 어떤 무기냐에 따라 소체 활성화 여부, 애니메이션, 공격 방식 등에 차이를 둘 예정
-	//CPartObject* pWeapon = Find_PartObject(TEXT("Part_Weapon"));
-	//pWeapon->Get_ObjType();
-	//
+	
 
 
-	// ksta : 총알 소환 테스트
-	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
-	{
-		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
-		if (pWeaponGun != nullptr)
-		{
-			// 날아갈 방향 계산
-			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
-
-			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-			_vector vCameraLook = matCameraview.r[2];
-			vDir = vCameraLook;
-
-			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
-			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
-			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
-			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
-
-			pWeaponGun->Shot(XMVectorSetW(vDir, 1.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
-		}
-	}
 
 	__super::Update(fTimeDelta);
 }
@@ -570,6 +540,63 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 	//std::cout << "[CPlayer::Update_TimeControl] Current Time Multiplier : " << m_pGameInstance->Get_TimeSpeed() << std::endl;
 }
 
+void CPlayer::Update_Interact(_float fTimeDelta)
+{
+
+	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
+	{
+		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+
+		// ksta : 총알 소환 테스트
+		if (pWeaponGun != nullptr)
+		{
+			// 날아갈 방향 계산
+			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+
+			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+			_vector vCameraLook = matCameraview.r[2];
+			vDir = vCameraLook;
+
+			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
+			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
+			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
+			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
+
+			pWeaponGun->Shot(XMVectorSetW(XMVector3Normalize(vDir), 1.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+		}
+		// ksta : pickupable object 와의 상호작용 테스트
+		else
+		{
+			_vector vDir = XMVectorZero();
+
+			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+			_vector vCameraLook = matCameraview.r[2];
+			vDir = vCameraLook;
+
+
+			RAYCOLLISION_DESC tRayDesc = {};
+			tRayDesc.vRayPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+
+			tRayDesc.vRayDir = XMVectorSetW(XMVector3Normalize(vDir), 1.f);
+
+			tRayDesc.iLayerIndex = 0;
+			tRayDesc.iMask = ENUM_CLASS(COLLISION_LAYER::PICKUPABLE);
+			tRayDesc.isActive = m_pPart_Weapon == nullptr;
+			tRayDesc.pOwner = this;
+
+			CGameObject* pRayObj = nullptr;
+			_float fRayDist = FLT_MAX;
+			if (m_pGameInstance->Check_RayCollisions(&tRayDesc, pRayObj, fRayDist))
+			{
+				if (pRayObj)
+					pRayObj->OnCollisionRay();
+			}
+
+		}
+	}
+
+}
+
 void CPlayer::Update_BoneColliders()
 {
 	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][0], "Head");
@@ -725,9 +752,6 @@ void CPlayer::Free()
 {
 	__super::Free();
 
-	for (auto& vecColliders : m_vecCollidersCom)
-		for (auto& collider : vecColliders)
-			Safe_Release(collider);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
