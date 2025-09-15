@@ -38,12 +38,13 @@ public:
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
+	CPartObject* Get_WeaponPart() { return m_pPart_Weapon; };
 
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
-	HRESULT		Ready_PartObjects();
+	HRESULT		Ready_PartObjects(_uint iObjType);
 
 	void		Update_Transform(_float fTimeDelta);		// 조작 등에 의한 "Transform" 제어
 	void		Update_AnimationState(_float fTimeDelta);	// 조작 등에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)

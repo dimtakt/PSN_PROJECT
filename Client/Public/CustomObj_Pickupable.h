@@ -28,16 +28,22 @@ public:
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
 
-	void		OnCollisionRay()					override;
+	void		OnCollisionRay(CGameObject* pCollisionHitBy)					override;
+	
 
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);
 	HRESULT		Bind_ShaderResources();
 
+	void		Update_PickingUp(_float fTimeDelta);
+
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-
+	_bool			m_isPickingUp = false;
+	_float			m_fPickingElapsedTime = 0.f;
+	const _float	m_fPickingMaxTime = 0.5f;
+	CGameObject*	m_pCollByTarget = nullptr;
 
 public:
 	static CCustomObj_Pickupable*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

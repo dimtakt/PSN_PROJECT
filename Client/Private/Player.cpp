@@ -74,7 +74,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 	if (pWeaponGun == nullptr)
 		if (m_pGameInstance->Get_IsKeyDown(DIK_O))
-			if (FAILED(Ready_PartObjects()))
+			if (FAILED(Ready_PartObjects(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN))))
 				return;
 
 #endif // _DEBUG
@@ -264,9 +264,11 @@ HRESULT CPlayer::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CPlayer::Ready_PartObjects()
+HRESULT CPlayer::Ready_PartObjects(_uint iObjType)
 {
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+#pragma region Legacy : CBody_Player
 
 	//CBody_Player::BODY_DESC     BodyDesc{};
 	//BodyDesc.pState = &m_iState;
@@ -279,6 +281,9 @@ HRESULT CPlayer::Ready_PartObjects()
 	//if (nullptr == pBody)
 	//	return E_FAIL;
 
+
+#pragma endregion
+
 	CWeapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pState = &m_iState;
 	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("root");
@@ -286,7 +291,17 @@ HRESULT CPlayer::Ready_PartObjects()
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Player"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
+	_wstring strObjPrototypeTag = {};
+	switch (iObjType)
+	{
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Karabin";	break;
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Pistol";		break;
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Shotgun";	break;
+	default:
+		break;
+	}
+
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Player"), ENUM_CLASS(LEVEL::STATIC), strObjPrototypeTag, &WeaponDesc)))
 		return E_FAIL;
 
 	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Player");
@@ -568,6 +583,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		else
 		{
 			_vector vDir = XMVectorZero();
+			_float fPickupableDist = 20.f;
 
 			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
 			_vector vCameraLook = matCameraview.r[2];
@@ -588,8 +604,12 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			_float fRayDist = FLT_MAX;
 			if (m_pGameInstance->Check_RayCollisions(&tRayDesc, pRayObj, fRayDist))
 			{
-				if (pRayObj)
-					pRayObj->OnCollisionRay();
+				if (pRayObj && fRayDist < fPickupableDist)
+				{
+					_uint iRayObjType = pRayObj->Get_ObjType();
+					Ready_PartObjects(iRayObjType);
+					pRayObj->OnCollisionRay(this);
+				}
 			}
 
 		}
