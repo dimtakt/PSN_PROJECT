@@ -34,22 +34,33 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
     _matrix matId = XMMatrixIdentity();
     _matrix matScale = matId, matRot1 = matId, matRot2 = matId, matPos = matId;
 
-    // matScale = XMMatrixScaling(1.f, 1.f, 1.f);
-    // matRot1 = XMMatrixRotationX(TO_RAD(-90));
-    // matRot2 = XMMatrixRotationZ(TO_RAD(180));
-    // matPos = XMMatrixTranslation(-0.2f, -0.6f, -1.5f);
-    matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
+
+    if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+    {
+        matPos = XMMatrixTranslation(0.2f, -0.05f, 0.5f); // 순서대로 오른쪽, 위쪽, 앞쪽
+    }
+    else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+    {
+        //matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+        //matRot1 = XMMatrixRotationX(TO_RAD(100));
+        //matRot2 = XMMatrixRotationZ(TO_RAD(215));
+        //matPos = XMMatrixTranslation(-0.15f, +0.15f, +0.1f);  // 오-뒤 - 왼-앞 - 위
+    }
+
 
     _matrix matTransform = matScale * matRot1 * matRot2 * matPos;
     m_pTransformCom->Set_WorldMatrix(matTransform);
 
 
-    //m_pTransformCom->Scaling(_float3(1.f, 1.f, 1.f));
-    //m_pTransformCom->Rotation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMConvertToRadians(180.0f));
-    //m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 0.f, -1.5f, 1.f));
+    // 총, 탄 관련 초기 설정
+    m_iMaxBullets = 4;
+    m_iCurBullets = m_iMaxBullets;
+
+    m_fShotRandRange = 5.f;
+    m_fZeroDst = 25.f;
 
 
-    m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN);
+    m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
 
     return S_OK;
 }
@@ -125,6 +136,7 @@ HRESULT CWeapon_Pistol::Render()
 
 void CWeapon_Pistol::Shot(_vector vDir, _uint iObjTypeIndex)
 {
+    __super::Shot(vDir, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Pistol::Ready_Components()
@@ -142,8 +154,8 @@ HRESULT CWeapon_Pistol::Ready_Components()
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
     OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-    OBBDesc.vExtents = _float3(1.0f, 1.5f, 2.f);
-    OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+    OBBDesc.vExtents = _float3(.03f, .10f, .15f);
+    OBBDesc.vCenter = _float3(0.f, 0.f, +(OBBDesc.vExtents.z * 0.4f));
 
     CCollider* tmpColCom = nullptr;
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
