@@ -15,6 +15,8 @@
 #include "TimeSpeed_Manager.h"
 #include "Collision_Manager.h"
 
+#include "Shadow.h"
+
 IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
@@ -36,6 +38,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
 	m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
 	if (nullptr == m_pInput_Device)
+		return E_FAIL;
+
+	m_pShadow = CShadow::Create(EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pShadow)
 		return E_FAIL;
 
 	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
@@ -549,9 +555,9 @@ HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTar
 	return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
 }
 
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV)
 {
-	return m_pTarget_Manager->Begin_MRT(strMRTTag);
+	return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV);
 }
 
 HRESULT CGameInstance::End_MRT()
@@ -562,6 +568,11 @@ HRESULT CGameInstance::End_MRT()
 HRESULT CGameInstance::Bind_RT_ShaderResource(const _wstring& strTargetTag, CShader* pShader, const _char* pConstantName)
 {
 	return m_pTarget_Manager->Bind_ShaderResource(strTargetTag, pShader, pConstantName);
+}
+
+HRESULT CGameInstance::Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pSourTexture)
+{
+	return m_pTarget_Manager->Copy_Resource(strTargetTag, pSourTexture);
 }
 
 #ifdef _DEBUG
@@ -577,6 +588,26 @@ HRESULT CGameInstance::Render_RT_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuff
 }
 
 #endif 
+
+#pragma endregion
+
+// ==============================
+// || SHADOW
+// ==============================
+
+#pragma region SHADOW
+
+const _float4x4* CGameInstance::Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const
+{
+	return m_pShadow->Get_Transform_Float4x4(eTransformState);
+}
+
+HRESULT CGameInstance::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
+{
+	return m_pShadow->Ready_ShadowLight(LightDesc);
+}
+
+#pragma endregion
 
 // ==============================
 // || [CUSTOM] TIMESPEED_MANAGER
@@ -634,6 +665,7 @@ void CGameInstance::Release_Engine()
 	Release();
 
 	
+	Safe_Release(m_pShadow);
 	Safe_Release(m_pTimeSpeed_Manager);
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFont_Manager);

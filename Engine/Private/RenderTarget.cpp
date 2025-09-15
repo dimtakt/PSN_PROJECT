@@ -48,6 +48,13 @@ HRESULT CRenderTarget::Bind_ShaderResource(CShader* pShader, const _char* pConst
 	return pShader->Bind_SRV(pConstantName, m_pSRV);
 }
 
+HRESULT CRenderTarget::Copy_Resource(ID3D11Texture2D* pSourTexture)
+{
+	m_pContext->CopyResource(pSourTexture, m_pTexture2D);
+
+	return S_OK;
+}
+
 void CRenderTarget::Clear()
 {
 	m_pContext->ClearRenderTargetView(m_pRTV, reinterpret_cast<_float*>(&m_vClearColor));

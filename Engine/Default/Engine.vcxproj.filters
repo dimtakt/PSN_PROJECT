@@ -175,6 +175,18 @@
     <Filter Include="01.Utility\03.Component\Collider\Manager">
       <UniqueIdentifier>{67a11ce0-8a93-4e3d-acaa-c91568515980}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Component\VIBuffer\Instance">
+      <UniqueIdentifier>{1d528675-4c2b-4b92-a5d7-f3813d4a85c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\VIBuffer\Instance\Point">
+      <UniqueIdentifier>{3bf531ae-a4d7-4a45-8924-f07bc257ac02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\VIBuffer\Instance\Rect">
+      <UniqueIdentifier>{6a7b4427-4a56-41ec-9a3a-03d0942754cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06.Shadow">
+      <UniqueIdentifier>{7f046274-1f3e-4d8b-a86a-6119e8ea6fd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -332,6 +344,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Collision_Manager.cpp">
       <Filter>01.Utility\03.Component\Collider\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Instance.cpp">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Point_Instance.cpp">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance\Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Rect_Instance.cpp">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shadow.cpp">
+      <Filter>01.Utility\06.Shadow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -511,6 +535,18 @@
     </ClInclude>
     <ClInclude Include="..\public\Collision_Manager.h">
       <Filter>01.Utility\03.Component\Collider\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Instance.h">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Point_Instance.h">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance\Point</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Rect_Instance.h">
+      <Filter>01.Utility\03.Component\VIBuffer\Instance\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Shadow.h">
+      <Filter>01.Utility\06.Shadow</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

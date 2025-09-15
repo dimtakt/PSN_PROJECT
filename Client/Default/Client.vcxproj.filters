@@ -130,6 +130,12 @@
     <Filter Include="02.GameObject\_NonAnimObject\_Pickupable">
       <UniqueIdentifier>{bf8724f1-39bd-407b-b439-fc38bf9b0ccf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Effect">
+      <UniqueIdentifier>{ae0d5e13-1815-4265-876c-69a32d89f0b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Effect\Particle">
+      <UniqueIdentifier>{789948d3-79ea-4614-9db3-3f9895d36ca4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -261,6 +267,9 @@
     <ClInclude Include="..\public\CustomObj_Pickupable.h">
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Particle.h">
+      <Filter>02.GameObject\Effect\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -390,12 +399,12 @@
     <ClCompile Include="..\private\CustomObj_Pickupable.cpp">
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Particle.cpp">
+      <Filter>02.GameObject\Effect\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -404,7 +413,16 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
     <FxCompile Include="..\..\..\SR_REF11\Client\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

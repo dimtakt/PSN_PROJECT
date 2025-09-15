@@ -28,6 +28,14 @@
 #include "UI_Crosshair.h"
 
 
+
+// Particle 
+
+#include "Particle.h"
+//#include "Snow.h"
+//#include "Explosion.h"
+
+
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
@@ -119,6 +127,40 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 	
+	/* Particle */
+
+	/* Prototype_Component_Particle_Explosion */
+	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		ExploDesc{};
+	ExploDesc.iNumInstance = 300;
+	ExploDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	ExploDesc.vRange = _float3(0.2f, 0.2f, 0.2f);
+	ExploDesc.vSize = _float2(0.05f, 0.1f);
+	ExploDesc.vLifeTime = _float2(0.5f, 2.f);
+	ExploDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	ExploDesc.vSpeed = _float2(0.5f, 1.f);
+	ExploDesc.isLoop = true;
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Particle_Explosion"),
+		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &ExploDesc))))
+		return E_FAIL;
+
+
+	/* Prototype_Component_Particle_Snow */
+	CVIBuffer_Point_Instance::POINT_INSTANCE_DESC		SnowDesc{};
+	SnowDesc.iNumInstance = 3000;
+	SnowDesc.vCenter = _float3(64.f, 20.f, 64.f);
+	SnowDesc.vRange = _float3(128.f, 1.f, 128.f);
+	SnowDesc.vSize = _float2(0.1f, 0.2f);
+	SnowDesc.vLifeTime = _float2(5.0f, 10.f);
+	SnowDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	SnowDesc.vSpeed = _float2(1.5f, 3.f);
+	SnowDesc.isLoop = true;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Particle_Snow"),
+		CVIBuffer_Point_Instance::Create(m_pDevice, m_pContext, &SnowDesc))))
+		return E_FAIL;
+
 
 
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Props_Pot"),

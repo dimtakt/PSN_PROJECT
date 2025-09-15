@@ -8,8 +8,8 @@ float g_fRange = 5.f;
 texture2D g_DiffuseTexture[2];
 texture2D g_MaskTexture;
 texture2D g_BrushTexture;
-vector    g_vMtrlAmbient = 1.f;
-vector    g_vMtrlSpecular = 1.f;
+vector g_vMtrlAmbient = 1.f;
+vector g_vMtrlSpecular = 1.f;
 
 
 struct VS_IN
@@ -80,14 +80,14 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector      vSourDiffuse = g_DiffuseTexture[0].Sample(DefaultSampler, In.vTexcoord * 50.f);
-    vector      vDestDiffuse = g_DiffuseTexture[1].Sample(DefaultSampler, In.vTexcoord * 50.f);
+    vector vSourDiffuse = g_DiffuseTexture[0].Sample(DefaultSampler, In.vTexcoord * 50.f);
+    vector vDestDiffuse = g_DiffuseTexture[1].Sample(DefaultSampler, In.vTexcoord * 50.f);
     
     vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
     vector vBrush = 0.f;
     
-    if (g_vBrushPos.x - g_fRange < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRange && 
-        g_vBrushPos.z - g_fRange < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRange)    
+    if (g_vBrushPos.x - g_fRange < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRange &&
+        g_vBrushPos.z - g_fRange < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRange)
     {
         float2 vTexcoord;
         
@@ -97,15 +97,15 @@ PS_OUT PS_MAIN(PS_IN In)
         vBrush = g_BrushTexture.Sample(DefaultSampler, vTexcoord);
     }
     
-    vector vMtrlDiffuse = vDestDiffuse * vMask.r + vSourDiffuse * (1.f - vMask.r) + vBrush;    
+    vector vMtrlDiffuse = vDestDiffuse * vMask.r + vSourDiffuse * (1.f - vMask.r) + vBrush;
     
     Out.vDiffuse = vMtrlDiffuse;
     
     /* In.vNormal(-1 ~ 1) -> Out.vNormal(0 ~ 1) */
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);   
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     // vector      vNormalDesc = g_NormalTexture.Sample();
     // vector vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);    
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 1.f);
     return Out;
 }
 

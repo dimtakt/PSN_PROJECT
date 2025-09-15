@@ -40,7 +40,14 @@ using namespace std;
 namespace Engine
 {
 	static const unsigned int g_iMaxNumBones = 512;
+
+	//const unsigned int g_iMaxWidth = 16384;
+	//const unsigned int g_iMaxHeight = 9216;	
+
+	const unsigned int g_iMaxWidth = 8192;
+	const unsigned int g_iMaxHeight = 4608;
 }
+
 
 #include "Engine_Enum.h"
 #include "Engine_Macro.h"

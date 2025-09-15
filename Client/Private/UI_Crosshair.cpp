@@ -69,7 +69,7 @@ HRESULT CUI_Crosshair::Render()
     if (FAILED(m_pTextureCom_Gun->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(1);
+    m_pShaderCom->Begin(2);
 
     m_pVIBufferCom->Bind_Resources();
 

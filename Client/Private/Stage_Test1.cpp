@@ -74,6 +74,18 @@ HRESULT CStage_Test1::Ready_Lights()
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
+
+	SHADOW_LIGHT_DESC			ShadowLightDesc{};
+
+	ShadowLightDesc.vEye = _float4(-30.f, 30.f, -30.f, 1.f);
+	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	ShadowLightDesc.fFovy = XMConvertToRadians(120.f);
+	ShadowLightDesc.fNear = 0.1f;
+	ShadowLightDesc.fFar = 1000.f;
+
+	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

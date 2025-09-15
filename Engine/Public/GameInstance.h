@@ -173,14 +173,22 @@ public:
 #pragma region TARGET_MANAGER
 	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr);
 	HRESULT End_MRT();
 	HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+	HRESULT Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pSourTexture);
 
 #ifdef _DEBUG
 	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Render_RT_Debug(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
+#pragma endregion
+
+	// ==============================
+
+#pragma region SHADOW
+	const _float4x4* Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;
+	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
 #pragma endregion
 
 	// ==============================
@@ -206,7 +214,6 @@ public:
 	_bool Check_RayCollisions(RAYCOLLISION_DESC* pRayDesc, CGameObject*& OutIntersectObj, _float& fOutDistance);
 
 #pragma endregion
-
 	// ==============================
 
 
@@ -224,6 +231,8 @@ private:
 	class CPicking*				m_pPicking = { nullptr };
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
+	class CShadow*				m_pShadow = { nullptr };
+
 	class CTimeSpeed_Manager*	m_pTimeSpeed_Manager = { nullptr };
 	class CCollision_Manager*	m_pCollision_Manager = { nullptr };
 

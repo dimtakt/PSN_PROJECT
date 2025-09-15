@@ -27,6 +27,22 @@ namespace Engine
 		float		fRange;
 	}LIGHT_DESC;
 
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+
+		float		fTrackPosition;
+	}KEYFRAME;
+
+	typedef struct tagShadowLightDesc
+	{
+		XMFLOAT4		vEye, vAt;
+		float			fFovy, fNear, fFar;
+	}SHADOW_LIGHT_DESC;
+
+
 	typedef struct tagVertexPosition
 	{
 		XMFLOAT3		vPosition;
@@ -48,16 +64,6 @@ namespace Engine
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 	}VTXPOSTEX;
-
-	typedef struct tagKeyFrame
-	{
-		XMFLOAT3	vScale;
-		XMFLOAT4	vRotation;
-		XMFLOAT3	vTranslation;
-
-		float		fTrackPosition;
-	}KEYFRAME;
-
 	typedef struct tagVertexCube
 	{
 		XMFLOAT3		vPosition;
@@ -126,6 +132,23 @@ namespace Engine
 	}VTXANIMMESH;
 
 
+	typedef struct tagVertexInstanceMesh
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vTranslation;
+	}VTXINSTANCE_MESH;
+
+	typedef struct tagVertexInstanceParticle
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vTranslation;
+
+		XMFLOAT2			vLifeTime;
+	}VTXINSTANCE_PARTICLE;
 
 
 

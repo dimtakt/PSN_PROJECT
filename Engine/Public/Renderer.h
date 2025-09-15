@@ -39,6 +39,9 @@ private:
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
 
 	_float4x4		m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
+	ID3D11DepthStencilView* m_pShadowDSV = { nullptr };
+
+	_float									m_fViewportWidth{}, m_fViewportHeight{};
 
 #ifdef _DEBUG
 private:
@@ -49,12 +52,17 @@ private:
 
 private:
 	HRESULT Render_Priority();
+	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
+
+private:
+	HRESULT Ready_Shadow_Depth_Stencil_View();
+	HRESULT SetUp_Viewport(_float fWidth, _float fHeight);
 
 #ifdef _DEBUG
 	HRESULT Render_Debug();
