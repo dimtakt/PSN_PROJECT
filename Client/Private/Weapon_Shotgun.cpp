@@ -23,6 +23,7 @@ HRESULT CWeapon_Shotgun::Initialize(void* pArg)
     WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
     m_pParentState = pDesc->pState;
     m_pSocketMatrix = pDesc->pSocketMatrix;
+    m_pParentTarget = pDesc->pParentTarget;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -53,10 +54,11 @@ HRESULT CWeapon_Shotgun::Initialize(void* pArg)
 
 
     // 총, 탄 관련 초기 설정
-    m_iMaxBullets = 20;
+    //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))? 20 : 100;
+    m_iMaxBullets = 200;
     m_iCurBullets = m_iMaxBullets;
 
-    m_fShotRandRange = 30.f;
+    m_fShotRandRange = 15.f;
     m_fZeroDst = 50.f;
 
     m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN);
@@ -135,7 +137,25 @@ HRESULT CWeapon_Shotgun::Render()
 
 void CWeapon_Shotgun::Shot(_vector vDir, _uint iObjTypeIndex)
 {
-    __super::Shot(vDir, iObjTypeIndex);
+    if (m_iCurBullets == 0)
+    {
+        // UI 출력 이벤트
+
+        return;
+    }
+
+
+    _uint iShotAmount = 10;
+    for (_uint i = 0; i < iShotAmount; i++)
+    {
+        __super::Shot(vDir, iObjTypeIndex);
+        m_iCurBullets--;
+    }
+
+}
+
+void CWeapon_Shotgun::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
+{
 }
 
 HRESULT CWeapon_Shotgun::Ready_Components()

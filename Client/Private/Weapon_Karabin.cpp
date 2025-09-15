@@ -54,10 +54,11 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
 
 
     // 총, 탄 관련 초기 설정
-    m_iMaxBullets = 12;
+    //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 12 : 60;
+    m_iMaxBullets = 200;
     m_iCurBullets = m_iMaxBullets;
     	
-    m_fShotRandRange = 10.f;
+    m_fShotRandRange = 8.f;
     m_fZeroDst = 50.f;
 
 
@@ -139,7 +140,24 @@ HRESULT CWeapon_Karabin::Render()
 
 void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
 {
-    __super::Shot(vDir, iObjTypeIndex);
+    if (m_iCurBullets == 0)
+    {
+        // UI 출력 이벤트
+
+        return;
+    }
+
+
+    _uint iShotAmount = 4;          // Karabin 의 경우엔 소총 쏘듯이, 일정 간격으로 4발 나가도록 해야 함
+    for (_uint i = 0; i < iShotAmount; i++)
+    {
+        __super::Shot(vDir, iObjTypeIndex);
+        m_iCurBullets--;
+    }
+}
+
+void CWeapon_Karabin::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
+{
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()
