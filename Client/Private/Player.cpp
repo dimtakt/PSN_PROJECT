@@ -592,8 +592,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 	{
 		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
-		// ksta : 총알 소환 테스트
-		if (pWeaponGun != nullptr)
+		if (pWeaponGun)
 		{
 			// 날아갈 방향 계산
 			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
@@ -609,7 +608,6 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 
 			pWeaponGun->Shot(XMVectorSetW(XMVector3Normalize(vDir), 1.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
 		}
-		// ksta : pickupable object 와의 상호작용 테스트
 		else
 		{
 			_vector vDir = XMVectorZero();
@@ -645,6 +643,23 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		}
 	}
 
+	else if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::RB))
+	{
+		CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+
+		if (pWeaponGun)
+		{
+			// 1. 현재 무기의 Transform 정보를 저장
+			// 2. 날아갈 Pickupable 오브젝트 생성, 여기엔 잔탄 정보 저장 (이는 충돌 시 파괴될 것임)
+			// 3. 현재 무기 삭제
+			// 4. 플레이어 애니메이션 중 투척에 가까운 것으로 재생
+
+
+
+
+		}
+
+	}
 }
 
 void CPlayer::Update_BoneColliders()
