@@ -50,7 +50,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 
 
-	//if (FAILED(Ready_PartObjects()))
+	//if (FAILED(Ready_PartObject()))
 	//	return E_FAIL;
 
 
@@ -75,7 +75,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 	if (pWeaponGun == nullptr)
 		if (m_pGameInstance->Get_IsKeyDown(DIK_O))
-			if (FAILED(Ready_PartObjects(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN))))
+			if (FAILED(Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN))))
 				return;
 
 #endif // _DEBUG
@@ -294,7 +294,7 @@ HRESULT CPlayer::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CPlayer::Ready_PartObjects(_uint iObjType)
+HRESULT CPlayer::Ready_PartObject(_uint iObjType, void* pArg)
 {
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
@@ -320,6 +320,9 @@ HRESULT CPlayer::Ready_PartObjects(_uint iObjType)
 	//WeaponDesc.pSocketMatrix = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
+
+	if (pArg)
+		WeaponDesc.iCurLeftBullets = static_cast<CWeapon_Gun::GUNINFO_DESC*>(pArg)->iCurLeftBullets;
 
 	_wstring strObjPrototypeTag = {};
 	switch (iObjType)
@@ -635,7 +638,22 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 				if (pRayObj && fRayDist < fPickupableDist)
 				{
 					_uint iRayObjType = pRayObj->Get_ObjType();
-					Ready_PartObjects(iRayObjType);
+					CWeapon_Gun::GUNINFO_DESC tGunDesc = {};
+
+					_bool isGun = false;
+					if (iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN) ||
+						iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL) ||
+						iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN))
+					{
+						isGun = true;
+						tGunDesc = dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_GunInfoDesc();
+					}
+
+					
+					if (isGun)	Ready_PartObject(iRayObjType, &tGunDesc);
+					else		Ready_PartObject(iRayObjType);
+
+					
 					pRayObj->OnCollisionRay(this);
 				}
 			}
@@ -653,10 +671,20 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			// 2. 날아갈 Pickupable 오브젝트 생성, 여기엔 잔탄 정보 저장 (이는 충돌 시 파괴될 것임)
 			// 3. 현재 무기 삭제
 			// 4. 플레이어 애니메이션 중 투척에 가까운 것으로 재생
+			 
+			// 날아갈 방향 계산
+			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 
+			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+			_vector vCameraLook = matCameraview.r[2];
+			vDir = vCameraLook;
 
+			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
+			pWeaponGun->Throw(XMVectorSetW(XMVector3Normalize(vDir), 1.f), XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
 
-
+			// 현재 사용중인 무기 삭제
+			Remove_PartObject(L"Part_Weapon_Player");
+			m_pPart_Weapon = nullptr;
 		}
 
 	}

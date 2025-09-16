@@ -56,7 +56,7 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
     // ÃÑ, Åº °ü·Ã ÃÊ±â ¼³Á¤
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 4 : 20;
     m_iMaxBullets = 200;
-    m_iCurBullets = m_iMaxBullets;
+    m_iCurBullets = (pDesc->iCurLeftBullets != UINT_MAX)? m_iMaxBullets : pDesc->iCurLeftBullets;
 
     m_fShotRandRange = 5.f;
     m_fZeroDst = 50.f;
@@ -151,6 +151,7 @@ void CWeapon_Pistol::Shot(_vector vDir, _uint iObjTypeIndex)
 
 void CWeapon_Pistol::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
 {
+    __super::Throw(vDir, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Pistol::Ready_Components()

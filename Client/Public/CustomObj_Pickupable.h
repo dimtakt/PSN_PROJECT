@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "CustomObj_NonAnim.h"
+#include "Weapon_Gun.h"
 
 
 NS_BEGIN(Engine)
@@ -15,6 +16,15 @@ NS_BEGIN(Client)
 
 class CCustomObj_Pickupable final : public CCustomObj_NonAnim
 {
+public:
+	typedef struct thrownPickupObjDesc : public CUSTOMOBJ_DESC
+	{
+		_vector vThrowDir = {};
+		_vector vThrowRot = {};
+
+		CWeapon_Gun::GUNINFO_DESC tGunInfoDesc = {};
+	} THROWN_PICKUPOBJ_DESC;
+
 private:
 	CCustomObj_Pickupable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCustomObj_Pickupable(const CGameObject& Prototype);
@@ -30,6 +40,7 @@ public:
 
 	void		OnCollisionRay(CGameObject* pCollisionHitBy)					override;
 	
+	CWeapon_Gun::GUNINFO_DESC Get_GunInfoDesc() { return m_tGunInfoDesc; }
 
 private:
 	// 로컬 함수들 (기능 분리)
@@ -44,6 +55,11 @@ private:
 	_float			m_fPickingElapsedTime = 0.f;
 	const _float	m_fPickingMaxTime = 0.5f;
 	CGameObject*	m_pCollByTarget = nullptr;
+
+	CWeapon_Gun::GUNINFO_DESC m_tGunInfoDesc = {};
+
+	_vector			m_pThrowDir = {};	// 던져진 경우 Transform의 변화
+	_vector			m_pThrowRot = {};	// 던져진 경우 Transform의 변화
 
 public:
 	static CCustomObj_Pickupable*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

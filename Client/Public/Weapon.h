@@ -21,6 +21,8 @@ public:
 		_uint* pState = { nullptr };
 
 		CGameObject* pParentTarget = { nullptr };
+
+		_uint iCurLeftBullets = UINT_MAX;
 	}WEAPON_DESC;
 protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -35,12 +37,13 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex) {};
+
 public:
 	void Set_toAttached(_bool isAttached) { m_isAttached = isAttached; };
 
 protected:
 	_bool				m_isAttached = false;
-	_uint				m_iGameObjType = { };
 
 	CShader*			m_pShaderCom = { nullptr };
 	CModel*				m_pModelCom = { nullptr };

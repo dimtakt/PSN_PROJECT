@@ -78,6 +78,16 @@ HRESULT CContainerObject::Add_PartObject(const _wstring& strPartObjectTag, _uint
     return S_OK;
 }
 
+HRESULT CContainerObject::Remove_PartObject(const _wstring& strPartObjectTag)
+{
+    CPartObject* pObject = Find_PartObject(strPartObjectTag);
+    Safe_Release(pObject);
+
+    m_PartObjects.erase(strPartObjectTag);
+
+    return S_OK;
+}
+
 CPartObject* CContainerObject::Find_PartObject(const _wstring& strPartObjectTag)
 {
     auto    iter = m_PartObjects.find(strPartObjectTag);

@@ -28,6 +28,15 @@ HRESULT CCustomObj_Pickupable::Initialize(void* pArg)
     if (FAILED(this->Ready_Components(pArg)))
         return E_FAIL;
 
+    if (pArg != nullptr)
+    {
+        THROWN_PICKUPOBJ_DESC* pDesc = static_cast<THROWN_PICKUPOBJ_DESC*>(pArg);
+        m_pThrowDir = pDesc->vThrowDir;
+        m_pThrowRot = pDesc->vThrowRot;
+
+        m_tGunInfoDesc = pDesc->tGunInfoDesc;
+    }
+
     return S_OK;
 }
 
@@ -40,6 +49,29 @@ void CCustomObj_Pickupable::Update(_float fTimeDelta)
 {
     if (m_isPickingUp)
         Update_PickingUp(fTimeDelta);
+
+
+
+
+    // 벡터분리 해서 현재 transform에 변화주도록
+
+    m_pTransformCom->Set_Position_Direct(m_pTransformCom->Get_Position() + m_pThrowDir * fTimeDelta);
+    //
+    //_matrix matRotation = QUAT_TO_MAT(m_pThrowRot);
+    //_float4x4 matStoreRotation;
+    //XMStoreFloat4x4(&matStoreRotation, matRotation);
+    //_float3 vRotationEuler = MAT_TO_ROT(matStoreRotation);
+    //
+    //_float3 vDeltaRot;
+    //XMStoreFloat3(&vDeltaRot, XMLoadFloat3(&vRotationEuler) * fTimeDelta);   //
+    //
+    //_float3 vCurRotationEuler = m_pTransformCom->Get_RotationEuler_Store();
+    //_float3 vCalcedRotation;
+    //XMStoreFloat3(&vCalcedRotation, XMLoadFloat3(&vCurRotationEuler) + XMLoadFloat3(&vDeltaRot)); //
+    //
+    //m_pTransformCom->Set_Rotation_DirectEuler(vCalcedRotation);
+
+
 
     m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
 }

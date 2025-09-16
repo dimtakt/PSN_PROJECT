@@ -3,6 +3,11 @@
 
 class CWeapon_Gun abstract : public CWeapon
 {
+public:
+	typedef struct tWeaponGunInfoDesc {
+		_uint iCurLeftBullets = UINT_MAX;
+	}GUNINFO_DESC;
+
 protected:
 	CWeapon_Gun(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWeapon_Gun(const CWeapon_Gun& Prototype);
@@ -17,8 +22,8 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual void Shot(_vector vDir, _uint iObjTypeIndex);					// 필요에 따라 하위ㅣ오브젝트에서 반복문으로 불러오도록.
-	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex);	// 우클릭으로 드랍하는 것 구현.
+	virtual void Shot(_vector vDir, _uint iObjTypeIndex);							// 어떤 총알을 발사할 것인가?
+	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex) override;	// 우클릭으로 드랍하는 것 구현.
 									// 이후 파괴 및 픽업오브젝트로 잔탄, transform, deltaTransform정보 넘겨주어 생성
 
 protected:

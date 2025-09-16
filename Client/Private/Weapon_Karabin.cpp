@@ -56,7 +56,7 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     // 총, 탄 관련 초기 설정
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 12 : 60;
     m_iMaxBullets = 200;
-    m_iCurBullets = m_iMaxBullets;
+    m_iCurBullets = (pDesc->iCurLeftBullets != UINT_MAX) ? m_iMaxBullets : pDesc->iCurLeftBullets;
     	
     m_fShotRandRange = 8.f;
     m_fZeroDst = 100.f;
@@ -79,7 +79,7 @@ void CWeapon_Karabin::Update(_float fTimeDelta)
     // weapon.cpp 에서 기본 업데이트 도는 중
     //__super::Update(fTimeDelta);
 
-
+    std::cout << "[CWeapon_Karabin::Update] Current Left Bullets : " << m_iCurBullets << std::endl;
     // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
 
     if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
@@ -158,6 +158,7 @@ void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
 
 void CWeapon_Karabin::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
 {
+    __super::Throw(vDir, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()

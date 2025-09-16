@@ -97,6 +97,7 @@ namespace Engine
 
 	#define			QUAT_TO_MAT(QUAT)								XMMatrixRotationQuaternion(QUAT)
 
+
 // END===========================
 
 #endif // Engine_Macro_h__

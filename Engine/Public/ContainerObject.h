@@ -27,6 +27,7 @@ protected:
 
 protected:
 	HRESULT Add_PartObject(const _wstring& strPartObjectTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Remove_PartObject(const _wstring& strPartObjectTag);
 	class CPartObject* Find_PartObject(const _wstring& strPartObjectTag);
 
 public:

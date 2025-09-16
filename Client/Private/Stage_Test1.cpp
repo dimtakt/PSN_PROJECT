@@ -4,6 +4,7 @@
 //#include "Camera_Free.h"
 #include "Camera_Player.h"
 #include "Terrain.h"
+#include "CustomObj_Pickupable.h"
 
 #include "CustomObj.h"
 
@@ -193,7 +194,7 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 
 
 
-		CCustomObj::CUSTOMOBJ_DESC tDesc = {};
+		CCustomObj_Pickupable::THROWN_PICKUPOBJ_DESC tDesc = {};
 
 		switch (iObjType)
 		{
@@ -201,7 +202,7 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 			// 여기서 1. 새로 pickupobj 추가, 2. pickupobj의 모티브가 됐던 오브젝트 제거 구현할 것
 		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):		
 		{
-			_wstring strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
+			//_wstring strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
 			// strModelPrototypeTag 라는 것은 모델 정의를 위해 Arg로 들어가야 하는 요소이고
 			// 미리 정의되어있을, 픽업오브젝트 기반의 "게임오브젝트" 프로토타입을 사용해야 함
 			// 이미 정의된 건 "모델" 프로토타입임. 그러므로 게임오브젝트 프로토타입은 따로 정의해야 함

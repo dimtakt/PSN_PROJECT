@@ -1,6 +1,7 @@
 #include "Weapon_Gun.h"
 #include "GameInstance.h"
 #include "Bullet.h"
+#include "CustomObj_Pickupable.h"
 
 CWeapon_Gun::CWeapon_Gun(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon{ pDevice, pContext }
@@ -94,6 +95,45 @@ void CWeapon_Gun::Shot(_vector vDir, _uint iObjTypeIndex)
 
 void CWeapon_Gun::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
 {
+    // 현재 위치로부터 던지는 오브젝트 생성되도록 진행,
+    // 해당 오브젝트는 pickupable 클래스이며, 잔탄 정보를 들고 있을 것임
+
+    _matrix matStartTransform = m_pTransformCom->Get_WorldMatrix();
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+    _wstring strModelPrototypeTag = {};
+    switch (iObjTypeIndex)
+    {
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):   
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";     break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):    
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Pistol_Fixed";      break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):   
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Shotgun_Fixed";     break;
+    }
+
+    CCustomObj_Pickupable::THROWN_PICKUPOBJ_DESC tDesc = {};
+    tDesc.strModelComPrototypeTag = strModelPrototypeTag;
+    tDesc.iGameObjType = iObjTypeIndex;
+
+    tDesc.vThrowDir = vDir;
+    tDesc.vThrowRot = vRot;
+    tDesc.tGunInfoDesc.iCurLeftBullets = m_iCurBullets;
+    
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable",
+        ENUM_CLASS(LEVEL::STATIC), L"Prototype_GameObject_Pickupable", &tDesc)))
+        MSG_BOX(L"[CWeapon_Gun::Throw] Pickupable Object Create Failed.");
+
+    // 생성한 pickupable 오브젝트의 Transform
+    CTransform* pObjTransformCom = static_cast<CTransform*>((m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable")->Get_Component(L"Com_Transform")));
+    pObjTransformCom->Set_WorldMatrix(m_CombinedWorldMatrix);
+   
+
+    // 이걸로 멀하려고했지?
+    // 원래 쓰던 총의 정보가 들어있ㅇ므
+
+    // 아마 잔탄 정보는 이쪽에 있었던거같은데..
+
 
 }
 
