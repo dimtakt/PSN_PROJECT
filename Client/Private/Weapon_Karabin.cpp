@@ -149,6 +149,24 @@ void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
     }
 
 
+    if (m_isDoingShot == false)
+    {
+        m_isDoingShot = true;
+        // shot 시도 시 isDoingShot 로컬변수가 true 가 되며,
+        // true 인 동안에는 정해진 발 수 만큼 공격 명령
+        // 종료 후 false 전환. true 인 동안에는 새로 shot 시도 불가.
+    }
+
+
+}
+
+void CWeapon_Karabin::Shot_Continuously(_vector vDir, _uint iObjTypeIndex)
+{
+    // 현재 날아갈 좌표를 어떻게 실시간으로 가져올거임?
+
+    m_isDoingShot;
+    m_fShotElapsed;
+
     _uint iShotAmount = 4;          // Karabin 의 경우엔 소총 쏘듯이, 일정 간격으로 4발 나가도록 해야 함
     for (_uint i = 0; i < iShotAmount; i++)
     {

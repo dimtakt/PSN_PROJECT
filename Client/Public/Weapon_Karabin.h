@@ -24,6 +24,12 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 
+private:
+	void Shot_Continuously(_vector vDir, _uint iObjTypeIndex);
+
+private:
+	_bool	m_isDoingShot = false;
+	_float	m_fShotElapsed = 0.f;
 
 public:
 	static CWeapon_Karabin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
