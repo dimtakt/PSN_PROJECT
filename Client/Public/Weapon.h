@@ -35,7 +35,11 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void Set_toAttached(_bool isAttached) { m_isAttached = isAttached; };
+
 protected:
+	_bool				m_isAttached = false;
 	_uint				m_iGameObjType = { };
 
 	CShader*			m_pShaderCom = { nullptr };

@@ -67,18 +67,16 @@ private:
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	CShader*			m_pShaderCom		= { nullptr };
-	CModel*				m_pModelCom			= { nullptr };
-	CNavigation*		m_pNavigationCom	= { nullptr };
+	CShader*						m_pShaderCom		= { nullptr };
+	CModel*							m_pModelCom			= { nullptr };
+	CNavigation*					m_pNavigationCom	= { nullptr };
 
-	CPartObject*		m_pPart_Weapon		= { nullptr };
+	CPartObject*					m_pPart_Weapon		= { nullptr };
 
-private:
+private:;
 	_uint			m_iState = { };
 
 	_float			m_fMouseSensor = { .1f };
-
-
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

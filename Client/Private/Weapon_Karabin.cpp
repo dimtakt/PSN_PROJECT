@@ -59,7 +59,7 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     m_iCurBullets = m_iMaxBullets;
     	
     m_fShotRandRange = 8.f;
-    m_fZeroDst = 50.f;
+    m_fZeroDst = 100.f;
 
 
 

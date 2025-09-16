@@ -34,6 +34,7 @@ public:
 	void		Update(_float fTimeDelta)			override;
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
+	HRESULT		Render_Shadow()						override;
 
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)

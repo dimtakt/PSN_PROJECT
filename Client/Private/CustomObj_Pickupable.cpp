@@ -3,6 +3,7 @@
 
 #include "Player.h"
 #include "PartObject.h"
+#include "Weapon.h"
 
 CCustomObj_Pickupable::CCustomObj_Pickupable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCustomObj_NonAnim(pDevice, pContext)
@@ -84,7 +85,6 @@ void CCustomObj_Pickupable::OnCollisionRay(CGameObject* pCollisionHitBy)
 {
     // 플레이어가 클릭 시 플레이어쪽으로 다가오며 사라지도록 할 것
     // 이게 무슨 오브젝트인지의 정보를 플레이어 단계에서 알아야 함
-
 
     m_pCollByTarget = pCollisionHitBy;
     _uint iCollisionObjType = m_pCollByTarget->Get_ObjType();
@@ -212,7 +212,7 @@ void CCustomObj_Pickupable::Update_PickingUp(_float fTimeDelta)
         // RawTimeDelta 기반, 이동 상태 반영
         m_fPickingElapsedTime += fRawTimeDelta;
         _float fLeftTime = max(0.0f, m_fPickingMaxTime - m_fPickingElapsedTime);
-        _float fRatio = min(1.0f, fTimeDelta / fLeftTime);
+        _float fRatio = min(1.0f, fRawTimeDelta / fLeftTime);
         //std::cout << "[CustomObj_Pickupable::Update_PickingUp] fRatio : " << fRatio << std::endl;
 
         _float3 vPos = {}, vRot = {}, vSca = {};
@@ -249,8 +249,11 @@ void CCustomObj_Pickupable::Update_PickingUp(_float fTimeDelta)
 
         // 파괴
         if (m_fPickingElapsedTime > m_fPickingMaxTime)  // 일정 시간이 다 지났으면
+        {
+            dynamic_cast<CWeapon*>(pPlayer->Get_WeaponPart())->Set_toAttached(true);
             m_isDead = true;
             //m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", this);
+        }
     } break;
     //case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
     //{

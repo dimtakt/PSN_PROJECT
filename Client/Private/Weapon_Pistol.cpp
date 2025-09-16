@@ -59,7 +59,7 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
     m_iCurBullets = m_iMaxBullets;
 
     m_fShotRandRange = 5.f;
-    m_fZeroDst = 25.f;
+    m_fZeroDst = 50.f;
 
 
     m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);

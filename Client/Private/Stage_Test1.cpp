@@ -77,9 +77,9 @@ HRESULT CStage_Test1::Ready_Lights()
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
 
-	ShadowLightDesc.vEye = _float4(-30.f, 30.f, -30.f, 1.f);
+	ShadowLightDesc.vEye = _float4(-20.f, 20.f, -20.f, 1.f);
 	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	ShadowLightDesc.fFovy = XMConvertToRadians(120.f);
+	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
 	ShadowLightDesc.fNear = 0.1f;
 	ShadowLightDesc.fFar = 1000.f;
 

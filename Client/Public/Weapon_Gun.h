@@ -17,8 +17,9 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual void Shot(_vector vDir, _uint iObjTypeIndex);		// 필요에 따라 하위ㅣ오브젝트에서 반복문으로 불러오도록.
-	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex);	// 우클릭으로 드랍하는 것 구현
+	virtual void Shot(_vector vDir, _uint iObjTypeIndex);					// 필요에 따라 하위ㅣ오브젝트에서 반복문으로 불러오도록.
+	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex);	// 우클릭으로 드랍하는 것 구현.
+									// 이후 파괴 및 픽업오브젝트로 잔탄, transform, deltaTransform정보 넘겨주어 생성
 
 protected:
 	_uint	m_iMaxBullets = {};		// 획득시 채워진 기본 탄 갯수

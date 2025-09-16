@@ -69,6 +69,9 @@ void CWeapon::Update(_float fTimeDelta)
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
+    if (!m_isAttached)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 

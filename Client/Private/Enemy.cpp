@@ -106,6 +106,8 @@ void CEnemy::Late_Update(_float fTimeDelta)
 
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+		return;
 
 #ifdef _DEBUG
 	for (auto& vecColliders : m_vecCollidersCom)
@@ -146,6 +148,36 @@ HRESULT CEnemy::Render()
 
 	return S_OK;
 }
+
+
+HRESULT CEnemy::Render_Shadow()
+{
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+
+	/* 그림자를 표현하고하는 특수한 광원을 정의하고 그 광원이 바라본 장면응로서 플레이어를 그려준다. */
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		m_pShaderCom->Begin(2);
+
+		m_pModelCom->Render(i);
+	}
+
+
+	return S_OK;
+}
+
 
 HRESULT CEnemy::Ready_Components(void* pArg)
 {

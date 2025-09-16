@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 
 #include "Body_Player.h"
+#include "CustomObj_Pickupable.h"
 
 //#include "Weapon.h"
 #include "Weapon_Karabin.h"
