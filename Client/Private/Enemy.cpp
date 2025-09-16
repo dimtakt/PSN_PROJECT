@@ -38,7 +38,8 @@ HRESULT CEnemy::Initialize(void* pArg)
 
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
-
+	if (m_pPart_Weapon)
+		static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
 
 	m_iMaxHp	= 3;
 	m_iHp		= 3;	// ksta : 일정 시간 공격받지 않으면 다시 최대 체력으로 회복되어야 함.

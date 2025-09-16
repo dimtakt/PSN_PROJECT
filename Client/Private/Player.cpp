@@ -75,8 +75,12 @@ void CPlayer::Update(_float fTimeDelta)
 
 	if (pWeaponGun == nullptr)
 		if (m_pGameInstance->Get_IsKeyDown(DIK_O))
+		{
 			if (FAILED(Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN))))
 				return;
+			if (m_pPart_Weapon)
+				static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
+		}
 
 #endif // _DEBUG
 

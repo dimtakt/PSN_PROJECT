@@ -56,7 +56,8 @@ HRESULT CWeapon_Karabin::Initialize(void* pArg)
     // ÃÑ, Åº °ü·Ã ÃÊ±â ¼³Á¤
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 12 : 60;
     m_iMaxBullets = 200;
-    m_iCurBullets = (pDesc->iCurLeftBullets != UINT_MAX) ? m_iMaxBullets : pDesc->iCurLeftBullets;
+    m_iCurBullets = (pDesc->iCurLeftBullets == UINT_MAX) ? 
+        m_iMaxBullets : pDesc->iCurLeftBullets;
     	
     m_fShotRandRange = 8.f;
     m_fZeroDst = 100.f;
