@@ -619,8 +619,6 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		if (pWeaponGun)
 		{
 			// 날아갈 방향 계산
-
-
 			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
 		}
 		else
@@ -655,11 +653,9 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 						tGunDesc = dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_GunInfoDesc();
 					}
 
-					
 					if (isGun)	Ready_PartObject(iRayObjType, &tGunDesc);
 					else		Ready_PartObject(iRayObjType);
 
-					
 					pRayObj->OnCollisionRay(this);
 				}
 			}

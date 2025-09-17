@@ -29,7 +29,7 @@ public:
 public:
 	void Change_Crosshair(_uint iTexIndex);
 	void Change_RotByCD(_float fCDRatio);
-	void Change_EnLarge(_float fDeltaTime);
+	void Change_EnLarge();
 
 private:
 
@@ -50,6 +50,7 @@ private:
 	CTexture*		m_pCurTextureCom = { nullptr };	// 조건에 따라 할당해주도록 나중에 수정
 
 	_float			m_fRotDeg = 0.f;
+	_float			m_fScaleMultiply = 1.f;
 	
 
 private:

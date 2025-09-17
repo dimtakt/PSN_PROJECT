@@ -53,7 +53,7 @@ private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
 	_bool			m_isPickingUp = false;
 	_float			m_fPickingElapsedTime = 0.f;
-	const _float	m_fPickingMaxTime = 0.5f;
+	const _float	m_fPickingMaxTime = 0.3f;
 	CGameObject*	m_pCollByTarget = nullptr;
 
 	CWeapon_Gun::GUNINFO_DESC m_tGunInfoDesc = {};

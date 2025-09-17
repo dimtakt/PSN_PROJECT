@@ -44,6 +44,12 @@ void CUI_Crosshair::Priority_Update(_float fTimeDelta)
 
 void CUI_Crosshair::Update(_float fTimeDelta)
 {
+    _float fRawTimeDelta = fTimeDelta / m_pGameInstance->Get_TimeSpeed();
+
+    _float fRestoreSpeed = 1.8f;
+    if (m_fScaleMultiply != 1.0f)
+        m_fScaleMultiply = max(m_fScaleMultiply * pow((1.f - (fRawTimeDelta * fRestoreSpeed)), 2.f), 1.0f);
+
     int a = 10;
 }
 
@@ -58,6 +64,11 @@ HRESULT CUI_Crosshair::Render()
     __super::Begin();
 
     m_pTransformCom->Rotation(XMVectorSet(0.0f, 0.f, 1.f, 1.0f), TO_RAD(-m_fRotDeg));
+
+    _float3 vCalcedScale = {};
+    XMStoreFloat3(&vCalcedScale, m_pTransformCom->Get_Scale() * m_fScaleMultiply);
+    m_pTransformCom->Scale(vCalcedScale);
+
 
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -86,6 +97,8 @@ HRESULT CUI_Crosshair::Render()
 
 void CUI_Crosshair::Change_Crosshair(_uint iTexIndex)
 {
+    CTexture* pPrevTextureCom = m_pCurTextureCom;
+    
     switch (iTexIndex)
     {
     case ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND):       m_pCurTextureCom = m_pTextureCom_BasicHand;          break;
@@ -101,11 +114,24 @@ void CUI_Crosshair::Change_Crosshair(_uint iTexIndex)
     default:
         break;
     }
+
+    if (pPrevTextureCom != m_pCurTextureCom &&
+        m_pCurTextureCom != m_pTextureCom_BasicDot)
+        Change_EnLarge();
 }
 
 void CUI_Crosshair::Change_RotByCD(_float fCDRatio)
 {
+    if (fCDRatio == 0.f &&
+        m_fRotDeg != 0.f)
+        Change_EnLarge();
+
     m_fRotDeg = fCDRatio * 90.f;
+}
+
+void CUI_Crosshair::Change_EnLarge()
+{
+    m_fScaleMultiply = 1.5f;
 }
 
 HRESULT CUI_Crosshair::Ready_Components()

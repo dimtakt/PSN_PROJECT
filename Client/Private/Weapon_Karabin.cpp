@@ -184,7 +184,7 @@ void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _flo
     const _uint iShotAmount = 4;          // Karabin 의 경우엔 소총 쏘듯이, 일정 간격으로 4발 나가도록 해야 함
  
     
-    if ((m_iShotIndex + 1) * (fShotInterval) <= m_fShotElapsedTime)
+    if ((m_iShotIndex) * (fShotInterval) <= m_fShotElapsedTime)
     {
         if (iShotAmount == m_iShotIndex)
         {
