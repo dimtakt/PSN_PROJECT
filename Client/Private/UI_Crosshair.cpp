@@ -57,6 +57,7 @@ HRESULT CUI_Crosshair::Render()
 {
     __super::Begin();
 
+    m_pTransformCom->Rotation(XMVectorSet(0.0f, 0.f, 1.f, 1.0f), TO_RAD(-m_fRotDeg));
 
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -100,6 +101,11 @@ void CUI_Crosshair::Change_Crosshair(_uint iTexIndex)
     default:
         break;
     }
+}
+
+void CUI_Crosshair::Change_RotByCD(_float fCDRatio)
+{
+    m_fRotDeg = fCDRatio * 90.f;
 }
 
 HRESULT CUI_Crosshair::Ready_Components()

@@ -80,7 +80,7 @@ void CWeapon_Karabin::Update(_float fTimeDelta)
     // weapon.cpp 에서 기본 업데이트 도는 중
     //__super::Update(fTimeDelta);
 
-    std::cout << "[CWeapon_Karabin::Update] Current Left Bullets : " << m_iCurBullets << std::endl;
+
     // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
 
     if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
@@ -168,7 +168,7 @@ void CWeapon_Karabin::Shot(_vector* pDir, _uint iObjTypeIndex)
         // 종료 후 false 전환. true 인 동안에는 새로 shot 시도 불가.
     }
 
-
+    std::cout << "[CWeapon_Karabin::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
 }
 
 void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _float fTimeDelta)

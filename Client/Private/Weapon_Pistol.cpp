@@ -59,7 +59,7 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
     m_iCurBullets = (pDesc->iCurLeftBullets == UINT_MAX)?
         m_iMaxBullets : pDesc->iCurLeftBullets;
 
-    m_fShotRandRange = 5.f;
+    m_fShotRandRange = 1.f;
     m_fZeroDst = 50.f;
 
 
@@ -77,7 +77,7 @@ void CWeapon_Pistol::Priority_Update(_float fTimeDelta)
 void CWeapon_Pistol::Update(_float fTimeDelta)
 {
     // weapon.cpp 에서 기본 업데이트 도는 중
-    //__super::Update(fTimeDelta);
+    __super::Update(fTimeDelta);
 
 
     // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
@@ -148,6 +148,10 @@ void CWeapon_Pistol::Shot(_vector* pDir, _uint iObjTypeIndex)
 
     __super::Shot(pDir, iObjTypeIndex);
     m_iCurBullets--;
+
+    m_isOnCD = true;
+
+    std::cout << "[CWeapon_Pistol::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
 }
 
 void CWeapon_Pistol::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)

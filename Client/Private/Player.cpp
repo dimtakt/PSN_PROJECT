@@ -576,7 +576,7 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 		fElapsedTime = 0;
 		isPressed = true;
-		fDuration = 0.20f;
+		fDuration = 0.15f;
 	}
 	else if (
 		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::RB) &&
@@ -704,7 +704,13 @@ void CPlayer::Update_UI(_float fTimeDelta)
 
 
 	if (m_pPart_Weapon)	// 총이 아닌 무기까지 추가한다면 세분화 필요
+	{
 		iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::GUN);
+
+		if (m_pPart_Weapon->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL) ||
+			m_pPart_Weapon->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN))
+			pUI_Crosshair->Change_RotByCD(dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon)->Get_CDRatio());
+	}
 	else
 	{
 		RAYCOLLISION_DESC tRayDesc = {};
@@ -744,6 +750,8 @@ void CPlayer::Update_UI(_float fTimeDelta)
 		}
 		else
 			iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICDOT);
+
+		pUI_Crosshair->Change_RotByCD(0.f);
 	}
 
 	pUI_Crosshair->Change_Crosshair(iTextureIndex);

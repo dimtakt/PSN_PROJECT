@@ -35,7 +35,19 @@ void CWeapon_Gun::Priority_Update(_float fTimeDelta)
 
 void CWeapon_Gun::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    if (m_isOnCD)
+    {
+        m_fShotElapsed += fTimeDelta;
+    }
+
+    if (m_fShotElapsed >= m_fShotMaxCD)
+    {
+        m_isOnCD = false;
+        m_fShotElapsed = 0.f;
+    }
+
+
+    //__super::Update(fTimeDelta);
 }
 
 void CWeapon_Gun::Late_Update(_float fTimeDelta)
@@ -53,8 +65,8 @@ HRESULT CWeapon_Gun::Render()
 
 void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
-    m_fShotRandRange;
-    m_fZeroDst;
+    if (m_isOnCD)
+        return;
 
     _vector vZeroDstPos = *pDir * m_fZeroDst;
     _vector vStartPos = XMVectorZero();

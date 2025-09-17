@@ -437,7 +437,7 @@ void CEnemy::Update_LogicInterval(_float fTimeDelta)
 		_float fIntervalRange[2] = { 0.4f, 0.6f };
 		m_fLogic_ResetIntervalTime = m_pGameInstance->Rand(fIntervalRange[0], fIntervalRange[1]);
 
-		std::cout << "[Enemy::Update_LogicInterval] Logic Triggered!" << std::endl;
+		//std::cout << "[Enemy::Update_LogicInterval] Logic Triggered!" << std::endl;
 	}
 }
 

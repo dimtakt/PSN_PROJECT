@@ -28,24 +28,29 @@ public:
 
 public:
 	void Change_Crosshair(_uint iTexIndex);
-		
+	void Change_RotByCD(_float fCDRatio);
+	void Change_EnLarge(_float fDeltaTime);
+
 private:
-	CShader* m_pShaderCom = { nullptr };
+
+private:
+	CShader*		m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
-	CTexture* m_pTextureCom_BasicHand = { nullptr };
-	CTexture* m_pTextureCom_BasicDot = { nullptr };
-	CTexture* m_pTextureCom_BasicPunch = { nullptr };
-	CTexture* m_pTextureCom_Gun = { nullptr };
-	CTexture* m_pTextureCom_Katana = { nullptr };
-	CTexture* m_pTextureCom_HotswitchHover = { nullptr };
-	CTexture* m_pTextureCom_HotswitchIdle = { nullptr };
-	CTexture* m_pTextureCom_HotswitchWait = { nullptr };
+	CTexture*		m_pTextureCom_BasicHand = { nullptr };
+	CTexture*		m_pTextureCom_BasicDot = { nullptr };
+	CTexture*		m_pTextureCom_BasicPunch = { nullptr };
+	CTexture*		m_pTextureCom_Gun = { nullptr };
+	CTexture*		m_pTextureCom_Katana = { nullptr };
+	CTexture*		m_pTextureCom_HotswitchHover = { nullptr };
+	CTexture*		m_pTextureCom_HotswitchIdle = { nullptr };
+	CTexture*		m_pTextureCom_HotswitchWait = { nullptr };
 
 private:
-	CTexture* m_pCurTextureCom = { nullptr };	// 조건에 따라 할당해주도록 나중에 수정
+	CTexture*		m_pCurTextureCom = { nullptr };	// 조건에 따라 할당해주도록 나중에 수정
 
-
+	_float			m_fRotDeg = 0.f;
+	
 
 private:
 	HRESULT Ready_Components();

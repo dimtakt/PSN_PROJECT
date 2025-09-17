@@ -75,7 +75,7 @@ void CWeapon_Shotgun::Priority_Update(_float fTimeDelta)
 void CWeapon_Shotgun::Update(_float fTimeDelta)
 {
     // weapon.cpp 에서 기본 업데이트 도는 중
-    //__super::Update(fTimeDelta);
+    __super::Update(fTimeDelta);
 
 
     // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
@@ -152,6 +152,9 @@ void CWeapon_Shotgun::Shot(_vector* pDir, _uint iObjTypeIndex)
         m_iCurBullets--;
     }
 
+    m_isOnCD = true;
+
+    std::cout << "[CWeapon_Shotgun::Update] Current Left Bullets : " << m_iCurBullets << std::endl;
 }
 
 void CWeapon_Shotgun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
