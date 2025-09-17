@@ -53,6 +53,7 @@ private:
 	void		Update_AnimationIndex(_float fTimeDelta);	// 조작 등에 의한 "애니메이션" 제어
 	void		Update_TimeControl(_float fTimeDelta);
 	void		Update_Interact(_float fTimeDelta);
+	void		Update_UI(_float fTimeDelta);
 
 	void		Update_BoneColliders();
 
@@ -73,10 +74,14 @@ private:
 
 	CPartObject*					m_pPart_Weapon		= { nullptr };
 
+	CGameObject*					m_pUI_Crosshair		= { nullptr };
+
 private:;
 	_uint			m_iState = { };
 
 	_float			m_fMouseSensor = { .1f };
+
+	_vector			m_vLoadShotDir = {};
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -22,8 +22,8 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual void Shot(_vector vDir, _uint iObjTypeIndex);							// 어떤 총알을 발사할 것인가?
-	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex) override;	// 우클릭으로 드랍하는 것 구현.
+	virtual void Shot(_vector* pDir, _uint iObjTypeIndex);							// 어떤 총알을 발사할 것인가?
+	virtual void Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex) override;	// 우클릭으로 드랍하는 것 구현.
 									// 이후 파괴 및 픽업오브젝트로 잔탄, transform, deltaTransform정보 넘겨주어 생성
 
 protected:

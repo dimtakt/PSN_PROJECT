@@ -144,7 +144,7 @@ HRESULT CEnemy::Render()
 
 		m_pShaderCom->Begin(0);
 
-		m_pModelCom->Render(i);
+		m_pModelCom->Render(i);;
 	}
 
 	return S_OK;
@@ -370,12 +370,10 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
 
 			_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
-			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
-			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
-			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
-			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
+	
+			m_vLoadShotDir = vDir;
 
-			pWeaponGun->Shot(XMVectorSetW(vDir, 1.f), ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
 			m_fElapsedShot = 0.f;
 		}
 		else

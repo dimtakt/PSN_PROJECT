@@ -9,7 +9,7 @@
 #include "Weapon_Pistol.h"
 #include "Weapon_Shotgun.h"
 
-
+#include "UI_Crosshair.h"
 
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -48,6 +48,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 
 
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	m_pUI_Crosshair = m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_Crosshair");
+	if (m_pUI_Crosshair == nullptr) return E_FAIL;
 
 
 	//if (FAILED(Ready_PartObject()))
@@ -96,6 +99,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 	Update_Interact(fTimeDelta);
 	Update_TimeControl(fTimeDelta);
+	Update_UI(fTimeDelta);
+
 #ifdef _DEBUG
 	//m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
 #endif // _DEBUG
@@ -573,6 +578,13 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		isPressed = true;
 		fDuration = 0.20f;
 	}
+	else if (
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::RB) &&
+		m_pPart_Weapon
+		)
+	{
+		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+	}
 	else if ((fElapsedTime < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
 	{
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
@@ -594,6 +606,11 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 
 void CPlayer::Update_Interact(_float fTimeDelta)
 {
+	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+
+	_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+	_vector vCameraLook = matCameraview.r[2];
+	m_vLoadShotDir = vCameraLook;
 
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB))
 	{
@@ -602,35 +619,20 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		if (pWeaponGun)
 		{
 			// 날아갈 방향 계산
-			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 
-			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-			_vector vCameraLook = matCameraview.r[2];
-			vDir = vCameraLook;
 
-			//_float fRandRange = .5f;		// 랜덤한 정도.. 는 각 총기별에서 계산
-			//_float fRandX = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetX(vDir, fRandX);
-			//_float fRandY = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetY(vDir, fRandY);
-			//_float fRandZ = m_pGameInstance->Rand(-fRandRange, fRandRange); XMVectorSetZ(vDir, fRandZ);
-
-			pWeaponGun->Shot(XMVectorSetW(XMVector3Normalize(vDir), 1.f), ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
 		}
 		else
 		{
-			_vector vDir = XMVectorZero();
 			_float fPickupableDist = 20.f;
-
-			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-			_vector vCameraLook = matCameraview.r[2];
-			vDir = vCameraLook;
-
 
 			RAYCOLLISION_DESC tRayDesc = {};
 			tRayDesc.vRayPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
 
-			tRayDesc.vRayDir = XMVectorSetW(XMVector3Normalize(vDir), 1.f);
+			tRayDesc.vRayDir = XMVectorSetW(XMVector3Normalize(m_vLoadShotDir), 1.f);
 
-			tRayDesc.iLayerIndex = 0;
+			tRayDesc.iLayerIndex = ENUM_CLASS(COLLISION_LAYER::NONE);
 			tRayDesc.iMask = ENUM_CLASS(COLLISION_LAYER::PICKUPABLE);
 			tRayDesc.isActive = m_pPart_Weapon == nullptr;
 			tRayDesc.pOwner = this;
@@ -641,7 +643,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			{
 				if (pRayObj && fRayDist < fPickupableDist)
 				{
-					_uint iRayObjType = pRayObj->Get_ObjType();
+					_uint iRayObjType = pRayObj->Get_ObjType();		// 이거 가져와서 레이 대상에 따라 바뀌도록
 					CWeapon_Gun::GUNINFO_DESC tGunDesc = {};
 
 					_bool isGun = false;
@@ -678,13 +680,14 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			 
 			// 날아갈 방향 계산
 			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+			_float fThrowPower = 3.f;
 
 			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
 			_vector vCameraLook = matCameraview.r[2];
 			vDir = vCameraLook;
 
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
-			pWeaponGun->Throw(XMVectorSetW(XMVector3Normalize(vDir), 1.f), XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
+			pWeaponGun->Throw(&m_vLoadShotDir, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
 
 			// 현재 사용중인 무기 삭제
 			Remove_PartObject(L"Part_Weapon_Player");
@@ -692,6 +695,58 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		}
 
 	}
+}
+
+void CPlayer::Update_UI(_float fTimeDelta)
+{
+	CUI_Crosshair* pUI_Crosshair = dynamic_cast<CUI_Crosshair*>(m_pUI_Crosshair);
+	_uint iTextureIndex = UINT_MAX;
+
+
+	if (m_pPart_Weapon)	// 총이 아닌 무기까지 추가한다면 세분화 필요
+		iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::GUN);
+	else
+	{
+		RAYCOLLISION_DESC tRayDesc = {};
+		tRayDesc.vRayPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+
+		tRayDesc.vRayDir = m_vLoadShotDir;
+
+		tRayDesc.iLayerIndex = ENUM_CLASS(COLLISION_LAYER::NONE);
+		tRayDesc.iMask = ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT) | ENUM_CLASS(COLLISION_LAYER::PICKUPABLE);
+		tRayDesc.isActive = true;
+		tRayDesc.pOwner = this;
+
+
+		_float fPickupableDist = 20.f;
+
+
+		CGameObject* pRayObj = nullptr;
+		_float fRayDist = FLT_MAX;
+		if (m_pGameInstance->Check_RayCollisions(&tRayDesc, pRayObj, fRayDist))
+		{
+			if (pRayObj && fRayDist < fPickupableDist)
+			{
+				_uint iRayObjType = pRayObj->Get_ObjType();		// 이거 가져와서 레이 대상에 따라 바뀌도록
+
+				switch (iRayObjType)
+				{
+				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND);		break;
+				case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
+					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICPUNCH);	break;
+				default:
+					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICDOT);		break;
+				}
+			}
+		}
+		else
+			iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICDOT);
+	}
+
+	pUI_Crosshair->Change_Crosshair(iTextureIndex);
 }
 
 void CPlayer::Update_BoneColliders()

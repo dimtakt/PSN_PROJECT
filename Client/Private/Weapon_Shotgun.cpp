@@ -135,7 +135,7 @@ HRESULT CWeapon_Shotgun::Render()
     return S_OK;
 }
 
-void CWeapon_Shotgun::Shot(_vector vDir, _uint iObjTypeIndex)
+void CWeapon_Shotgun::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     if (m_iCurBullets == 0)
     {
@@ -148,15 +148,15 @@ void CWeapon_Shotgun::Shot(_vector vDir, _uint iObjTypeIndex)
     _uint iShotAmount = 10;
     for (_uint i = 0; i < iShotAmount; i++)
     {
-        __super::Shot(vDir, iObjTypeIndex);
+        __super::Shot(pDir, iObjTypeIndex);
         m_iCurBullets--;
     }
 
 }
 
-void CWeapon_Shotgun::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Shotgun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
 {
-    __super::Throw(vDir, vRot, iObjTypeIndex);
+    __super::Throw(pDir, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Shotgun::Ready_Components()

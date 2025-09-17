@@ -109,6 +109,13 @@ void CWeapon_Karabin::Update(_float fTimeDelta)
 
 
     // 여기에서 업데이트 동작 진행.. (총알 발사 등)
+    if (m_isDoingShot)
+        Shot_Continuously(m_pShotDir, m_iShotObjTypeIndex, fTimeDelta);
+    else
+    {
+        m_pShotDir = nullptr;
+        m_iShotObjTypeIndex = UINT_MAX;
+    }
 
 }
 
@@ -139,7 +146,7 @@ HRESULT CWeapon_Karabin::Render()
     return S_OK;
 }
 
-void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
+void CWeapon_Karabin::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     if (m_iCurBullets == 0)
     {
@@ -152,6 +159,10 @@ void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
     if (m_isDoingShot == false)
     {
         m_isDoingShot = true;
+        m_pShotDir = pDir;
+        m_iShotObjTypeIndex = iObjTypeIndex;
+        m_iShotIndex = 0;
+        m_fShotElapsedTime = 0;
         // shot 시도 시 isDoingShot 로컬변수가 true 가 되며,
         // true 인 동안에는 정해진 발 수 만큼 공격 명령
         // 종료 후 false 전환. true 인 동안에는 새로 shot 시도 불가.
@@ -160,24 +171,38 @@ void CWeapon_Karabin::Shot(_vector vDir, _uint iObjTypeIndex)
 
 }
 
-void CWeapon_Karabin::Shot_Continuously(_vector vDir, _uint iObjTypeIndex)
+void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _float fTimeDelta)
 {
-    // 현재 날아갈 좌표를 어떻게 실시간으로 가져올거임?
+    // Shot을 한번만 호출할거면,
+    // 현재 날아갈 좌표 (vDIr) 를 어떻게 실시간으로 가져올거임?
+    // 로컬에 포인터로 받아와서 저장해두고 그걸 사용하기?
 
-    m_isDoingShot;
-    m_fShotElapsed;
+    m_fShotElapsedTime += fTimeDelta;
+    
+    _float fShotInterval = 0.25f;
 
-    _uint iShotAmount = 4;          // Karabin 의 경우엔 소총 쏘듯이, 일정 간격으로 4발 나가도록 해야 함
-    for (_uint i = 0; i < iShotAmount; i++)
+    const _uint iShotAmount = 4;          // Karabin 의 경우엔 소총 쏘듯이, 일정 간격으로 4발 나가도록 해야 함
+ 
+    
+    if ((m_iShotIndex + 1) * (fShotInterval) <= m_fShotElapsedTime)
     {
-        __super::Shot(vDir, iObjTypeIndex);
+        if (iShotAmount == m_iShotIndex)
+        {
+            m_isDoingShot = false;
+            return;
+        }
+        __super::Shot(pDir, iObjTypeIndex);
+        m_iShotIndex++;
         m_iCurBullets--;
+
+        if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+            m_pGameInstance->Req_EditTimeSpeed(1.f, true);
     }
 }
 
-void CWeapon_Karabin::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Karabin::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
 {
-    __super::Throw(vDir, vRot, iObjTypeIndex);
+    __super::Throw(pDir, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()

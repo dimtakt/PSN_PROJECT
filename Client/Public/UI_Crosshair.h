@@ -26,6 +26,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void Change_Crosshair(_uint iTexIndex);
+		
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };

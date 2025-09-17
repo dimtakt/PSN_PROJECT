@@ -32,6 +32,8 @@ HRESULT CUI_Crosshair::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    m_pCurTextureCom = m_pTextureCom_Gun;
+
     return S_OK;
 }
 
@@ -66,7 +68,10 @@ HRESULT CUI_Crosshair::Render()
 
 
     // 조건에 따라 바뀌도록 할 것
-    if (FAILED(m_pTextureCom_Gun->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    if (m_pCurTextureCom == nullptr)
+        return E_FAIL;;
+
+    if (FAILED(m_pCurTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
     m_pShaderCom->Begin(2);
@@ -76,6 +81,25 @@ HRESULT CUI_Crosshair::Render()
     m_pVIBufferCom->Render();
 
     return S_OK;
+}
+
+void CUI_Crosshair::Change_Crosshair(_uint iTexIndex)
+{
+    switch (iTexIndex)
+    {
+    case ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND):       m_pCurTextureCom = m_pTextureCom_BasicHand;          break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::BASICDOT):        m_pCurTextureCom = m_pTextureCom_BasicDot;           break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::BASICPUNCH):      m_pCurTextureCom = m_pTextureCom_BasicPunch;         break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::GUN):             m_pCurTextureCom = m_pTextureCom_Gun;                break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::KATANA):          m_pCurTextureCom = m_pTextureCom_Katana;             break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::HS_HOVER):        m_pCurTextureCom = m_pTextureCom_HotswitchHover;     break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::HS_IDLE):         m_pCurTextureCom = m_pTextureCom_HotswitchIdle;      break;
+    case ENUM_CLASS(CROSSHAIR_INDEX::HS_WAIT):         m_pCurTextureCom = m_pTextureCom_HotswitchWait;      break;
+    
+    case ENUM_CLASS(CROSSHAIR_INDEX::END):
+    default:
+        break;
+    }
 }
 
 HRESULT CUI_Crosshair::Ready_Components()
@@ -95,7 +119,6 @@ HRESULT CUI_Crosshair::Ready_Components()
     //    return E_FAIL;
 
     // 텍스쳐.
-    // ksta : 크로스헤어 이미지로 변경할 것
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Crosshair_BasicHand"),
         TEXT("Com_Texture_BasicHand"), reinterpret_cast<CComponent**>(&m_pTextureCom_BasicHand), nullptr)))
         return E_FAIL;

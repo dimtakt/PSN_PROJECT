@@ -51,12 +51,12 @@ HRESULT CWeapon_Gun::Render()
     return S_OK;
 }
 
-void CWeapon_Gun::Shot(_vector vDir, _uint iObjTypeIndex)
+void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     m_fShotRandRange;
     m_fZeroDst;
 
-    _vector vZeroDstPos = vDir * m_fZeroDst;
+    _vector vZeroDstPos = *pDir * m_fZeroDst;
     _vector vStartPos = XMVectorZero();
 
     _float fRandRangeX = m_pGameInstance->Rand(- m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
@@ -93,7 +93,7 @@ void CWeapon_Gun::Shot(_vector vDir, _uint iObjTypeIndex)
         MSG_BOX(L"총알 생성 실패");
 }
 
-void CWeapon_Gun::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Gun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
 {
     // 현재 위치로부터 던지는 오브젝트 생성되도록 진행,
     // 해당 오브젝트는 pickupable 클래스이며, 잔탄 정보를 들고 있을 것임
@@ -116,7 +116,7 @@ void CWeapon_Gun::Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex)
     tDesc.strModelComPrototypeTag = strModelPrototypeTag;
     tDesc.iGameObjType = iObjTypeIndex;
 
-    tDesc.vThrowDir = vDir;
+    tDesc.vThrowDir = *pDir;
     tDesc.vThrowRot = vRot;
     tDesc.tGunInfoDesc.iCurLeftBullets = m_iCurBullets;
     

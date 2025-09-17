@@ -17,19 +17,24 @@ public:
 	virtual HRESULT Render()							override;
 
 public:
-	virtual void Shot(_vector vDir, _uint iObjTypeIndex) override;
-	virtual void Throw(_vector vDir, _vector vRot, _uint iObjTypeIndex) override;
+	virtual void Shot(_vector* pDir, _uint iObjTypeIndex) override;
+	virtual void Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex) override;
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 
 private:
-	void Shot_Continuously(_vector vDir, _uint iObjTypeIndex);
+	void Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _float fTimeDelta);
 
 private:
-	_bool	m_isDoingShot = false;
-	_float	m_fShotElapsed = 0.f;
+	_bool		m_isDoingShot = false;
+
+	_vector*	m_pShotDir = {};
+	_uint		m_iShotObjTypeIndex = UINT_MAX;
+
+	_uint		m_iShotIndex = { };
+	_float		m_fShotElapsedTime = {};
 
 public:
 	static CWeapon_Karabin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

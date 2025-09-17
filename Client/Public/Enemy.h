@@ -86,6 +86,8 @@ private:
 private:
 	_uint				m_iState			= { };
 
+	_vector				m_vLoadShotDir		= {};
+
 
 public:
 	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

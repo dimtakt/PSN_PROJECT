@@ -9,6 +9,21 @@ namespace Client
 	const unsigned int			g_iWinSizeX = 1280;
 	const unsigned int			g_iWinSizeY = 720;
 
+	enum class CROSSHAIR_INDEX
+	{
+		BASICHAND,
+		BASICDOT,
+		BASICPUNCH,
+		GUN,
+		KATANA,
+		HS_HOVER,		// hotswitch
+		HS_IDLE,
+		HS_WAIT,
+		END
+	};
+
+
+
 	enum class ENEMY_STATE {
 		IDLE		= (1 << 0),
 		MOVE		= (1 << 1),
@@ -176,6 +191,8 @@ namespace Client
 	};
 
 	enum class COLLISION_LAYER {
+		NONE		= 0,
+
 		PLAYER_ATK	= (1 << 0),
 		ENEMY_ATK	= (1 << 1),
 
@@ -186,7 +203,7 @@ namespace Client
 
 
 		PICKUPABLE	= (1 << 5),
-
+		
 
 		END			= (1 << 6)
 	};

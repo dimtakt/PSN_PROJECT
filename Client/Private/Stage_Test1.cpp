@@ -25,6 +25,9 @@ HRESULT CStage_Test1::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 	
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+	
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
 		return E_FAIL;
 	
@@ -122,7 +125,12 @@ HRESULT CStage_Test1::Ready_Layer_BackGround(const _wstring& strLayerTag)
 		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Skybox"))))
 		return E_FAIL; // !!
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+	return S_OK;
+}
+
+HRESULT CStage_Test1::Ready_Layer_UI(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag + L"_Crosshair",
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_Crosshair"))))
 		return E_FAIL;
 
