@@ -6,17 +6,18 @@
 NS_BEGIN(Engine)
 class CShader;
 class CTexture;
+//class CVIBuffer_Point_Instance;
 class CVIBuffer_Rect_Instance;
 NS_END
 
 NS_BEGIN(Client)
 
-class CParticle final : public CGameObject
+class CTriParticle final : public CGameObject
 {
 private:
-	CParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CParticle(const CParticle& Prototype);
-	virtual ~CParticle() = default;
+	CTriParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTriParticle(const CTriParticle& Prototype);
+	virtual ~CTriParticle() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -27,16 +28,17 @@ public:
 	virtual HRESULT Render();
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect_Instance* m_pVIBufferCom = { nullptr };
+	CShader*					m_pShaderCom	= { nullptr };
+	CTexture*					m_pTextureCom	= { nullptr };
+	//CVIBuffer_Point_Instance*	m_pVIBufferCom	= { nullptr };
+	CVIBuffer_Rect_Instance*	m_pVIBufferCom	= { nullptr };
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTriParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

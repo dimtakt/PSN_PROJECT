@@ -31,7 +31,7 @@
 
 // Particle 
 
-#include "Particle.h"
+#include "TriParticle.h"
 //#include "Snow.h"
 //#include "Explosion.h"
 

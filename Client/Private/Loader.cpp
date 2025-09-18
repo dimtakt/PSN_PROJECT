@@ -18,8 +18,13 @@
 #include "Weapon.h"
 //#include "Bullet.h"
 
-//#include "Effect.h"
+
+// Effects...
+#include "TriParticle.h"
 #include "Skybox.h"
+
+
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -317,6 +322,7 @@ HRESULT CLoader::Loading_For_Editor_Level()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
+
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
 	// Camera
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::EDITOR), TEXT("Prototype_GameObject_Camera_Free"),
@@ -363,8 +369,12 @@ HRESULT CLoader::Loading_For_Stages()
 		return E_FAIL;
 
 	/* Prototype_Component_Texture_Particle_Triangle */
-	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Snow"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle.png"), 1))))
+		return E_FAIL;
+	/* Prototype_Component_Texture_Snow */
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Snow"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
@@ -379,6 +389,23 @@ HRESULT CLoader::Loading_For_Stages()
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Cube"),
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Particle_TriEffect */
+	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		TriEffectDesc{};
+	TriEffectDesc.iNumInstance = 100;
+	TriEffectDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	TriEffectDesc.vRange = _float3(0.2f, 0.2f, 0.2f);
+	TriEffectDesc.vSize = _float2(5.f, 10.f);
+	TriEffectDesc.vLifeTime = _float2(0.5f, 2.f);
+	TriEffectDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	TriEffectDesc.vSpeed = _float2(0.5f, 3.f);
+	TriEffectDesc.isLoop = true;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_TriEffect"),
+		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &TriEffectDesc))))
+		return E_FAIL;
+
+
 
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
@@ -441,6 +468,11 @@ HRESULT CLoader::Loading_For_Stages()
 	/* Prototype_GameObject_Skybox */
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Skybox"),
 		CSkybox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Particle_TriEffect */
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_TriEffect"),
+		CTriParticle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

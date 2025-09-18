@@ -267,7 +267,7 @@
     <ClInclude Include="..\public\CustomObj_Pickupable.h">
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Particle.h">
+    <ClInclude Include="..\public\TriParticle.h">
       <Filter>02.GameObject\Effect\Particle</Filter>
     </ClInclude>
   </ItemGroup>
@@ -399,7 +399,7 @@
     <ClCompile Include="..\private\CustomObj_Pickupable.cpp">
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Particle.cpp">
+    <ClCompile Include="..\private\TriParticle.cpp">
       <Filter>02.GameObject\Effect\Particle</Filter>
     </ClCompile>
   </ItemGroup>

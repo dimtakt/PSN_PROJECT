@@ -1,22 +1,22 @@
-#include "Particle.h"
+#include "TriParticle.h"
 #include "GameInstance.h"
 
-CParticle::CParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTriParticle::CTriParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
 
-CParticle::CParticle(const CParticle& Prototype)
+CTriParticle::CTriParticle(const CTriParticle& Prototype)
     : CGameObject{ Prototype }
 {
 }
 
-HRESULT CParticle::Initialize_Prototype()
+HRESULT CTriParticle::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CParticle::Initialize(void* pArg)
+HRESULT CTriParticle::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -27,28 +27,30 @@ HRESULT CParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CParticle::Priority_Update(_float fTimeDelta)
+void CTriParticle::Priority_Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CParticle::Update(_float fTimeDelta)
+void CTriParticle::Update(_float fTimeDelta)
 {
     m_pVIBufferCom->Spread(fTimeDelta);
 }
 
-void CParticle::Late_Update(_float fTimeDelta)
+void CTriParticle::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
         return;
 }
 
-HRESULT CParticle::Render()
+HRESULT CTriParticle::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
     m_pShaderCom->Begin(1);
+    
+    m_pTransformCom;
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -57,24 +59,32 @@ HRESULT CParticle::Render()
     return S_OK;
 }
 
-HRESULT CParticle::Ready_Components()
+HRESULT CTriParticle::Ready_Components()
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+    //if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+    //    TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    //    return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Particle_Explosion"),
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_TriEffect"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Snow"),
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
+    //if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_Snow"),
+    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+    //    return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT CParticle::Bind_ShaderResources()
+HRESULT CTriParticle::Bind_ShaderResources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -91,33 +101,33 @@ HRESULT CParticle::Bind_ShaderResources()
     return S_OK;
 }
 
-CParticle* CParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTriParticle* CTriParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CParticle* pInstance = new CParticle(pDevice, pContext);
+    CTriParticle* pInstance = new CTriParticle(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CParticle"));
+        MSG_BOX(TEXT("Failed to Created : CTriParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CParticle::Clone(void* pArg)
+CGameObject* CTriParticle::Clone(void* pArg)
 {
-    CParticle* pInstance = new CParticle(*this);
+    CTriParticle* pInstance = new CTriParticle(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CParticle"));
+        MSG_BOX(TEXT("Failed to Created : CTriParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CParticle::Free()
+void CTriParticle::Free()
 {
     __super::Free();
 

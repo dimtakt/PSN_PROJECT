@@ -70,7 +70,7 @@ HRESULT CStage_Test1::Ready_Lights()
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.5f, -1.f, 0.5f, 0.f);	// Light 방향
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 0.1f);		// Light 색상 및 밝기의 세기
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 0.5f);		// Light 색상 및 밝기의 세기
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);	// Light 환경광으로 가정. 최소 밝기 보장에 관여.
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);		// Light 반사광.
 
@@ -184,6 +184,9 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 
 HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Particle_TriEffect"))))
+		return E_FAIL;
 
 	return S_OK;
 }
