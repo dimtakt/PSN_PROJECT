@@ -68,41 +68,8 @@ void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
     if (m_isOnCD)
         return;
 
-    _vector vZeroDstPos = *pDir * m_fZeroDst;
-    _vector vStartPos = XMVectorZero();
-
-    _float fRandRangeX = m_pGameInstance->Rand(- m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
-    _float fRandRangeY = m_pGameInstance->Rand(- m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
-    _float fRandRangeZ = m_pGameInstance->Rand(- m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
-    _vector vRandRange = XMVectorSet(fRandRangeX, fRandRangeY, fRandRangeZ, 1.0f);
-
-    _vector vCalcedZeroDstPos = vZeroDstPos + vRandRange;
-    _vector vCalcedDir = XMVector3Normalize(vCalcedZeroDstPos);     // 최종 계산된, 랜덤이 가미된 방향
-
-    
-    
-    
-    // 총알 생성..
-    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
-    CBullet::Bullet_DESC bulletDesc = {};
-    bulletDesc.vMoveDir = vCalcedDir /*vDir*/;
-    //bulletDesc.vMoveDir = vDir;
-    bulletDesc.fSpeedPerSec = 0.f;
-    bulletDesc.iGameObjType = iObjTypeIndex;
-
-
-    // 주체가 플레이어면 카메라에서 나가도록
-    // 적이라면 무기좌표에서 나가도록
-    bulletDesc.matSpawnTransform;
-    if      (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
-        bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-    else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
-        bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
-
-
-    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
-        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))
-        MSG_BOX(L"총알 생성 실패");
+    Add_Bullet(pDir, iObjTypeIndex);
+    Add_ShotEffect();
 }
 
 void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
@@ -112,6 +79,10 @@ void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint i
 
     _matrix matStartTransform = m_pTransformCom->Get_WorldMatrix();
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+
+
+    // Create Pickupables...
 
     _wstring strModelPrototypeTag = {};
     switch (iObjTypeIndex)
@@ -147,6 +118,65 @@ void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint i
     // 아마 잔탄 정보는 이쪽에 있었던거같은데..
 
 
+}
+
+void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
+{
+    _vector vZeroDstPos = *pDir * m_fZeroDst;
+    _vector vStartPos = XMVectorZero();
+
+    _float fRandRangeX = m_pGameInstance->Rand(-m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
+    _float fRandRangeY = m_pGameInstance->Rand(-m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
+    _float fRandRangeZ = m_pGameInstance->Rand(-m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
+    _vector vRandRange = XMVectorSet(fRandRangeX, fRandRangeY, fRandRangeZ, 1.0f);
+
+    _vector vCalcedZeroDstPos = vZeroDstPos + vRandRange;
+    _vector vCalcedDir = XMVector3Normalize(vCalcedZeroDstPos);     // 최종 계산된, 랜덤이 가미된 방향
+
+
+
+
+    // 총알 생성..
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+    CBullet::Bullet_DESC bulletDesc = {};
+    bulletDesc.vMoveDir = vCalcedDir /*vDir*/;
+    //bulletDesc.vMoveDir = vDir;
+    bulletDesc.fSpeedPerSec = 0.f;
+    bulletDesc.iGameObjType = iObjTypeIndex;
+
+
+    // 주체가 플레이어면 카메라에서 나가도록
+    // 적이라면 무기좌표에서 나가도록
+    bulletDesc.matSpawnTransform;
+    if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+        bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+    else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
+        bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))
+        MSG_BOX(L"총알 생성 실패");
+}
+
+void CWeapon_Gun::Add_ShotEffect()
+{
+    _matrix matGunTransform = m_pTransformCom->Get_WorldMatrix();
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+    const _wstring strEffectTag = L"Layer_Particle_TriEffect";
+
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strEffectTag,
+        iDestLevel, TEXT("Prototype_GameObject_Particle_TriEffect"))))
+        MSG_BOX(L"이펙트 생성 실패");
+    CGameObject* pEffectObj = m_pGameInstance->Get_LastGameObject(iDestLevel, strEffectTag);
+    CTransform* pEffectTransform = dynamic_cast<CTransform*>(pEffectObj->Get_Component(L"Com_Transform"));
+
+    // effect의 -z축 방향이 무기 원점 좌표방향을 보도록 최초 회전값을 설정해주어야 함.
+    // 위치의 경우는 무기 콜라이더의 앞쪽 부분으로.
+
+    pEffectTransform->Set_WorldMatrix(m_CombinedWorldMatrix);
+
+    return;
 }
 
 void CWeapon_Gun::Free()

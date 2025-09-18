@@ -28,6 +28,10 @@ public:
 	virtual _float Get_CDRatio() { return m_fShotElapsed / m_fShotMaxCD; }
 	virtual _bool Get_isOnCD() { return m_isOnCD; }
 
+private:
+	void Add_Bullet(_vector* pDir, _uint iObjTypeIndex);
+	void Add_ShotEffect();
+
 protected:
 	_uint			m_iMaxBullets = {};		// È¹µæ½Ã Ã¤¿öÁø ±âº» Åº °¹¼ö
 	_uint			m_iCurBullets = {};		// ÀÜÅº °¹¼ö

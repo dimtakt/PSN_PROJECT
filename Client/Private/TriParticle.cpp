@@ -48,7 +48,7 @@ HRESULT CTriParticle::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(1);
+    m_pShaderCom->Begin(2);
     
     m_pTransformCom;
 
