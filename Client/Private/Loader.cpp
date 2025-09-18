@@ -84,9 +84,13 @@ HRESULT CLoader::Loading()
 	case LEVEL::EDITOR:
 		hr = Loading_For_Editor_Level();
 		break;
-		
-	case LEVEL::TEST_EXTRA1:
-		hr = Loading_For_Test_Extra1_Level();
+	
+	
+	default:
+		hr = Loading_For_Stages();
+		break;
+	//case LEVEL::TEST_EXTRA1:
+	//	hr = Loading_For_Test_Extra1_Level();
 	}
 
 	if (FAILED(hr))
@@ -337,40 +341,42 @@ HRESULT CLoader::Loading_For_Editor_Level()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_Test_Extra1_Level()
+HRESULT CLoader::Loading_For_Stages()
 {
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	/* Prototype_Component_Texture_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Terrain"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 2))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Terrain_Probuilder"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Terrain_Probuilder"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/GridBox_Default.dds"), 1))))
 		return E_FAIL;
 
 	/* Prototype_Component_Texture_Sky */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Sky"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Sky"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/WhiteSkybox.dds"), 4))))
 		//CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 		return E_FAIL;
 
 	/* Prototype_Component_Texture_Particle_Triangle */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Texture_Snow"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Snow"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle.png"), 1))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
 	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_VIBuffer_Terrain"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/_Prototype/black.bmp")))))
 		//CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
 		return E_FAIL;
 
 	/* Prototype_Component_VIBuffer_Cube */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_VIBuffer_Cube"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Cube"),
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
@@ -378,7 +384,7 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
 
 	/* Prototype_Component_Navigation */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Navigation"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_Test1.datnavmesh")))))
 		//CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
 		return E_FAIL;
@@ -387,32 +393,32 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));
 
 	/* Prototype_Component_Shader_VtxNorTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxNorTex"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Shader_VtxMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxMesh"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Shader_VtxAnimMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Shader_VtxCube */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxCube"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxCube"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Shader_VtxInstance_Particle */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Particle.hlsl"), VTXPARTICLE::Elements, VTXPARTICLE::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Shader_VtxInstance_PointParticle*/
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl"), VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
 		return E_FAIL;
 
@@ -420,20 +426,20 @@ HRESULT CLoader::Loading_For_Test_Extra1_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트를 로딩중입니다."));
 
 	/* Prototype_GameObject_Terrain*/
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Terrain"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_Camera_Free */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Free"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Camera_Free"),
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Player"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Camera_Player"),
 		CCamera_Player::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_Skybox */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Skybox"),
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Skybox"),
 		CSkybox::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
