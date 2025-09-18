@@ -392,14 +392,14 @@ HRESULT CLoader::Loading_For_Stages()
 
 	/* Prototype_Component_VIBuffer_Particle_TriEffect */
 	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		TriEffectDesc{};
-	TriEffectDesc.iNumInstance = 100;
+	TriEffectDesc.iNumInstance = 10;
 	TriEffectDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	TriEffectDesc.vRange = _float3(0.2f, 0.2f, 0.2f);
-	TriEffectDesc.vSize = _float2(5.f, 10.f);
+	TriEffectDesc.vSize = _float2(0.5f, 1.f);
 	TriEffectDesc.vLifeTime = _float2(0.5f, 2.f);
 	TriEffectDesc.vPivot = _float3(0.f, 0.f, 0.f);
 	TriEffectDesc.vSpeed = _float2(0.5f, 3.f);
-	TriEffectDesc.isLoop = true;
+	TriEffectDesc.isLoop = false;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_TriEffect"),
 		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &TriEffectDesc))))

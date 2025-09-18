@@ -184,9 +184,9 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 
 HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Particle_TriEffect"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+	//	ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Particle_TriEffect"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
