@@ -12,6 +12,8 @@ CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& 
 	, m_vPivot{ Prototype.m_vPivot }
 	, m_pSpeeds{ Prototype.m_pSpeeds }
 	, m_isLoop{ Prototype.m_isLoop }
+	, m_vCenter{ Prototype.m_vCenter }
+	, m_vRange{ Prototype.m_vRange }
 
 {
 }
@@ -22,6 +24,10 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 
 	m_vPivot = pRectDesc->vPivot;
 	m_isLoop = pRectDesc->isLoop;
+
+	m_vCenter = pRectDesc->vCenter;
+	m_vRange = pRectDesc->vRange;
+
 
 	m_iNumIndexPerInstance = 6;
 	m_iInstanceVertexStride = sizeof(VTXINSTANCE_PARTICLE);
@@ -117,12 +123,12 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
 		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
 		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-		pInstanceVertices[i].vTranslation = _float4(
-			m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
-			m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
-			m_pGameInstance->Rand(pRectDesc->vCenter.z - pRectDesc->vRange.z * 0.5f, pRectDesc->vCenter.z + pRectDesc->vRange.z * 0.5f),
-			1.f
-		);
+		//pInstanceVertices[i].vTranslation = _float4(
+		//	m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
+		//	m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
+		//	m_pGameInstance->Rand(pRectDesc->vCenter.z - pRectDesc->vRange.z * 0.5f, pRectDesc->vCenter.z + pRectDesc->vRange.z * 0.5f),
+		//	1.f
+		//);
 
 		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
 
@@ -136,6 +142,18 @@ HRESULT CVIBuffer_Rect_Instance::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	// 위치는 생성 시 마다 재정의
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+		pInstanceVertices[i].vTranslation = _float4(
+			m_pGameInstance->Rand(m_vCenter.x - m_vRange.x * 0.5f, m_vCenter.x + m_vRange.x * 0.5f),
+			m_pGameInstance->Rand(m_vCenter.y - m_vRange.y * 0.5f, m_vCenter.y + m_vRange.y * 0.5f),
+			m_pGameInstance->Rand(m_vCenter.z - m_vRange.z * 0.5f, m_vCenter.z + m_vRange.z * 0.5f),
+			1.f
+		);
+	}
 
 	return S_OK;
 }

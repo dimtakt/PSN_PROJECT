@@ -34,6 +34,10 @@ private:
 	CVIBuffer_Rect_Instance*	m_pVIBufferCom	= { nullptr };
 
 private:
+	_float				m_fElapsedTime = {};
+	const _float		m_fMaxTime = 1.f;
+
+private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 

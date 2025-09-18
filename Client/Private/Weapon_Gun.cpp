@@ -174,7 +174,22 @@ void CWeapon_Gun::Add_ShotEffect()
     // effect의 -z축 방향이 무기 원점 좌표방향을 보도록 최초 회전값을 설정해주어야 함.
     // 위치의 경우는 무기 콜라이더의 앞쪽 부분으로.
 
+    // 총의 좌표를 반영한다.
     pEffectTransform->Set_WorldMatrix(m_CombinedWorldMatrix);
+
+    _matrix matCalcedPos = XMMatrixIdentity();
+    _float3 vAdjustPos = {};
+
+    switch (m_iGameObjType)
+    {
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.5f / 2.f};    break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):    vAdjustPos = {0.f, 0.04f, 4.f * 0.15f / 2.f};   break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.7f / 2.f};    break;
+    default:                                                                                        break;
+    }
+
+    matCalcedPos = XMMatrixTranslationFromVector(XMLoadFloat3(&vAdjustPos)) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    pEffectTransform->Set_WorldMatrix(matCalcedPos);
 
     return;
 }

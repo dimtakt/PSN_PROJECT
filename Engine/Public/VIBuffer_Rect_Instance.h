@@ -29,6 +29,9 @@ public:
 	void Drop(_float fTimeDelta);
 
 private:
+	_float3					m_vCenter = {};
+	_float3					m_vRange = {};
+
 	_float3					m_vPivot = {};
 	_float*					m_pSpeeds = {};
 	_bool					m_isLoop = {};

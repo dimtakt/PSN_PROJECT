@@ -35,6 +35,10 @@ void CTriParticle::Priority_Update(_float fTimeDelta)
 void CTriParticle::Update(_float fTimeDelta)
 {
     m_pVIBufferCom->Spread(fTimeDelta);
+
+    m_fElapsedTime += fTimeDelta;
+    if (m_fElapsedTime >= m_fMaxTime)
+        m_isDead = true;
 }
 
 void CTriParticle::Late_Update(_float fTimeDelta)
