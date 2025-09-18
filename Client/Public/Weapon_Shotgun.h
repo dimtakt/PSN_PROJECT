@@ -18,7 +18,7 @@ public:
 
 public:
 	virtual void Shot(_vector* pDir, _uint iObjTypeIndex) override;
-	virtual void Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex) override;
+	virtual void Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex) override;
 
 private:
 	HRESULT Ready_Components();

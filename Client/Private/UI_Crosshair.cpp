@@ -46,7 +46,7 @@ void CUI_Crosshair::Update(_float fTimeDelta)
 {
     _float fRawTimeDelta = fTimeDelta / m_pGameInstance->Get_TimeSpeed();
 
-    _float fRestoreSpeed = 1.8f;
+    _float fRestoreSpeed = 1.0f;
     if (m_fScaleMultiply != 1.0f)
         m_fScaleMultiply = max(m_fScaleMultiply * pow((1.f - (fRawTimeDelta * fRestoreSpeed)), 2.f), 1.0f);
 

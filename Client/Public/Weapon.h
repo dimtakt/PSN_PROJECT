@@ -37,7 +37,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-	virtual void Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex) {};
+	virtual void Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex) {};
 
 public:
 	void Set_toAttached(_bool isAttached) { m_isAttached = isAttached; };

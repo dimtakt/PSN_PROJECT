@@ -23,9 +23,10 @@ public:
 
 public:
 	virtual void Shot(_vector* pDir, _uint iObjTypeIndex);							// 어떤 총알을 발사할 것인가?
-	virtual void Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex) override;	// 우클릭으로 드랍하는 것 구현.
+	virtual void Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex) override;	// 우클릭으로 드랍하는 것 구현.
 									// 이후 파괴 및 픽업오브젝트로 잔탄, transform, deltaTransform정보 넘겨주어 생성
 	virtual _float Get_CDRatio() { return m_fShotElapsed / m_fShotMaxCD; }
+	virtual _bool Get_isOnCD() { return m_isOnCD; }
 
 protected:
 	_uint			m_iMaxBullets = {};		// 획득시 채워진 기본 탄 갯수

@@ -196,13 +196,16 @@ void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _flo
         m_iCurBullets--;
 
         if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        {
             m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+            m_pGameInstance->Req_EditTimeSpeed(0.01f);
+        }
     }
 }
 
-void CWeapon_Karabin::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Karabin::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
 {
-    __super::Throw(pDir, vRot, iObjTypeIndex);
+    __super::Throw(pDir, fThrowPower, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Karabin::Ready_Components()

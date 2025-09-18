@@ -157,9 +157,9 @@ void CWeapon_Shotgun::Shot(_vector* pDir, _uint iObjTypeIndex)
     std::cout << "[CWeapon_Shotgun::Update] Current Left Bullets : " << m_iCurBullets << std::endl;
 }
 
-void CWeapon_Shotgun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Shotgun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
 {
-    __super::Throw(pDir, vRot, iObjTypeIndex);
+    __super::Throw(pDir, fThrowPower, vRot, iObjTypeIndex);
 }
 
 HRESULT CWeapon_Shotgun::Ready_Components()

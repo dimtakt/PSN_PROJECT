@@ -293,6 +293,8 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 
+	_float fShotInterval = 2.2f;
+
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
@@ -364,7 +366,7 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
 	{
-		if (pWeaponGun != nullptr && m_fElapsedShot > 1.f)
+		if (pWeaponGun != nullptr && m_fElapsedShot > fShotInterval)
 		{
 			// 날아갈 방향 계산
 			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);

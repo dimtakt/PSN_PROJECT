@@ -52,6 +52,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pUI_Crosshair = m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_Crosshair");
 	if (m_pUI_Crosshair == nullptr) return E_FAIL;
 
+	m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
 
 	//if (FAILED(Ready_PartObject()))
 	//	return E_FAIL;
@@ -93,12 +94,13 @@ void CPlayer::Update(_float fTimeDelta)
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
 
+	Update_TimeControl(fTimeDelta);
+
 	Update_Transform(fTimeDelta);
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
 
 	Update_Interact(fTimeDelta);
-	Update_TimeControl(fTimeDelta);
 	Update_UI(fTimeDelta);
 
 #ifdef _DEBUG
@@ -280,11 +282,14 @@ HRESULT CPlayer::Bind_ShaderResources()
 	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
 		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+	//	return E_FAIL;
 
 	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
 	//if (nullptr == pLightDesc)
@@ -380,6 +385,7 @@ void CPlayer::Update_Transform(_float fTimeDelta)
 
 void CPlayer::Update_AnimationState(_float fTimeDelta)
 {
+
 	// 상태 추가 (켜기) → |=
 	// 상태 제거 (끄기) → &= ~
 	// 
@@ -433,6 +439,9 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 		m_iState = ENUM_CLASS(PLAYER_STATE::IDLE);
 	else if (m_iState & ~ENUM_CLASS(PLAYER_STATE::IDLE))
 		m_iState &= ~ENUM_CLASS(PLAYER_STATE::IDLE);
+
+
+
 
 }
 
@@ -551,6 +560,7 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 	// 그 외의 경우 원래 속도(느린)대로 정상화
 
 	_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
 	static _float fElapsedTime = 0.f;
 	static _bool isPressed = false;
@@ -569,21 +579,33 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		fDuration = 0.05f;
 	}
 	else if (
-		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) ||
-		false
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB)
+		)
+	{
+		if ((pWeaponGun && pWeaponGun->Get_isOnCD()))			// 총이 있다면 쿨이 아니라서 격발될때
+		{
+			m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+			fElapsedTime = 0;
+			isPressed = true;
+			fDuration = 0.01f;
+		}
+		else if (!pWeaponGun && !(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))		// 총이 없다면 공격중이 아닐 때
+		{
+			m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+			fElapsedTime = 0;
+			isPressed = true;
+			fDuration = 0.01f;
+		}
+	}
+	else if (
+		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::RB) &&
+		pWeaponGun
 		)
 	{
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 		fElapsedTime = 0;
 		isPressed = true;
-		fDuration = 0.15f;
-	}
-	else if (
-		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::RB) &&
-		m_pPart_Weapon
-		)
-	{
-		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
+		fDuration = 0.01f;
 	}
 	else if ((fElapsedTime < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
 	{
@@ -674,16 +696,10 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			// 3. 현재 무기 삭제
 			// 4. 플레이어 애니메이션 중 투척에 가까운 것으로 재생
 			 
-			// 날아갈 방향 계산
-			_vector vDir = XMVectorZero();	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 			_float fThrowPower = 3.f;
 
-			_matrix matCameraview = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-			_vector vCameraLook = matCameraview.r[2];
-			vDir = vCameraLook;
-
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
-			pWeaponGun->Throw(&m_vLoadShotDir, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
+			pWeaponGun->Throw(&m_vLoadShotDir, fThrowPower, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
 
 			// 현재 사용중인 무기 삭제
 			Remove_PartObject(L"Part_Weapon_Player");

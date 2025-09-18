@@ -105,7 +105,7 @@ void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
         MSG_BOX(L"총알 생성 실패");
 }
 
-void CWeapon_Gun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
+void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
 {
     // 현재 위치로부터 던지는 오브젝트 생성되도록 진행,
     // 해당 오브젝트는 pickupable 클래스이며, 잔탄 정보를 들고 있을 것임
@@ -128,7 +128,7 @@ void CWeapon_Gun::Throw(_vector* pDir, _vector vRot, _uint iObjTypeIndex)
     tDesc.strModelComPrototypeTag = strModelPrototypeTag;
     tDesc.iGameObjType = iObjTypeIndex;
 
-    tDesc.vThrowDir = *pDir;
+    tDesc.vThrowDir = *pDir * fThrowPower;
     tDesc.vThrowRot = vRot;
     tDesc.tGunInfoDesc.iCurLeftBullets = m_iCurBullets;
     
