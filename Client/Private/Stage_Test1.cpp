@@ -69,8 +69,8 @@ HRESULT CStage_Test1::Ready_Lights()
 	//(LightDesc.Diffuse * MtrlDesc.Diffuse) * (fShade(0 ~ 1) + (LightDesc.Ambient * MtrlDesc.Ambient))
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);	// Light 방향
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);		// Light 색상 및 밝기의 세기
+	LightDesc.vDirection = _float4(0.5f, -1.f, 0.5f, 0.f);	// Light 방향
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 0.1f);		// Light 색상 및 밝기의 세기
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);	// Light 환경광으로 가정. 최소 밝기 보장에 관여.
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);		// Light 반사광.
 
@@ -81,7 +81,12 @@ HRESULT CStage_Test1::Ready_Lights()
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
 
-	ShadowLightDesc.vEye = _float4(-20.f, 20.f, -20.f, 1.f);
+	//ShadowLightDesc.vEye = _float4(-20.f, 20.f, -20.f, 1.f);
+	//ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	//ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+	//ShadowLightDesc.fNear = 0.1f;
+	//ShadowLightDesc.fFar = 1000.f;
+	ShadowLightDesc.vEye = _float4(0.1f, -1.f, 0.1f, 0.f);
 	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
 	ShadowLightDesc.fNear = 0.1f;
