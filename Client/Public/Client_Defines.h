@@ -199,13 +199,14 @@ namespace Client
 		PLAYER_HIT	= (1 << 2),
 		ENEMY_HIT	= (1 << 3),
 
-		BULLET_ATK	= (1 << 4),
+		PLAYER_BULLET_ATK	= (1 << 4),
+		ENEMY_BULLET_ATK	= (1 << 5),
 
 
-		PICKUPABLE	= (1 << 5),
+		PICKUPABLE	= (1 << 6),
 		
 
-		END			= (1 << 6)
+		END			= (1 << 7)
 	};
 
 

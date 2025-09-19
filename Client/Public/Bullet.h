@@ -33,6 +33,8 @@ public:
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
 
+	virtual void OnCollision(CGameObject* pCollisionHitBy) override;
+
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
@@ -43,6 +45,8 @@ private:
 	HRESULT		Bind_ShaderResources();
 
 	void		Check_Destroy(_float fTimeDelta);
+
+	void		Add_HitEffect();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)

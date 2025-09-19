@@ -66,9 +66,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
-	__super::Priority_Update(fTimeDelta);
+	__super::Priority_Update(fTimeDelta);		// 본인이 아닌, PartObject 들의 Priority_Update 를 순회함
 
-
+	Update_HitCD(fTimeDelta);
 }
 
 void CPlayer::Update(_float fTimeDelta)
@@ -807,7 +807,7 @@ HRESULT CPlayer::Ready_Colliders(void* pArg)
 		{
 			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
 				ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
-				ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK),
+				ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK) | ENUM_CLASS(COLLISION_LAYER::ENEMY_BULLET_ATK),
 				true, this
 			};
 			SphereDesc.tColDesc = colDesc;
@@ -816,8 +816,8 @@ HRESULT CPlayer::Ready_Colliders(void* pArg)
 					strNameTag[i] == L"RightHand"	)
 		{
 			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
-				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) & ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
-				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
+				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT) | ENUM_CLASS(COLLISION_LAYER::ENEMY_BULLET_ATK),
 				false, this
 			};
 			SphereDesc.tColDesc = colDesc;
@@ -840,7 +840,7 @@ HRESULT CPlayer::Ready_Colliders(void* pArg)
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 	colDesc = {
 		ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT), 
-		ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK),
+		ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK) | ENUM_CLASS(COLLISION_LAYER::ENEMY_BULLET_ATK),
 		true, this
 	};
 	OBBDesc.tColDesc = colDesc;

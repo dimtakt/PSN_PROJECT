@@ -43,7 +43,8 @@ HRESULT CBullet::Initialize(void* pArg)
 	m_vMoveDir = pDesc->vMoveDir;
 	m_pTransformCom->Set_WorldMatrix(pDesc->matSpawnTransform);	// 컴포넌트 생성 이후에 호출돼야 함
 	
-
+	m_iHp = 1;
+	m_iMaxHp = 1;
 
 	_float fScaled = 2.f;
 	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
@@ -58,6 +59,12 @@ void CBullet::Priority_Update(_float fTimeDelta)
 	__super::Priority_Update(fTimeDelta);
 
 
+
+	if (m_isDeadStandby == true)
+	{
+		m_isDead = true;
+		Add_HitEffect();
+	}
 }
 
 void CBullet::Update(_float fTimeDelta)
@@ -137,6 +144,13 @@ HRESULT CBullet::Render()
 	return S_OK;
 }
 
+void CBullet::OnCollision(CGameObject* pCollisionHitBy)
+{
+	__super::OnCollision(pCollisionHitBy);
+
+	Add_HitEffect();
+}
+
 HRESULT CBullet::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
@@ -160,7 +174,7 @@ HRESULT CBullet::Ready_Components(void* pArg)
 	{
 	case ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET):
 		colDesc = {
-			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
+			ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK),
 			ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
 			true, this
 		};
@@ -168,7 +182,7 @@ HRESULT CBullet::Ready_Components(void* pArg)
 
 	case ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET):
 		colDesc = {
-			ENUM_CLASS(COLLISION_LAYER::BULLET_ATK),
+			ENUM_CLASS(COLLISION_LAYER::ENEMY_BULLET_ATK),
 			ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
 			true, this
 		};
@@ -217,6 +231,21 @@ void CBullet::Check_Destroy(_float fTimeDelta)
 		//m_fElapsedTime = 0;
 		m_isDead = true;
 	}
+}
+
+void CBullet::Add_HitEffect()
+{
+	_matrix matBulletTransform = m_pTransformCom->Get_WorldMatrix();
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	const _wstring strEffectTag = L"Layer_Particle_HitEffect";
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strEffectTag,
+		iDestLevel, TEXT("Prototype_GameObject_Particle_HitEffect"))))
+		MSG_BOX(L"이펙트 생성 실패");
+
+	CGameObject* pEffectObj = m_pGameInstance->Get_LastGameObject(iDestLevel, strEffectTag);
+	CTransform* pEffectTransform = dynamic_cast<CTransform*>(pEffectObj->Get_Component(L"Com_Transform"));
+	pEffectTransform->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix());
 }
 
 CBullet* CBullet::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

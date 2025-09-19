@@ -52,6 +52,9 @@ public:
 	virtual void OnCollision(CGameObject* pCollisionHitBy);
 	virtual void OnCollisionRay(CGameObject* pCollisionHitBy) {};
 
+	// 공격받은 경우 내부적으로 피격 쿨타임을 계산합니다. 선언 필요.
+	void Update_HitCD(_float fTimeDelta);
+
 public:
 	// 사용 전 반드시 Set_BufferRef 로 버퍼 할당 필요
 	_bool isPicked(
@@ -103,8 +106,11 @@ protected:
 	_uint			m_iGameObjType	= { };
 
 	_bool			m_isDead		= false;
+	_bool			m_isDeadStandby	= false;
 	
-	
+	_bool			m_isHitCD		= false;
+	_float			m_fHitElapsed	= {};
+	const _float	m_fHitCD		= 0.2f;
 	
 protected:
 	/*원형컴포넌트를 찾아서 복제한다. */

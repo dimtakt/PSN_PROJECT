@@ -55,14 +55,17 @@ HRESULT CGameObject::Initialize(void* pArg)
 
 void CGameObject::Priority_Update(_float fTimeDelta) 
 {
+	Update_HitCD(fTimeDelta);
 }
 
 void CGameObject::Update(_float fTimeDelta)
 {
+
 }
 
 void CGameObject::Late_Update(_float fTimeDelta)
 {
+
 }
 
 HRESULT CGameObject::Render()
@@ -72,7 +75,31 @@ HRESULT CGameObject::Render()
 
 void CGameObject::OnCollision(CGameObject* pCollisionHitBy)
 {
-	std::cout << "[CGameObject::OnCollision] Collision Detected!" << std::endl;
+	// 일반적으로 적에게 공격받는 경우 지속 발동됨.
+	// 때문에 m_isHit 종류를 통해 1회만 데미지를 받도록 해야 함.
+
+
+	if (m_isHitCD)						// 이미 쿨 상태라면 충돌 무시
+		return;
+
+	std::cout << "[CGameObject::OnCollision] Collision Detect! Hp Reduced!" << std::endl;
+	m_iHp--;
+	m_isHitCD = true;
+
+	if (m_iHp <= 0)						// 체력이 0이라면 사망 준비 처리
+		m_isDeadStandby = true;
+}
+
+void CGameObject::Update_HitCD(_float fTimeDelta)
+{
+	if (m_isHitCD == true)				// 피격쿨이라면, 시간 계산을 위해 경과 시간 갱신
+		m_fHitElapsed += fTimeDelta;
+
+	if (m_fHitElapsed >= m_fHitCD)		// 피격 쿨이 충분히 지났다면, 피격 쿨 비활성화 및 경과시간 초기화
+	{
+		m_isHitCD = false;
+		m_fHitElapsed = 0.f;
+	}
 }
 
 _bool CGameObject::isPicked(_float3* pOut, _bool bReturnAll, std::vector<_float3>* vecOut)

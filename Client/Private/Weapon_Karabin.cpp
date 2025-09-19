@@ -168,7 +168,7 @@ void CWeapon_Karabin::Shot(_vector* pDir, _uint iObjTypeIndex)
         // 종료 후 false 전환. true 인 동안에는 새로 shot 시도 불가.
     }
 
-    std::cout << "[CWeapon_Karabin::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
+
 }
 
 void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _float fTimeDelta)
@@ -193,8 +193,8 @@ void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _flo
         }
         __super::Shot(pDir, iObjTypeIndex);
         m_iShotIndex++;
-        m_iCurBullets--;
-        __super::Add_ShotEffect();
+        //m_iCurBullets--;
+        //__super::Add_ShotEffect();
 
         if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
         {

@@ -329,7 +329,7 @@ namespace Engine
 	typedef struct tagCollisionDesc
 	{
 		unsigned int		iLayerIndex;	// 비트연산자로 콜라이더 대상이 무슨 타입인지 정의
-		unsigned int		iMask;			// 비트연산자로 충돌할 레이어 정의
+		unsigned int		iMask;			// 비트연산자로 충돌할 레이어 정의. 이 콜라이더가 해당 레이어와 충돌하면, 해당 콜라이더의 오너 콜리전 함수를 실행함.
 		bool				isActive	= true;
 
 		class CGameObject*	pOwner		= { nullptr };

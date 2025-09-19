@@ -147,12 +147,10 @@ void CWeapon_Pistol::Shot(_vector* pDir, _uint iObjTypeIndex)
     }
 
     __super::Shot(pDir, iObjTypeIndex);
-    m_iCurBullets--;
-    __super::Add_ShotEffect();
+   
 
     m_isOnCD = true;
 
-    std::cout << "[CWeapon_Pistol::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
 }
 
 void CWeapon_Pistol::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
