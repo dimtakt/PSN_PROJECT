@@ -180,8 +180,9 @@ void CWeapon_Gun::Add_ShotEffect()
     _matrix matCalcedPos = XMMatrixIdentity();
     _float3 vAdjustPos = {};
 
+    // 총구부분에 맞도록 보정
     switch (m_iGameObjType)
-    {
+    { 
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.5f / 2.f};    break;
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):    vAdjustPos = {0.f, 0.04f, 4.f * 0.15f / 2.f};   break;
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.7f / 2.f};    break;
@@ -198,3 +199,4 @@ void CWeapon_Gun::Free()
 {
     __super::Free();
 }
+

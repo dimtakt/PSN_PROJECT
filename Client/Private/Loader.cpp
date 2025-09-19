@@ -20,7 +20,7 @@
 
 
 // Effects...
-#include "TriParticle.h"
+#include "ShotParticle.h"
 #include "Skybox.h"
 
 
@@ -472,7 +472,7 @@ HRESULT CLoader::Loading_For_Stages()
 
 	/* Prototype_GameObject_Particle_TriEffect */
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_TriEffect"),
-		CTriParticle::Create(m_pDevice, m_pContext))))
+		CShotParticle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

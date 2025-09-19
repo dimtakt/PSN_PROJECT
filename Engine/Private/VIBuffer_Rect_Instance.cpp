@@ -14,6 +14,8 @@ CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& 
 	, m_isLoop{ Prototype.m_isLoop }
 	, m_vCenter{ Prototype.m_vCenter }
 	, m_vRange{ Prototype.m_vRange }
+	, m_isTurn{ Prototype.m_isTurn }
+	, m_pTurnSpeeds{ Prototype.m_pTurnSpeeds }
 
 {
 }
@@ -27,6 +29,7 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 
 	m_vCenter = pRectDesc->vCenter;
 	m_vRange = pRectDesc->vRange;
+	m_isTurn = pRectDesc->isTurn;
 
 
 	m_iNumIndexPerInstance = 6;
@@ -110,7 +113,9 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 	m_VBInstanceDesc.StructureByteStride = m_iInstanceVertexStride;
 
 	m_pInstanceVertices = new VTXINSTANCE_PARTICLE[m_iNumInstance];
-	m_pSpeeds = new _float[m_iNumInstance];
+	m_pSpeeds			= new _float[m_iNumInstance];
+	m_pTurnSpeeds		= new _float[m_iNumInstance];
+	m_pAxises			= new _vector[m_iNumInstance];
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -120,9 +125,50 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 		_float		fLifeTime = m_pGameInstance->Rand(pRectDesc->vLifeTime.x, pRectDesc->vLifeTime.y);
 		m_pSpeeds[i] = m_pGameInstance->Rand(pRectDesc->vSpeed.x, pRectDesc->vSpeed.y);
 
-		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+
+		if (m_isTurn)
+#pragma region Initialize Scale & Rotation
+		{
+			// ===== 최초 회전값 지정 =====
+			_float randYaw = m_pGameInstance->Rand(0.f, XM_2PI);
+			_float randPitch = m_pGameInstance->Rand(0.f, XM_2PI);
+			_float randRoll = m_pGameInstance->Rand(0.f, XM_2PI);
+			_matrix matRot = XMMatrixRotationRollPitchYaw(randPitch, randYaw, randRoll);
+			_matrix matSca = XMMatrixScaling(fScale, fScale, fScale);
+			_matrix matResult = matSca * matRot;
+			XMStoreFloat4(&pInstanceVertices[i].vRight, matResult.r[0]);
+			XMStoreFloat4(&pInstanceVertices[i].vUp, matResult.r[1]);
+			XMStoreFloat4(&pInstanceVertices[i].vLook, matResult.r[2]);
+
+			// ===== 회전방향 지정 =====
+			_float3 vRotAxis = {};
+			vRotAxis.x = m_pGameInstance->Rand(0.f, 1.f);
+			vRotAxis.y = m_pGameInstance->Rand(0.f, 1.f);
+			vRotAxis.z = m_pGameInstance->Rand(0.f, 1.f);
+			m_pAxises[i] = XMVector3Normalize(XMLoadFloat3(&vRotAxis));
+
+			// ===== 회전속도 지정 =====
+			m_pTurnSpeeds[i] = m_pGameInstance->Rand(pRectDesc->vTurnSpeed.x, pRectDesc->vTurnSpeed.y);
+
+			// ==============================
+		}
+#pragma endregion
+		else
+#pragma region Initialize Scale
+		{
+			pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+			pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
+			pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+		}
+#pragma endregion
+
+
+
+#pragma region Initialize Position (old)
+
+		// ===== 최초 위치값 지정 =====
+		// .. 인데 매 프레임마다 갱신시켜서 위치 완전히 랜덤이도록 변경함
+		
 		//pInstanceVertices[i].vTranslation = _float4(
 		//	m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
 		//	m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
@@ -130,8 +176,10 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 		//	1.f
 		//);
 
-		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
+#pragma endregion
 
+
+		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
 	}
 
 	return S_OK;
@@ -166,13 +214,16 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
 
 	/*m_pVB->Lock(0, 0, (void**)&pVertex, 0);*/
 
+	// 컨텍스트로부터 현재 인스턴스 버퍼의 정보를 받아옴. 이는 GPU도 셰이더를 위해 참조하는 것.
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
 
 	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
 
-
+	// 단순히 인스턴스의 생성 위치에 따라, 중앙 위치의 반대 방향으로 이동하는 코드
+	// 그 외의 세부사항은 셰이더 및 desc 값에 따라 조절
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		// 단순 방사 방향 구함
 		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
 
 		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
@@ -180,12 +231,71 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
 
 		if (true == m_isLoop)
 		{
-			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)		// ElapsedTime 이 MaxTime 넘기면 다시 돌아가서 루프
 			{
 				pVertices[i].vLifeTime.x = 0.f;
 				pVertices[i].vTranslation = pInstanceVertices[i].vTranslation;
 			}
 		}
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Rect_Instance::Spread_Turn(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	/*m_pVB->Lock(0, 0, (void**)&pVertex, 0);*/
+
+	// 컨텍스트로부터 현재 인스턴스 버퍼의 정보를 받아옴. 이는 GPU도 셰이더를 위해 참조하는 것.
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+	// 단순히 인스턴스의 생성 위치에 따라, 중앙 위치의 반대 방향으로 이동하는 코드
+	// 그 외의 세부사항은 셰이더 및 desc 값에 따라 조절
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		// 단순 방사 방향 구함
+		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
+
+		_matrix matDeltaRot = XMMatrixRotationAxis(m_pAxises[i], m_pTurnSpeeds[i] * fTimeDelta);
+
+		if (m_isTurn)
+		{
+			// 현재 인스턴스의 로컬 회전 행렬 구성
+			_matrix matCurrent = XMMatrixSet(
+				pVertices[i].vRight.x	, pVertices[i].vRight.y	, pVertices[i].vRight.z	, 0.f,
+				pVertices[i].vUp.x		, pVertices[i].vUp.y	, pVertices[i].vUp.z	, 0.f,
+				pVertices[i].vLook.x	, pVertices[i].vLook.y	, pVertices[i].vLook.z	, 0.f,
+				0.f, 0.f, 0.f, 1.f
+			);
+
+			// 회전 적용
+			_matrix matCalced = matDeltaRot * matCurrent;
+
+			// 다시 vRight, vUp, vLook에 저장
+			XMStoreFloat4(&pVertices[i].vRight	, matCalced.r[0]);
+			XMStoreFloat4(&pVertices[i].vUp		, matCalced.r[1]);
+			XMStoreFloat4(&pVertices[i].vLook	, matCalced.r[2]);
+		}
+
+
+		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+		pVertices[i].vLifeTime.x += fTimeDelta;
+
+		if (true == m_isLoop)
+		{
+			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)		// ElapsedTime 이 MaxTime 넘기면 다시 돌아가서 루프
+			{
+				pVertices[i].vLifeTime.x = 0.f;
+				pVertices[i].vTranslation = pInstanceVertices[i].vTranslation;
+			}
+		}
+
 	}
 
 	m_pContext->Unmap(m_pVBInstance, 0);
@@ -225,5 +335,9 @@ void CVIBuffer_Rect_Instance::Free()
 	__super::Free();
 
 	if (false == m_isCloned)
+	{
 		Safe_Delete_Array(m_pSpeeds);
+		Safe_Delete_Array(m_pTurnSpeeds);
+		Safe_Delete_Array(m_pAxises);
+	}
 }

@@ -14,6 +14,9 @@ public:
 		_float2			vSpeed;
 		_float2			vLifeTime;
 		_bool			isLoop;
+
+		_bool			isTurn = false;
+		_float2			vTurnSpeed = {};
 	}RECT_INSTANCE_DESC;
 private:
 	CVIBuffer_Rect_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -26,6 +29,8 @@ public:
 
 public:
 	void Spread(_float fTimeDelta);
+	void Spread_Turn(_float fTimeDelta);
+
 	void Drop(_float fTimeDelta);
 
 private:
@@ -33,8 +38,12 @@ private:
 	_float3					m_vRange = {};
 
 	_float3					m_vPivot = {};
-	_float*					m_pSpeeds = {};
+	_float*					m_pSpeeds = {};			// 얘는 Update중에도 써야 하니까 이렇게 저장
 	_bool					m_isLoop = {};
+
+	_bool					m_isTurn = false;
+	_vector*				m_pAxises = {};
+	_float*					m_pTurnSpeeds = {};
 
 public:
 	static CVIBuffer_Rect_Instance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc);

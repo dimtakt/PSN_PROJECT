@@ -12,12 +12,12 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CTriParticle final : public CGameObject
+class CShotParticle final : public CGameObject
 {
 private:
-	CTriParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTriParticle(const CTriParticle& Prototype);
-	virtual ~CTriParticle() = default;
+	CShotParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CShotParticle(const CShotParticle& Prototype);
+	virtual ~CShotParticle() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -42,7 +42,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CTriParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CShotParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

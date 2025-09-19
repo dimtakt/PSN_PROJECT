@@ -1,22 +1,22 @@
-#include "TriParticle.h"
+#include "ShotParticle.h"
 #include "GameInstance.h"
 
-CTriParticle::CTriParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CShotParticle::CShotParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
 
-CTriParticle::CTriParticle(const CTriParticle& Prototype)
+CShotParticle::CShotParticle(const CShotParticle& Prototype)
     : CGameObject{ Prototype }
 {
 }
 
-HRESULT CTriParticle::Initialize_Prototype()
+HRESULT CShotParticle::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CTriParticle::Initialize(void* pArg)
+HRESULT CShotParticle::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -27,12 +27,12 @@ HRESULT CTriParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CTriParticle::Priority_Update(_float fTimeDelta)
+void CShotParticle::Priority_Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CTriParticle::Update(_float fTimeDelta)
+void CShotParticle::Update(_float fTimeDelta)
 {
     m_pVIBufferCom->Spread(fTimeDelta);
 
@@ -41,13 +41,13 @@ void CTriParticle::Update(_float fTimeDelta)
         m_isDead = true;
 }
 
-void CTriParticle::Late_Update(_float fTimeDelta)
+void CShotParticle::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
         return;
 }
 
-HRESULT CTriParticle::Render()
+HRESULT CShotParticle::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
@@ -63,7 +63,7 @@ HRESULT CTriParticle::Render()
     return S_OK;
 }
 
-HRESULT CTriParticle::Ready_Components()
+HRESULT CShotParticle::Ready_Components()
 {
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
@@ -88,7 +88,7 @@ HRESULT CTriParticle::Ready_Components()
     return S_OK;
 }
 
-HRESULT CTriParticle::Bind_ShaderResources()
+HRESULT CShotParticle::Bind_ShaderResources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -105,33 +105,33 @@ HRESULT CTriParticle::Bind_ShaderResources()
     return S_OK;
 }
 
-CTriParticle* CTriParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CShotParticle* CShotParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CTriParticle* pInstance = new CTriParticle(pDevice, pContext);
+    CShotParticle* pInstance = new CShotParticle(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CTriParticle"));
+        MSG_BOX(TEXT("Failed to Created : CShotParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CTriParticle::Clone(void* pArg)
+CGameObject* CShotParticle::Clone(void* pArg)
 {
-    CTriParticle* pInstance = new CTriParticle(*this);
+    CShotParticle* pInstance = new CShotParticle(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CTriParticle"));
+        MSG_BOX(TEXT("Failed to Created : CShotParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CTriParticle::Free()
+void CShotParticle::Free()
 {
     __super::Free();
 

@@ -90,8 +90,8 @@ PS_OUT PS_MAIN(PS_IN In)
 }
 
 
-
-PS_OUT PS_MAIN_TRIPARTICLE(PS_IN In)
+// Shot
+PS_OUT PS_MAIN_SHOTPARTICLE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -101,12 +101,35 @@ PS_OUT PS_MAIN_TRIPARTICLE(PS_IN In)
         discard;
     
     //float fColor = saturate(In.vLifeTime.y - In.vLifeTime.x);
-    //float fAlphaBase = saturate(In.vLifeTime.y - In.vLifeTime.x);                  // y가 1 아래라면 알파값이 0 ~ y 가 됨
-    float fAlphaBase = saturate((In.vLifeTime.y - In.vLifeTime.x) / In.vLifeTime.y); // 알파값 0 ~ 1
+    //float fAlphaBase = saturate(In.vLifeTime.y - In.vLifeTime.x);                 // y가 1 아래라면 알파값이 0 ~ y 가 됨
+    float fAlphaBase = saturate((In.vLifeTime.y - In.vLifeTime.x) / In.vLifeTime.y);// 알파값 0 ~ 1
     
-    float fAlpha = saturate(-(pow(fAlphaBase - 1.f, 2.f)) + 1.f); // y = -(x-1)^2 + 1  ( x = fAlphaBase, y = fAlpha )
+    float fAlpha = saturate(-(pow(fAlphaBase - 1.f, 2.f)) + 1.f);                   // y = -(x-1)^2 + 1  ( x = fAlphaBase, y = fAlpha )
+    
+    Out.vColor = vector(0.8f, 1.f, 1.f, 1.f);                                       // 색상 값은 고정으로 두고, 알파값만 바뀌도록 해서 까매지며 없어지지 않도록 수정
+    
+    Out.vColor.a = fAlpha;
+    
+    return Out;
+}
+
+// Hit
+PS_OUT PS_MAIN_HITPARTICLE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (Out.vColor.a < 0.3f)
+        discard;
+    
+    //float fColor = saturate(In.vLifeTime.y - In.vLifeTime.x);
+    //float fAlphaBase = saturate(In.vLifeTime.y - In.vLifeTime.x);                 // y가 1 아래라면 알파값이 0 ~ y 가 됨
+    float fAlphaBase = saturate((In.vLifeTime.y - In.vLifeTime.x) / In.vLifeTime.y);// 알파값 0 ~ 1
+    
+    float fAlpha = saturate(-(pow(fAlphaBase - 1.f, 2.f)) + 1.f);                   // y = -(x-1)^2 + 1  ( x = fAlphaBase, y = fAlpha )
         
-    Out.vColor = vector(0.8f, 1.f, 1.f, 1.f);           // 색상 값은 고정으로 두고, 알파값만 바뀌도록 해서 까매지며 없어지지 않도록 수정
+    Out.vColor = vector(1.f, 0.f, 0.f, 1.f);                                        // 색상 값은 고정으로 두고, 알파값만 바뀌도록 해서 까매지며 없어지지 않도록 수정
     
     Out.vColor.a = fAlpha;
     
@@ -141,13 +164,23 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass AlphaBlend_TriParticle
+    pass AlphaBlend_ShotParticle
     {
         SetRasterizerState(RS_Cull_None);               // 반대에서도 보이도록 cull none으로 바꿈
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_TRIPARTICLE();
+        PixelShader = compile ps_5_0 PS_MAIN_SHOTPARTICLE();
+    }
+
+    pass AlphaBlend_HitParticle
+    {
+        SetRasterizerState(RS_Cull_None);               // 반대에서도 보이도록 cull none으로 바꿈
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_HITPARTICLE();
     }
 }
