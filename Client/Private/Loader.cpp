@@ -21,6 +21,7 @@
 
 // Effects...
 #include "ShotParticle.h"
+#include "HitParticle.h"
 #include "Skybox.h"
 
 
@@ -390,19 +391,39 @@ HRESULT CLoader::Loading_For_Stages()
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/* Prototype_Component_VIBuffer_Particle_TriEffect */
-	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		TriEffectDesc{};
-	TriEffectDesc.iNumInstance = 15;
-	TriEffectDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	TriEffectDesc.vRange = _float3(0.15f, 0.15f, 0.15f);
-	TriEffectDesc.vSize = _float2(0.03f, 0.05f);
-	TriEffectDesc.vLifeTime = _float2(0.3f, 0.6f);
-	TriEffectDesc.vPivot = _float3(0.f, 0.f, 0.f);
-	TriEffectDesc.vSpeed = _float2(0.05f, 0.08f);
-	TriEffectDesc.isLoop = false;
+	/* Prototype_Component_VIBuffer_Particle_TriEffects */
 
-	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_TriEffect"),
-		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &TriEffectDesc))))
+	// Shot
+	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		ShotEffectDesc{};
+	ShotEffectDesc.iNumInstance = 15;
+	ShotEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
+	ShotEffectDesc.vRange		= _float3(0.15f, 0.15f, 0.15f);
+	ShotEffectDesc.vSize		= _float2(0.03f, 0.05f);
+	ShotEffectDesc.vLifeTime	= _float2(0.3f, 0.6f);
+	ShotEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
+	ShotEffectDesc.vSpeed		= _float2(0.05f, 0.08f);
+	ShotEffectDesc.isLoop		= false;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_ShotEffect"),
+		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &ShotEffectDesc))))
+		return E_FAIL;
+
+	// Hit
+	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		HitEffectDesc{};
+	HitEffectDesc.iNumInstance	= 50;
+	HitEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
+	HitEffectDesc.vRange		= _float3(0.25f, 0.25f, 0.25f);
+	HitEffectDesc.vSize			= _float2(0.06f, 0.1f);
+	HitEffectDesc.vLifeTime		= _float2(0.6f, 1.0f);
+	HitEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
+	HitEffectDesc.vSpeed		= _float2(0.08f, 0.12f);
+	HitEffectDesc.isLoop		= false;
+
+	HitEffectDesc.isTurn		= true;
+	HitEffectDesc.vTurnSpeed	= _float2(-180.f, 180.f);	// Degree per Second
+
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_HitEffect"),
+		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &HitEffectDesc))))
 		return E_FAIL;
 
 
@@ -471,8 +492,13 @@ HRESULT CLoader::Loading_For_Stages()
 		return E_FAIL;
 
 	/* Prototype_GameObject_Particle_TriEffect */
-	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_TriEffect"),
+	// Shot
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_ShotEffect"),
 		CShotParticle::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	// Hit
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_HitEffect"),
+		CHitParticle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

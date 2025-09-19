@@ -30,6 +30,8 @@ public:
 
 private:
 	void Add_Bullet(_vector* pDir, _uint iObjTypeIndex);
+
+protected:
 	void Add_ShotEffect();
 
 protected:

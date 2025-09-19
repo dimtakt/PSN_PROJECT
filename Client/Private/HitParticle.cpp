@@ -1,22 +1,22 @@
-#include "ShotParticle.h"
+#include "HitParticle.h"
 #include "GameInstance.h"
 
-CShotParticle::CShotParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHitParticle::CHitParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
 
-CShotParticle::CShotParticle(const CShotParticle& Prototype)
+CHitParticle::CHitParticle(const CHitParticle& Prototype)
     : CGameObject{ Prototype }
 {
 }
 
-HRESULT CShotParticle::Initialize_Prototype()
+HRESULT CHitParticle::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CShotParticle::Initialize(void* pArg)
+HRESULT CHitParticle::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -27,31 +27,31 @@ HRESULT CShotParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CShotParticle::Priority_Update(_float fTimeDelta)
+void CHitParticle::Priority_Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CShotParticle::Update(_float fTimeDelta)
+void CHitParticle::Update(_float fTimeDelta)
 {
-    m_pVIBufferCom->Spread(fTimeDelta);
+    m_pVIBufferCom->Spread_Turn(fTimeDelta);
 
     if (m_pVIBufferCom->Get_isLifeOver())
         m_isDead = true;
 }
 
-void CShotParticle::Late_Update(_float fTimeDelta)
+void CHitParticle::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
         return;
 }
 
-HRESULT CShotParticle::Render()
+HRESULT CHitParticle::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(2);
+    m_pShaderCom->Begin(3);
     
     m_pTransformCom;
 
@@ -62,7 +62,7 @@ HRESULT CShotParticle::Render()
     return S_OK;
 }
 
-HRESULT CShotParticle::Ready_Components()
+HRESULT CHitParticle::Ready_Components()
 {
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
@@ -73,7 +73,7 @@ HRESULT CShotParticle::Ready_Components()
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_ShotEffect"),
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_HitEffect"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
@@ -87,7 +87,7 @@ HRESULT CShotParticle::Ready_Components()
     return S_OK;
 }
 
-HRESULT CShotParticle::Bind_ShaderResources()
+HRESULT CHitParticle::Bind_ShaderResources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -104,33 +104,33 @@ HRESULT CShotParticle::Bind_ShaderResources()
     return S_OK;
 }
 
-CShotParticle* CShotParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHitParticle* CHitParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CShotParticle* pInstance = new CShotParticle(pDevice, pContext);
+    CHitParticle* pInstance = new CHitParticle(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CShotParticle"));
+        MSG_BOX(TEXT("Failed to Created : CHitParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CShotParticle::Clone(void* pArg)
+CGameObject* CHitParticle::Clone(void* pArg)
 {
-    CShotParticle* pInstance = new CShotParticle(*this);
+    CHitParticle* pInstance = new CHitParticle(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CShotParticle"));
+        MSG_BOX(TEXT("Failed to Created : CHitParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CShotParticle::Free()
+void CHitParticle::Free()
 {
     __super::Free();
 

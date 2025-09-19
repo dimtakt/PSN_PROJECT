@@ -162,11 +162,11 @@ void CWeapon_Gun::Add_ShotEffect()
 {
     _matrix matGunTransform = m_pTransformCom->Get_WorldMatrix();
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
-    const _wstring strEffectTag = L"Layer_Particle_TriEffect";
+    const _wstring strEffectTag = L"Layer_Particle_ShotEffect";
 
 
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strEffectTag,
-        iDestLevel, TEXT("Prototype_GameObject_Particle_TriEffect"))))
+        iDestLevel, TEXT("Prototype_GameObject_Particle_ShotEffect"))))
         MSG_BOX(L"이펙트 생성 실패");
     CGameObject* pEffectObj = m_pGameInstance->Get_LastGameObject(iDestLevel, strEffectTag);
     CTransform* pEffectTransform = dynamic_cast<CTransform*>(pEffectObj->Get_Component(L"Com_Transform"));
@@ -186,7 +186,7 @@ void CWeapon_Gun::Add_ShotEffect()
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.5f / 2.f};    break;
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):    vAdjustPos = {0.f, 0.04f, 4.f * 0.15f / 2.f};   break;
     case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):   vAdjustPos = {0.f, 0.04f, 3.f * 0.7f / 2.f};    break;
-    default:                                                                                        break;
+    default:                                                                                                break;
     }
 
     matCalcedPos = XMMatrixTranslationFromVector(XMLoadFloat3(&vAdjustPos)) * XMLoadFloat4x4(&m_CombinedWorldMatrix);

@@ -188,6 +188,12 @@ HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Particle_TriEffect"))))
 	//	return E_FAIL;
 
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Particle_HitEffect",
+		iDestLevel, TEXT("Prototype_GameObject_Particle_HitEffect"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

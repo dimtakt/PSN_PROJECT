@@ -151,6 +151,7 @@ void CWeapon_Shotgun::Shot(_vector* pDir, _uint iObjTypeIndex)
         __super::Shot(pDir, iObjTypeIndex);
         m_iCurBullets--;
     }
+    Add_ShotEffect();
 
     m_isOnCD = true;
 

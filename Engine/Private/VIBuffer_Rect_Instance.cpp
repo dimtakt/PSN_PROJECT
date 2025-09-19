@@ -16,7 +16,8 @@ CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& 
 	, m_vRange{ Prototype.m_vRange }
 	, m_isTurn{ Prototype.m_isTurn }
 	, m_pTurnSpeeds{ Prototype.m_pTurnSpeeds }
-
+	, m_pAxises{ Prototype.m_pAxises }
+	, m_fMaxLifetime{ Prototype.m_fMaxLifetime }
 {
 }
 
@@ -30,6 +31,8 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 	m_vCenter = pRectDesc->vCenter;
 	m_vRange = pRectDesc->vRange;
 	m_isTurn = pRectDesc->isTurn;
+
+	m_fMaxLifetime = pRectDesc->vLifeTime.y;
 
 
 	m_iNumIndexPerInstance = 6;
@@ -208,6 +211,8 @@ HRESULT CVIBuffer_Rect_Instance::Initialize(void* pArg)
 
 void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
 {
+	m_fElapsedTime += fTimeDelta;
+
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
 	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
@@ -244,6 +249,8 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
 
 void CVIBuffer_Rect_Instance::Spread_Turn(_float fTimeDelta)
 {
+	m_fElapsedTime += fTimeDelta;
+
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
 	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
@@ -262,7 +269,7 @@ void CVIBuffer_Rect_Instance::Spread_Turn(_float fTimeDelta)
 		// 단순 방사 방향 구함
 		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
 
-		_matrix matDeltaRot = XMMatrixRotationAxis(m_pAxises[i], m_pTurnSpeeds[i] * fTimeDelta);
+		_matrix matDeltaRot = XMMatrixRotationAxis(m_pAxises[i], TO_RAD(m_pTurnSpeeds[i] * fTimeDelta));
 
 		if (m_isTurn)
 		{

@@ -33,6 +33,12 @@ public:
 
 	void Drop(_float fTimeDelta);
 
+public:
+	_float Get_isLifeOver() { 
+		if ((!m_isLoop) && (m_fElapsedTime >= m_fMaxLifetime))	return true;
+		else													return false;
+	}
+
 private:
 	_float3					m_vCenter = {};
 	_float3					m_vRange = {};
@@ -44,6 +50,9 @@ private:
 	_bool					m_isTurn = false;
 	_vector*				m_pAxises = {};
 	_float*					m_pTurnSpeeds = {};
+
+	_float					m_fElapsedTime = {};
+	_float					m_fMaxLifetime = {};
 
 public:
 	static CVIBuffer_Rect_Instance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc);

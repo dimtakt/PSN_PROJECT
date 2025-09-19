@@ -194,6 +194,7 @@ void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _flo
         __super::Shot(pDir, iObjTypeIndex);
         m_iShotIndex++;
         m_iCurBullets--;
+        __super::Add_ShotEffect();
 
         if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
         {

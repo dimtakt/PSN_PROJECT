@@ -136,6 +136,12 @@
     <Filter Include="02.GameObject\Effect\Particle">
       <UniqueIdentifier>{789948d3-79ea-4614-9db3-3f9895d36ca4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Effect\Particle\Shot">
+      <UniqueIdentifier>{791d0b65-ee41-4632-8e87-b6a4e57cc401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Effect\Particle\Hit">
+      <UniqueIdentifier>{3ba2fdaf-8ffa-40cf-b025-a0e41056c136}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -268,7 +274,10 @@
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClInclude>
     <ClInclude Include="..\public\ShotParticle.h">
-      <Filter>02.GameObject\Effect\Particle</Filter>
+      <Filter>02.GameObject\Effect\Particle\Shot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HitParticle.h">
+      <Filter>02.GameObject\Effect\Particle\Hit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -400,7 +409,10 @@
       <Filter>02.GameObject\_NonAnimObject\_Pickupable</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ShotParticle.cpp">
-      <Filter>02.GameObject\Effect\Particle</Filter>
+      <Filter>02.GameObject\Effect\Particle\Shot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HitParticle.cpp">
+      <Filter>02.GameObject\Effect\Particle\Hit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
