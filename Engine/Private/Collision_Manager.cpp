@@ -31,7 +31,7 @@ void CCollision_Manager::Update()
 					COLLISION_DESC descA = m_vecColliders[i]->Get_ColDesc();	// 공격
 					COLLISION_DESC descB = m_vecColliders[j]->Get_ColDesc();	// 피격
 
-					descB.pOwner->OnCollision(descA.pOwner);
+					descB.pOwner->OnCollision(&descA, &descB);
 				}
 			}
 }

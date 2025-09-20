@@ -73,14 +73,14 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
-void CGameObject::OnCollision(CGameObject* pCollisionHitBy)
+_bool CGameObject::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo)
 {
 	// 일반적으로 적에게 공격받는 경우 지속 발동됨.
 	// 때문에 m_isHit 종류를 통해 1회만 데미지를 받도록 해야 함.
 
 
 	if (m_isHitCD)						// 이미 쿨 상태라면 충돌 무시
-		return;
+		return false;
 
 	std::cout << "[CGameObject::OnCollision] Collision Detect! Hp Reduced!" << std::endl;
 	m_iHp--;
@@ -88,6 +88,10 @@ void CGameObject::OnCollision(CGameObject* pCollisionHitBy)
 
 	if (m_iHp <= 0)						// 체력이 0이라면 사망 준비 처리
 		m_isDeadStandby = true;
+
+
+
+	return true;
 }
 
 void CGameObject::Update_HitCD(_float fTimeDelta)

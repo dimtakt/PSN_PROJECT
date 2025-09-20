@@ -333,6 +333,7 @@ namespace Engine
 		bool				isActive	= true;
 
 		class CGameObject*	pOwner		= { nullptr };
+		class CCollider*	pColCom		= { nullptr };
 
 	} COLLISION_DESC;
 

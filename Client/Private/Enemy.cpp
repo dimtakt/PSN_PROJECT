@@ -180,6 +180,37 @@ HRESULT CEnemy::Render_Shadow()
 	return S_OK;
 }
 
+_bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo)
+{
+	if (__super::OnCollision(pColDescFrom, pColDescTo) == false)
+		return false;
+
+	// 콜리젼을 받는 경우를 정의..
+	// 이는 피격 당 1회 (정확히는 최소 0.2초 간격) 로만 발동됨.
+
+	// 맞은 desc와 공격한 desc 정보 둘 다를 받아와야 할 듯
+	
+	CCollider* pHitCom = pColDescTo->pColCom;	// 공격받은 콜라이더
+
+	if (pHitCom == CGameObject::Get_Component(L"Com_Collider_BodyAll") ||
+		pHitCom == CGameObject::Get_Component(L"Com_Collider_LeftHand") || 
+		pHitCom == CGameObject::Get_Component(L"Com_Collider_RightHand"))
+	{
+		// 몸통에 맞음
+		std::cout << "[CEnemy::OnCollision] Body Collision Detected." << std::endl;
+	}
+	else if (pHitCom == CGameObject::Get_Component(L"Com_Collider_Head"))
+	{
+		// 머리에 맞음
+
+		std::cout << "[CEnemy::OnCollision] Head Collision Detected." << std::endl;
+	}
+
+
+
+	return true;
+}
+
 
 HRESULT CEnemy::Ready_Components(void* pArg)
 {

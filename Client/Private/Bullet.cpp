@@ -144,11 +144,14 @@ HRESULT CBullet::Render()
 	return S_OK;
 }
 
-void CBullet::OnCollision(CGameObject* pCollisionHitBy)
+_bool CBullet::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo)
 {
-	__super::OnCollision(pCollisionHitBy);
+	if (__super::OnCollision(pColDescFrom, pColDescTo) == false)
+		return false;
 
 	Add_HitEffect();
+
+	return true;
 }
 
 HRESULT CBullet::Ready_Components(void* pArg)

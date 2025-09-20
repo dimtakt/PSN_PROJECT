@@ -36,6 +36,8 @@ public:
 	HRESULT		Render()							override;
 	HRESULT		Render_Shadow()						override;
 
+	_bool		OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo) override;
+
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..

@@ -562,7 +562,7 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 		fElapsedTime = 0;
 		isPressed = true;
-		fDuration = 0.05f;
+		fDuration = 0.015f;
 	}
 	else if (
 		m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB)
@@ -573,14 +573,14 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 			m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 			fElapsedTime = 0;
 			isPressed = true;
-			fDuration = 0.01f;
+			fDuration = 0.015f;
 		}
 		else if (!pWeaponGun && !(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))		// 총이 없다면 공격중이 아닐 때
 		{
 			m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 			fElapsedTime = 0;
 			isPressed = true;
-			fDuration = 0.01f;
+			fDuration = 0.015f;
 		}
 	}
 	else if (
@@ -591,7 +591,7 @@ void CPlayer::Update_TimeControl(_float fTimeDelta)
 		m_pGameInstance->Req_EditTimeSpeed(1.f, true);
 		fElapsedTime = 0;
 		isPressed = true;
-		fDuration = 0.01f;
+		fDuration = 0.015f;
 	}
 	else if ((fElapsedTime < fDuration) && isPressed)		// 조작을 하지 않는 동안 시간 복원까지 유예 타이머 진행
 	{

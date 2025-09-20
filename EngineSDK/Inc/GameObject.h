@@ -49,7 +49,7 @@ public:
 	virtual HRESULT Render_Shadow() { return S_OK; }
 
 public:
-	virtual void OnCollision(CGameObject* pCollisionHitBy);
+	virtual _bool OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo);
 	virtual void OnCollisionRay(CGameObject* pCollisionHitBy) {};
 
 	// 공격받은 경우 내부적으로 피격 쿨타임을 계산합니다. 선언 필요.

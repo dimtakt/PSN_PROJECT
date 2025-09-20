@@ -49,6 +49,7 @@ HRESULT CCollider::Initialize(void* pArg)
 {
 	CBounding::BOUNDING_DESC* pDesc = static_cast<CBounding::BOUNDING_DESC*>(pArg);
 	m_tColDesc = pDesc->tColDesc;
+	m_tColDesc.pColCom = this;
 
 	switch (m_eType)
 	{
