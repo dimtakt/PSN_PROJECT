@@ -407,7 +407,7 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 	
 			m_vLoadShotDir = vDir;
 
-			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+			//pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
 			m_fElapsedShot = 0.f;
 		}
 		else
@@ -533,8 +533,8 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 			strNameTag[i] == L"RightHand")
 		{
 			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
-				ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK) | ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
-				ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT) | ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK),
+				/*ENUM_CLASS(COLLISION_LAYER::ENEMY_ATK) | */ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+				ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
 				false, this
 			};
 			SphereDesc.tColDesc = colDesc;

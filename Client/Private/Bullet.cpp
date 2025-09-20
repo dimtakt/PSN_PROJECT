@@ -49,7 +49,7 @@ HRESULT CBullet::Initialize(void* pArg)
 	_float fScaled = 2.f;
 	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
 
-	std::cout << "[CBullet::Initialize]BulletIndex " << m_iIndex << " Created!" << std::endl;
+	//std::cout << "[CBullet::Initialize]BulletIndex " << m_iIndex << " Created!" << std::endl;
 
 	return S_OK;
 }

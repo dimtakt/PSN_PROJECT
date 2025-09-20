@@ -763,7 +763,7 @@ void CPlayer::Update_BoneColliders()
 
 	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
 
-	//Update_ToggleColliders();
+	Update_ToggleColliders();
 }
 
 void CPlayer::Update_BoneCollider(CCollider* pCollider, const _char* szBoneName)
@@ -816,9 +816,9 @@ HRESULT CPlayer::Ready_Colliders(void* pArg)
 					strNameTag[i] == L"RightHand"	)
 		{
 			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
-				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
-				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT) | ENUM_CLASS(COLLISION_LAYER::ENEMY_BULLET_ATK),
-				false, this
+				/*ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | */ENUM_CLASS(COLLISION_LAYER::PLAYER_HIT),
+				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
+				false, this	// 이게 공격 중에만 켜지게.?
 			};
 			SphereDesc.tColDesc = colDesc;
 		}
