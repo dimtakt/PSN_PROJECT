@@ -35,8 +35,7 @@ private:
 
 
 private:
-	_float m_fYaw = 0.f;     // 좌우 회전 값 (도)
-	_float m_fPitch = 0.f;   // 상하 회전 값 (도)
+	_float m_fPitch = 0.f;   // 상하 회전 값
 
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

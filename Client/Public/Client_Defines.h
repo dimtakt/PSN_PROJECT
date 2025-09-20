@@ -44,7 +44,7 @@ namespace Client
 		ATK_WEAPON_BLUNT = (1 << 10),
 		ATK_WEAPON_GUN = (1 << 11),
 
-		// 
+		
 
 
 		ENEMY_STATE_END = (1 << 12)

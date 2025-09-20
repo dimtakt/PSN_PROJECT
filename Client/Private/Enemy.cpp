@@ -73,6 +73,8 @@ void CEnemy::Update(_float fTimeDelta)
 
 	Update_BoneColliders();
 
+	Update_LogicInterval(fTimeDelta);
+
 
 	//for (auto& vecColliders : m_vecCollidersCom)
 	//	for (auto& collider : vecColliders)
@@ -97,7 +99,6 @@ void CEnemy::Update(_float fTimeDelta)
 	//	m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 
 
-	Update_LogicInterval(fTimeDelta);
 	__super::Update(fTimeDelta);
 }
 
@@ -198,12 +199,35 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 	{
 		// 몸통에 맞음
 		std::cout << "[CEnemy::OnCollision] Body Collision Detected." << std::endl;
+		
+		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::DMGD_L);
+			m_fGroggy_ElapsedTime = 0.f;
+		}
+		else
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::DMGD_L);
+			m_isGroggy = true;
+		}
 	}
 	else if (pHitCom == CGameObject::Get_Component(L"Com_Collider_Head"))
 	{
 		// 머리에 맞음
 
 		std::cout << "[CEnemy::OnCollision] Head Collision Detected." << std::endl;
+		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::DMGD_U);
+			m_fGroggy_ElapsedTime = 0.f;
+		}
+		else
+		{
+			m_iState = ENUM_CLASS(ENEMY_STATE::DMGD_U);
+			m_isGroggy = true;
+		}
 	}
 
 
@@ -342,7 +366,9 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 	// 근접 공격을 받는 경우도..
 
-	if (m_isLogicTriggered)
+	if (m_isLogicTriggered && 
+		!(m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U)))
 	{
 
 
@@ -407,13 +433,28 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 	
 			m_vLoadShotDir = vDir;
 
-			//pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
 			m_fElapsedShot = 0.f;
 		}
 		else
 			m_fElapsedShot += fTimeDelta;
 	}
 	
+
+	// 공격받은 상태라면
+	if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))
+	{
+		// ksta : 피격 애니메이션 종료 시 공격받음 상태 제거..?
+		CModel::MODEL_ANIM_DESC tUpperDesc = m_pModelCom->Get_PlayingAnimDesc(PART_UPPER);
+		CModel::MODEL_ANIM_DESC tLowerDesc = m_pModelCom->Get_PlayingAnimDesc(PART_LOWER);
+
+		if (!m_isGroggy)
+		{
+			m_iState &= ~ENUM_CLASS(ENEMY_STATE::DMGD_L);
+			m_iState &= ~ENUM_CLASS(ENEMY_STATE::DMGD_U);
+		}
+	}
 
 
 }
@@ -425,8 +466,8 @@ void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 
 		if  (m_iState & ENUM_CLASS(ENEMY_STATE::IDLE))
 		{
-			m_tAnimDesc[PART_UPPER] = { MOVE_U_IDLE, true };
-			m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true };
+			m_tAnimDesc[PART_UPPER] = { MOVE_U_IDLE, true, 0.4f };
+			m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true, 0.4f };
 		
 			//m_pModelCom->Set_Animation(GUN_U_RIFLE_AIM_IDLE, PART_UPPER, true);
 			//m_pModelCom->Set_Animation(GUN_L_RIFLE_AIM_IDLE, PART_LOWER, true);
@@ -453,6 +494,20 @@ void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 		}
 	}
 
+	if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))
+	{
+		if		(m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L))
+		{
+			m_tAnimDesc[PART_UPPER] = { DMGD_U_BIG_STOMACH_HIT, true };
+			m_tAnimDesc[PART_LOWER] = { DMGD_L_BIG_STOMACH_HIT, true };
+		}
+		else if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))
+		{
+			m_tAnimDesc[PART_UPPER] = { DMGD_U_HEAD_HIT, true};
+			m_tAnimDesc[PART_LOWER] = { DMGD_L_HEAD_HIT, true};
+		}
+	}
 
 	m_pModelCom->Set_Animation(m_tAnimDesc[PART_UPPER].iAnimIndex, PART_UPPER, m_tAnimDesc[PART_UPPER].isAnimLoop, m_tAnimDesc[PART_UPPER].fTransitionTime);
 	m_pModelCom->Set_Animation(m_tAnimDesc[PART_LOWER].iAnimIndex, PART_LOWER, m_tAnimDesc[PART_LOWER].isAnimLoop, m_tAnimDesc[PART_LOWER].fTransitionTime);
@@ -472,6 +527,17 @@ void CEnemy::Update_LogicInterval(_float fTimeDelta)
 		m_fLogic_ResetIntervalTime = m_pGameInstance->Rand(fIntervalRange[0], fIntervalRange[1]);
 
 		//std::cout << "[Enemy::Update_LogicInterval] Logic Triggered!" << std::endl;
+	}
+
+	if (m_isGroggy == true)
+	{
+		m_fGroggy_ElapsedTime += fTimeDelta;
+
+		if (m_fGroggy_ElapsedTime >= m_fGroggyTime)
+		{
+			m_isGroggy = false;
+			m_fGroggy_ElapsedTime = 0;
+		}
 	}
 }
 

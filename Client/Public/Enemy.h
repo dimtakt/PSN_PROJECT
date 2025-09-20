@@ -90,6 +90,9 @@ private:
 
 	_vector				m_vLoadShotDir		= {};
 
+	_bool				m_isGroggy			= false;
+	_float				m_fGroggy_ElapsedTime = {};
+	const _float		m_fGroggyTime		= 0.55f;
 
 public:
 	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
