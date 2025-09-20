@@ -72,7 +72,6 @@ void CEnemy::Update(_float fTimeDelta)
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 
 	Update_BoneColliders();
-
 	Update_LogicInterval(fTimeDelta);
 
 
@@ -396,9 +395,9 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 		}
 		else				// [ X ]	든 무기 없음
 		{
-			if (isNearExistWeapon)
+			if (isNearExistWeapon)	//	근처에 무기 감지
 				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON);
-			else
+			else					//	근처에 무기가 없다면
 			{
 				if (fDist >= 20.f)
 				{
@@ -419,25 +418,23 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 		}
 
 
-	}
-
-
-	if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
-	{
-		if (pWeaponGun != nullptr && m_fElapsedShot > fShotInterval)
+		if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
 		{
-			// 날아갈 방향 계산
-			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
+			if (pWeaponGun != nullptr && m_fElapsedShot > fShotInterval)
+			{
+				// 날아갈 방향 계산
+				_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
 
-			_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
+				_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
 	
-			m_vLoadShotDir = vDir;
+				m_vLoadShotDir = vDir;
 
-			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
-			m_fElapsedShot = 0.f;
+				pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+				m_fElapsedShot = 0.f;
+			}
+			else
+				m_fElapsedShot += fTimeDelta;
 		}
-		else
-			m_fElapsedShot += fTimeDelta;
 	}
 	
 
@@ -446,9 +443,10 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))
 	{
 		// ksta : 피격 애니메이션 종료 시 공격받음 상태 제거..?
-		CModel::MODEL_ANIM_DESC tUpperDesc = m_pModelCom->Get_PlayingAnimDesc(PART_UPPER);
-		CModel::MODEL_ANIM_DESC tLowerDesc = m_pModelCom->Get_PlayingAnimDesc(PART_LOWER);
+		//CModel::MODEL_ANIM_DESC tUpperDesc = m_pModelCom->Get_PlayingAnimDesc(PART_UPPER);
+		//CModel::MODEL_ANIM_DESC tLowerDesc = m_pModelCom->Get_PlayingAnimDesc(PART_LOWER);
 
+		// 그냥 자체 그로기 쿨타임 적용..
 		if (!m_isGroggy)
 		{
 			m_iState &= ~ENUM_CLASS(ENEMY_STATE::DMGD_L);
