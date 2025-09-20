@@ -412,8 +412,8 @@ HRESULT CLoader::Loading_For_Stages()
 	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		HitEffectDesc{};
 	HitEffectDesc.iNumInstance	= 50;
 	HitEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
-	HitEffectDesc.vRange		= _float3(0.25f, 0.25f, 0.25f);
-	HitEffectDesc.vSize			= _float2(0.12f, 0.2f);
+	HitEffectDesc.vRange		= _float3(0.5f, 0.5f, 0.5f);
+	HitEffectDesc.vSize			= _float2(0.24f, 0.4f);
 	HitEffectDesc.vLifeTime		= _float2(0.6f, 1.0f);
 	HitEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
 	HitEffectDesc.vSpeed		= _float2(0.08f, 0.12f);
