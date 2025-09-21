@@ -69,8 +69,12 @@ void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
         return;
 
     Add_Bullet(pDir, iObjTypeIndex);
-    m_iCurBullets--;
-    std::cout << "[CWeapon_Gun::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
+
+    if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+    {
+        m_iCurBullets--;
+        std::cout << "[CWeapon_Gun::Shot] Current Left Bullets : " << m_iCurBullets << std::endl;
+    }
 
     Add_ShotEffect();
 }

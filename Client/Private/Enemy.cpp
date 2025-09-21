@@ -4,6 +4,12 @@
 #include "Weapon_Karabin.h"
 #include "Weapon_Pistol.h"
 #include "Weapon_Shotgun.h"
+#include "CustomObj_Pickupable.h"
+
+
+//#define _TESTDEFAULTWEAPON
+
+
 
 CEnemy::CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject( pDevice, pContext )
@@ -36,11 +42,14 @@ HRESULT CEnemy::Initialize(void* pArg)
 	m_pModelCom->Add_Animation();
 	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 
-	if (FAILED(Ready_PartObjects()))
+#ifdef _TESTDEFAULTWEAPON
+
+	if (FAILED(Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL))))
 		return E_FAIL;
 	if (m_pPart_Weapon)
 		static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
 
+#endif // _TESTDEFAULTWEAPON
 	m_iMaxHp	= 3;
 	m_iHp		= 3;	// ksta : 일정 시간 공격받지 않으면 다시 최대 체력으로 회복되어야 함.
 	
@@ -63,13 +72,14 @@ void CEnemy::Update(_float fTimeDelta)
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
 
-	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
-	if (!pWeaponGun)
-		Update_NearestWeapons();
+
 
 	Update_Transform(fTimeDelta);
+	Update_NearestWeapons();
+
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
+	Update_Interact(fTimeDelta);
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 
@@ -317,10 +327,8 @@ HRESULT CEnemy::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CEnemy::Ready_PartObjects()
+HRESULT CEnemy::Ready_PartObject(_uint iObjType, void* pArg)
 {
-	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
-
 	CWeapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pState = &m_iState;
 	WeaponDesc.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHand");
@@ -328,9 +336,25 @@ HRESULT CEnemy::Ready_PartObjects()
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Karabin"), &WeaponDesc)))
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Pistol"), &WeaponDesc)))
 		return E_FAIL;
 	
+	//if (pArg)
+	//	WeaponDesc.iCurLeftBullets = static_cast<CWeapon_Gun::GUNINFO_DESC*>(pArg)->iCurLeftBullets;
+
+	//_wstring strObjPrototypeTag = {};
+	//switch (iObjType)
+	//{
+	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Karabin";	break;
+	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Pistol";		break;
+	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Shotgun";	break;
+	//default:
+	//	break;
+	//}
+
+	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), strObjPrototypeTag, &WeaponDesc)))
+	//	return E_FAIL;
+
 	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Enemy");
 
 	return S_OK;
@@ -428,12 +452,7 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 		if (pWeaponGun)		// [총]		무기 들고 있음
 		{
-			if (fDist >= 80.f)								// [Idle]	멀리 있음 
-			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
-				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-			}
-			else if (IS_BETWEEN(fDist, 50.f, 80.f))			// [Track]	적당히 가까이 있음
+			if (IS_BETWEEN(fDist, 50.f, 80.f))				// [Track]	적당히 가까이 있음
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
 				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
@@ -441,6 +460,11 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 			else if (IS_BETWEEN(fDist, 0.f, 50.f))			// [Aiming]	가까이 있음
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
+				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
+			}
+			else if (fDist >= 70.f)							// [Idle]	멀리 있음 
+			{
+				m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
 				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
 			}
 		}
@@ -462,7 +486,7 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 					m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
 					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
 				}
-				else if (IS_BETWEEN(fDist, 10.f, 40.f))
+				else if (IS_BETWEEN(fDist, 10.f, 20.f))
 				{
 					m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
 					m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
@@ -543,6 +567,11 @@ void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 		}
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
 		{
+			//switch (m_pPart_Weapon->Get_ObjType().)
+			//{
+			//default:
+			//	break;
+			//}
 			m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };
 
 			if (!(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE)))
@@ -594,6 +623,42 @@ void CEnemy::Update_LogicInterval(_float fTimeDelta)
 			m_isGroggy = false;
 			m_fGroggy_ElapsedTime = 0;
 		}
+	}
+}
+
+void CEnemy::Update_Interact(_float fTimeDelta)
+{
+	if (!(
+		m_pPart_Weapon == nullptr &&
+		(m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON)) &&
+		m_pNearestWeapon != nullptr
+		))
+		return;
+
+	_float fPickupableDist = 10.f;
+
+	CTransform* pNearestWeaponTransform = dynamic_cast<CTransform*>(m_pNearestWeapon->Get_Component(L"Com_Transform"));
+	_float fDist = XMVectorGetX(XMVector3Length(pNearestWeaponTransform->Get_Position() - m_pTransformCom->Get_Position()));
+
+
+	if (fDist /* 적과 무기 간의 거리 계산 후 조건 삽입 */< fPickupableDist)
+	{
+		_uint iRayObjType = m_pNearestWeapon->Get_ObjType();		// 이거 가져와서 레이 대상에 따라 바뀌도록
+		CWeapon_Gun::GUNINFO_DESC tGunDesc = {};
+
+		_bool isGun = false;
+		if (iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN) ||
+			iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL) ||
+			iRayObjType == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN))
+		{
+			isGun = true;
+			tGunDesc = dynamic_cast<CCustomObj_Pickupable*>(m_pNearestWeapon)->Get_GunInfoDesc();
+		}
+
+		if (isGun)	Ready_PartObject(iRayObjType, &tGunDesc);
+		else		Ready_PartObject(iRayObjType);
+
+		m_pNearestWeapon->OnCollisionRay(this);
 	}
 }
 
@@ -720,6 +785,7 @@ void CEnemy::Update_NearestWeapons()
 {
 	// 가진 무기가 없을 때만 탐색
 	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+	m_pNearestWeapon = nullptr;
 	if (pWeaponGun) return;
 
 

@@ -343,7 +343,7 @@ HRESULT CPlayer::Ready_PartObject(_uint iObjType, void* pArg)
 	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Player");
 	
 	return S_OK;
-} // Remove도 만들기?
+}
 
 void CPlayer::Update_Transform(_float fTimeDelta)
 {

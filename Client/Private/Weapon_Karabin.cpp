@@ -81,16 +81,11 @@ void CWeapon_Karabin::Update(_float fTimeDelta)
     //__super::Update(fTimeDelta);
 
 
-    // 수동 Update. m_pTransform 은 로컬 트랜스폼이 되어야 하는데..
-
     if      (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
     {
         const _float4x4* matCam = m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW);
         XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(matCam));
-
-
     }
-    
     else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
     {
         _matrix     BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);

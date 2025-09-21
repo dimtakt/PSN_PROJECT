@@ -40,8 +40,11 @@ public:
 
 	void		OnCollisionRay(CGameObject* pCollisionHitBy)					override;
 	
+public:
+	// 퍼블릭 함수들 (Get/Set 등..)
 	CWeapon_Gun::GUNINFO_DESC Get_GunInfoDesc() { return m_tGunInfoDesc; }
-
+	_bool		Get_IsPickingUp() { return m_isPickingUp; }
+	
 private:
 	// 로컬 함수들 (기능 분리)
 	HRESULT		Ready_Components(void* pArg);

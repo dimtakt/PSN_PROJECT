@@ -2,6 +2,7 @@
 #include "Gameinstance.h"
 
 #include "Player.h"
+#include "Enemy.h"
 #include "PartObject.h"
 #include "Weapon.h"
 
@@ -131,7 +132,14 @@ void CCustomObj_Pickupable::OnCollisionRay(CGameObject* pCollisionHitBy)
         m_isPickingUp = true;
         m_pCollByTarget = pCollisionHitBy;
 
-        std::cout << "[CustomObj_Pickupable::OnCollisionRay] CollisionRay Event Called. Hit by Player!" << std::endl;
+        //std::cout << "[CustomObj_Pickupable::OnCollisionRay] CollisionRay Event Called. Hit by Player!" << std::endl;
+    }
+    else if (iCollisionObjType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+    {
+        m_isPickingUp = true;
+        m_pCollByTarget = pCollisionHitBy;
+
+        std::cout << "[CustomObj_Pickupable::OnCollisionRay] CollisionRay Event Called. by Enemy!" << std::endl;
     }
     //else if (iCollisionObjType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
     //{
@@ -287,10 +295,54 @@ void CCustomObj_Pickupable::Update_PickingUp(_float fTimeDelta)
             //m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", this);
         }
     } break;
-    //case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
-    //{
+    case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
+    {
+        // Enemy는 TimeDelta 기반, 이동 상태 반영
+        m_fPickingElapsedTime += fTimeDelta;
+        _float fLeftTime = max(0.0f, m_fPickingMaxTime - m_fPickingElapsedTime);
+        _float fRatio = min(1.0f, fTimeDelta / fLeftTime);
+        //std::cout << "[CustomObj_Pickupable::Update_PickingUp] fRatio : " << fRatio << std::endl;
 
-    //} break;
+        _float3 vPos = {}, vRot = {}, vSca = {};
+        _float3 vDestPos = {}, vDestRot = {}, vDestSca = {};
+        _float3 vCalcPos = {}, vCalcRot = {}, vCalcSca = {};
+
+        CEnemy* pEnemy = dynamic_cast<CEnemy*>(m_pCollByTarget);
+        if (nullptr == pEnemy->Get_WeaponPart())
+            return;
+
+
+        //CTransform* pTargetTransform = dynamic_cast<CTransform*>(pPlayer->Get_WeaponPart()->Get_Component(L"Com_Transform"));
+        _float4x4 matWeaponMatrix = pEnemy->Get_WeaponPart()->Get_CombinedMatrix();
+
+        _vector vLoadDestPos = {}, vLoadDestRot = {}, vLoadDestSca = {};
+        XMMatrixDecompose(&vLoadDestSca, &vLoadDestRot, &vLoadDestPos, XMLoadFloat4x4(&matWeaponMatrix));
+
+        XMStoreFloat3(&vDestPos, vLoadDestPos);
+        _float4x4 matTmpRot; XMStoreFloat4x4(&matTmpRot, QUAT_TO_MAT(vLoadDestRot));
+        vDestRot = MAT_TO_ROT(matTmpRot);
+        XMStoreFloat3(&vDestSca, vLoadDestSca);
+
+        vPos = m_pTransformCom->Get_Position_Store();
+        vRot = m_pTransformCom->Get_RotationEuler_Store();
+        vSca = m_pTransformCom->Get_Scale_Store();
+
+        XMStoreFloat3(&vCalcPos, XMLoadFloat3(&vPos) * (1 - fRatio) + XMLoadFloat3(&vDestPos) * (fRatio));
+        XMStoreFloat3(&vCalcRot, XMLoadFloat3(&vRot) * (1 - fRatio) + XMLoadFloat3(&vDestRot) * (fRatio));
+        XMStoreFloat3(&vCalcSca, XMLoadFloat3(&vSca) * (1 - fRatio) + XMLoadFloat3(&vDestSca) * (fRatio));
+
+        m_pTransformCom->Set_Scale_Direct(vCalcSca);
+        m_pTransformCom->Set_Rotation_DirectEuler(vCalcRot);
+        m_pTransformCom->Set_Position_Direct(vCalcPos);
+
+        // 파괴
+        if (m_fPickingElapsedTime > m_fPickingMaxTime)  // 일정 시간이 다 지났으면
+        {
+            dynamic_cast<CWeapon*>(pEnemy->Get_WeaponPart())->Set_toAttached(true);
+            m_isDead = true;
+            //m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", this);
+        }
+    } break;
     default:
     {
 
