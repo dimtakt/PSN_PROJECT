@@ -28,6 +28,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Cursor_Lock();
+
+private:
 	_float			m_fMouseSensor = { };
 
 	_bool			m_isFreeMode = false;

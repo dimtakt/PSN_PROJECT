@@ -44,6 +44,8 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     // Free Move
     if (m_isFreeMode)
     {
+        ShowCursor(TRUE);
+
         if (m_pGameInstance->Get_IsKeyPressing(DIK_UP))
             m_pTransformCom->Go_Straight(fRawTimeDelta);
         if (m_pGameInstance->Get_IsKeyPressing(DIK_DOWN))
@@ -56,6 +58,9 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     // Player Attached
     else
     {
+        Cursor_Lock();
+        ShowCursor(FALSE);
+
         _uint iDestLevel = m_pGameInstance->Get_DestLevel();
         m_pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
 
@@ -107,6 +112,19 @@ void CCamera_Player::Late_Update(_float fTimeDelta)
 HRESULT CCamera_Player::Render()
 {
     return S_OK;
+}
+
+void CCamera_Player::Cursor_Lock()
+{
+    RECT rect;
+    GetClientRect(g_hWnd, &rect);
+
+    _int iX = (rect.right - rect.left) / 2;
+    _int iY = (rect.bottom - rect.top) / 2;
+
+    POINT pt{ iX, iY };
+    ClientToScreen(g_hWnd, &pt);
+    SetCursorPos(pt.x, pt.y);
 }
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
