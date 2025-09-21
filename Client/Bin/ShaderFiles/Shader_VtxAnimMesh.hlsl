@@ -160,11 +160,11 @@ PS_OUT PS_MAIN_FADEOUT(PS_IN In)
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    // Y 좌표 기준 디졸브
+    // Y 좌표 기준 페이드아웃..
     
     //const float gSpeed = 0.3f;
     const float fFadeWidth = 1.f;
-    const float fFadeSpeed = 8.f;
+    const float fFadeSpeed = 12.f;
     
     float fFadeStartHeight = g_fFadeDeltaRatio * fFadeSpeed;
     float fHeightDiff = In.vWorldPos.y - fFadeStartHeight;

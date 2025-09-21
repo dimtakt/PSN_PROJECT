@@ -59,11 +59,11 @@ private:
 
 private:
 	void		Update_BoneCollider(CCollider* pCollider, const _char* szBoneName);
+	void		Update_ToggleColliders();
 	
 	HRESULT		Ready_Colliders(void* pArg);
 
-private:
-	void		Update_ToggleColliders();
+	void		Update_NearestWeapons();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
@@ -95,6 +95,10 @@ private:
 	const _float		m_fGroggyTime		= 0.55f;
 
 	_float				m_fDeadDeltaTime	= 0.f;
+
+private:
+	// 근처 무기 탐색용
+	CGameObject*		m_pNearestWeapon	= { nullptr };
 
 public:
 	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
