@@ -75,8 +75,8 @@ void CEnemy::Update(_float fTimeDelta)
 
 
 
-	Update_Transform(fTimeDelta);
 	Update_NearestWeapons();
+	Update_Transform(fTimeDelta);
 
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
@@ -379,7 +379,7 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
 	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
 	CTransform* pNearestWeaponTransformCom = (m_pNearestWeapon)? dynamic_cast<CTransform*>(m_pNearestWeapon->Get_Component(L"Com_Transform")) : nullptr;
-
+	
 	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
 
 	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
@@ -396,7 +396,8 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
 			vTargetDir = XMVector3Normalize(pPlayerTransformCom->Get_Position() - m_pTransformCom->Get_Position()); // 목표 위치 방향
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-			vTargetDir = XMVector3Normalize(pNearestWeaponTransformCom->Get_Position() - m_pTransformCom->Get_Position());
+			if (m_pNearestWeapon)
+				vTargetDir = XMVector3Normalize(pNearestWeaponTransformCom->Get_Position() - m_pTransformCom->Get_Position());
 
 		_float vDeg = TO_DEG(acosf(XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir))));	// 바라보는 방향과 목표물의 각도 차이
 
@@ -413,7 +414,8 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
 			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-			m_pTransformCom->Chase(pNearestWeaponTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
+			if (m_pNearestWeapon)
+				m_pTransformCom->Chase(pNearestWeaponTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
 
 
 
@@ -421,8 +423,11 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 
 	if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
 	{
-		_vector vWeaponPos = pNearestWeaponTransformCom->Get_Position();
-		m_pTransformCom->LookAt(XMVectorSetY(vWeaponPos, m_pTransformCom->Get_Position_Store().y));
+		if (m_pNearestWeapon)
+		{
+			_vector vWeaponPos = pNearestWeaponTransformCom->Get_Position();
+			m_pTransformCom->LookAt(XMVectorSetY(vWeaponPos, m_pTransformCom->Get_Position_Store().y));
+		}
 	}
 	else 
 		m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
