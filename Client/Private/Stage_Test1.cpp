@@ -167,7 +167,7 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 	CGameObject::GAMEOBJECT_DESC GameObjDesc{};
 
 	GameObjDesc.fRotationPerSec = XMConvertToRadians(180.f);
-	GameObjDesc.fSpeedPerSec = 10.f;
+	GameObjDesc.fSpeedPerSec = 15.f;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))

@@ -29,6 +29,7 @@ public:
 	void Set_isActive(_bool isActive)	{ m_tColDesc.isActive = isActive; }
 	void Set_LayerIndex(_uint iLayer)	{ m_tColDesc.iLayerIndex = iLayer; }
 	void Set_LayerMask(_uint iMask)		{ m_tColDesc.iMask = iMask; }
+	void Set_Owner(CGameObject* pOwner)	{ m_tColDesc.pOwner = pOwner; }
 
 
 #ifdef _DEBUG

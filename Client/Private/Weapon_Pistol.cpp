@@ -44,8 +44,8 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
     {
         matScale = XMMatrixScaling(1.f, 1.f, 1.f);
         matRot1 = XMMatrixRotationX(TO_RAD(100));
-        matRot2 = XMMatrixRotationZ(TO_RAD(215));
-        matPos = XMMatrixTranslation(+0.f, +0.f, 0.f);  // 오-뒤 - 왼-앞 - 위
+        matRot2 = XMMatrixRotationZ(TO_RAD(220));
+        matPos = XMMatrixTranslation(-0.09f, +0.12f, 0.f);  // 왼-뒤 - 왼-앞 - 위 (적 시점 기준)
     }
 
 

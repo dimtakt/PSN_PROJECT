@@ -81,12 +81,17 @@ void CWeapon_Gun::Shot(_vector* pDir, _uint iObjTypeIndex)
 
 void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
 {
+    // ==============================
+    // || 플레이어가 "던지는" 경우 || .. 에는 콜라이더가 활성화되며 충돌 판정으로 작동하도록.
+    // ==============================
+
     // 현재 위치로부터 던지는 오브젝트 생성되도록 진행,
     // 해당 오브젝트는 pickupable 클래스이며, 잔탄 정보를 들고 있을 것임
 
+
+
     _matrix matStartTransform = m_pTransformCom->Get_WorldMatrix();
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
-
 
 
     // Create Pickupables...
@@ -115,16 +120,64 @@ void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint i
         MSG_BOX(L"[CWeapon_Gun::Throw] Pickupable Object Create Failed.");
 
     // 생성한 pickupable 오브젝트의 Transform
+    CGameObject* pPickupObj = m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable");
+    CTransform* pObjTransformCom = static_cast<CTransform*>((pPickupObj->Get_Component(L"Com_Transform")));
+    pObjTransformCom->Set_WorldMatrix(m_CombinedWorldMatrix);
+
+    // 생성한 pickupable 오브젝트의 콜라이더 설정. 플레이어가 던진다 가정
+    vector<CCollider*>* vecObjColliders = pPickupObj->Get_Colliders();
+    for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
+        for (auto& collider : vecObjColliders[i])
+        {
+            collider->Set_LayerIndex(ENUM_CLASS(COLLISION_LAYER::THROWN));
+            collider->Set_LayerMask(ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT));
+            collider->Set_isActive(true);
+        }
+
+}
+
+void CWeapon_Gun::Drop(_vector* pDir, _float fThrowPower, _vector vRot, _uint iObjTypeIndex)
+{
+    // ==============================
+    // || 적이 드랍하는 경우        || .. 에는 현행유지. 줍기 가능한 무기로.
+    // ==============================
+
+    // 현재 위치로부터 던지는 오브젝트 생성되도록 진행,
+    // 해당 오브젝트는 pickupable 클래스이며, 잔탄 정보를 들고 있을 것임
+
+    _matrix matStartTransform = m_pTransformCom->Get_WorldMatrix();
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+
+
+    // Create Pickupables...
+
+    _wstring strModelPrototypeTag = {};
+    switch (iObjTypeIndex)
+    {
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";     break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Pistol_Fixed";      break;
+    case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+        strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Shotgun_Fixed";     break;
+    }
+
+    CCustomObj_Pickupable::THROWN_PICKUPOBJ_DESC tDesc = {};
+    tDesc.strModelComPrototypeTag = strModelPrototypeTag;
+    tDesc.iGameObjType = iObjTypeIndex;
+
+    tDesc.vThrowDir = *pDir * fThrowPower;
+    tDesc.vThrowRot = vRot;
+    tDesc.tGunInfoDesc.iCurLeftBullets = m_iCurBullets;
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable",
+        ENUM_CLASS(LEVEL::STATIC), L"Prototype_GameObject_Pickupable", &tDesc)))
+        MSG_BOX(L"[CWeapon_Gun::Throw] Pickupable Object Create Failed.");
+
+    // 생성한 pickupable 오브젝트의 Transform
     CTransform* pObjTransformCom = static_cast<CTransform*>((m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable")->Get_Component(L"Com_Transform")));
     pObjTransformCom->Set_WorldMatrix(m_CombinedWorldMatrix);
-   
-
-    // 이걸로 멀하려고했지?
-    // 원래 쓰던 총의 정보가 들어있ㅇ므
-
-    // 아마 잔탄 정보는 이쪽에 있었던거같은데..
-
-
 }
 
 void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)

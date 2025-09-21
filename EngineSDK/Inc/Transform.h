@@ -76,7 +76,7 @@ public:
 	void Rotation(_fvector vAxis, _float fRadian);	// 회전 (절대적, 해당 수치 변경)
 	void Turn(_fvector vAxis, _float fTimeDelta);	// 회전 (상대적, 현재 대비 변경)
 	void LookAt(_fvector vAt);						// 해당 방향을 바라보도록 회전
-	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f); // 머임? 타겟한테 쫒아오는거인듯
+	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f, CNavigation* pNavigation = nullptr); // 머임? 타겟한테 쫒아오는거인듯
 
 
 

@@ -57,22 +57,18 @@ void CCustomObj_Pickupable::Update(_float fTimeDelta)
     // 벡터분리 해서 현재 transform에 변화주도록
 
     m_pTransformCom->Set_Position_Direct(m_pTransformCom->Get_Position() + m_pThrowDir * fTimeDelta);
-    //
-    //_matrix matRotation = QUAT_TO_MAT(m_pThrowRot);
-    //_float4x4 matStoreRotation;
-    //XMStoreFloat4x4(&matStoreRotation, matRotation);
-    //_float3 vRotationEuler = MAT_TO_ROT(matStoreRotation);
-    //
-    //_float3 vDeltaRot;
-    //XMStoreFloat3(&vDeltaRot, XMLoadFloat3(&vRotationEuler) * fTimeDelta);   //
-    //
-    //_float3 vCurRotationEuler = m_pTransformCom->Get_RotationEuler_Store();
-    //_float3 vCalcedRotation;
-    //XMStoreFloat3(&vCalcedRotation, XMLoadFloat3(&vCurRotationEuler) + XMLoadFloat3(&vDeltaRot)); //
-    //
-    //m_pTransformCom->Set_Rotation_DirectEuler(vCalcedRotation);
+    
 
+    _vector vEulerDelta = m_pThrowRot * fTimeDelta;  // 이번 프레임에 회전할 양 (degree)
+    _vector qDelta = ROT_TO_QUAT(   TO_RAD(XMVectorGetX(vEulerDelta)),
+                                    TO_RAD(XMVectorGetY(vEulerDelta)),
+                                    TO_RAD(XMVectorGetZ(vEulerDelta)));
 
+    _vector qCur = m_pTransformCom->Get_RotationQuat();
+    _vector qCalced = XMQuaternionMultiply(qCur, qDelta);
+    qCalced = XMQuaternionNormalize(qCalced);
+
+    m_pTransformCom->Set_Rotation_DirectQuat(qCalced);
 
     m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
 }
@@ -90,6 +86,16 @@ void CCustomObj_Pickupable::Late_Update(_float fTimeDelta)
                 return;
         }
 #endif
+
+
+
+
+    if (m_isDeadStandby)
+    {
+        for (auto& vecColliders : m_vecCollidersCom)
+            for (auto& collider : vecColliders)
+                collider->Set_isActive(false);
+    }
 }
 
 HRESULT CCustomObj_Pickupable::Render()
@@ -112,6 +118,19 @@ HRESULT CCustomObj_Pickupable::Render()
     }
 
     return S_OK;
+}
+
+_bool CCustomObj_Pickupable::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo)
+{
+    // 1. 이펙트 추가
+    // 2. 사망 타이머 작동, 작동 중 사라짐
+    // 3. 사망 타이머 채워질 시 사망 및 삭제
+    Add_HitEffect();
+    m_isDeadStandby = true;
+    
+    m_isDead = true; // 임시
+
+    return true;
 }
 
 void CCustomObj_Pickupable::OnCollisionRay(CGameObject* pCollisionHitBy)
@@ -351,6 +370,20 @@ void CCustomObj_Pickupable::Update_PickingUp(_float fTimeDelta)
     }
 }
 
+void CCustomObj_Pickupable::Add_HitEffect()
+{
+    _matrix matBulletTransform = m_pTransformCom->Get_WorldMatrix();
+    _uint iDestLevel = m_pGameInstance->Get_DestLevel();
+    const _wstring strEffectTag = L"Layer_Particle_HitEffect";
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strEffectTag,
+        iDestLevel, TEXT("Prototype_GameObject_Particle_HitEffect"))))
+        MSG_BOX(L"이펙트 생성 실패");
+
+    CGameObject* pEffectObj = m_pGameInstance->Get_LastGameObject(iDestLevel, strEffectTag);
+    CTransform* pEffectTransform = dynamic_cast<CTransform*>(pEffectObj->Get_Component(L"Com_Transform"));
+    pEffectTransform->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix());
+}
 
 CCustomObj_Pickupable* CCustomObj_Pickupable::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

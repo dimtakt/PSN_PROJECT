@@ -204,9 +204,10 @@ namespace Client
 
 
 		PICKUPABLE	= (1 << 6),
+		THROWN		= (1 << 7),
 		
 
-		END			= (1 << 7)
+		END			= (1 << 8)
 	};
 
 

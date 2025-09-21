@@ -7,7 +7,7 @@
 #include "CustomObj_Pickupable.h"
 
 
-//#define _TESTDEFAULTWEAPON
+#define _TESTDEFAULTWEAPON
 
 
 
@@ -71,6 +71,7 @@ void CEnemy::Update(_float fTimeDelta)
 {
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
+
 
 
 
@@ -265,7 +266,18 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 		}
 	}
 
+	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+	if (pWeaponGun)
+	{
+		_float fThrowPower = 2.5f;
+		pWeaponGun->Drop(&m_vLoadShotDir, fThrowPower, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
 
+		// 현재 사용중인 무기 삭제
+		Remove_PartObject(L"Part_Weapon_Enemy");
+		m_pPart_Weapon = nullptr;
+	}
+
+	Update_NearestWeapons();
 
 	return true;
 }
@@ -336,24 +348,24 @@ HRESULT CEnemy::Ready_PartObject(_uint iObjType, void* pArg)
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentTarget = this;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Pistol"), &WeaponDesc)))
-		return E_FAIL;
-	
-	//if (pArg)
-	//	WeaponDesc.iCurLeftBullets = static_cast<CWeapon_Gun::GUNINFO_DESC*>(pArg)->iCurLeftBullets;
-
-	//_wstring strObjPrototypeTag = {};
-	//switch (iObjType)
-	//{
-	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Karabin";	break;
-	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Pistol";		break;
-	//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Shotgun";	break;
-	//default:
-	//	break;
-	//}
-
-	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), strObjPrototypeTag, &WeaponDesc)))
+	//if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Pistol"), &WeaponDesc)))
 	//	return E_FAIL;
+	
+	if (pArg)
+		WeaponDesc.iCurLeftBullets = static_cast<CWeapon_Gun::GUNINFO_DESC*>(pArg)->iCurLeftBullets;
+
+	_wstring strObjPrototypeTag = {};
+	switch (iObjType)
+	{
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Karabin";	break;
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Pistol";		break;
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):	strObjPrototypeTag = L"Prototype_GameObject_Weapon_Shotgun";	break;
+	default:
+		break;
+	}
+
+	if (FAILED(__super::Add_PartObject(TEXT("Part_Weapon_Enemy"), ENUM_CLASS(LEVEL::STATIC), strObjPrototypeTag, &WeaponDesc)))
+		return E_FAIL;
 
 	m_pPart_Weapon = Find_PartObject(L"Part_Weapon_Enemy");
 
@@ -399,16 +411,19 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 
 
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
-			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f);
+			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-			m_pTransformCom->Chase(pNearestWeaponTransformCom->Get_Position(), fTimeDelta, 0.5f);
+			m_pTransformCom->Chase(pNearestWeaponTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
 
 
 
 	}
 
 	if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-		m_pTransformCom->LookAt(pNearestWeaponTransformCom->Get_Position());
+	{
+		_vector vWeaponPos = pNearestWeaponTransformCom->Get_Position();
+		m_pTransformCom->LookAt(XMVectorSetY(vWeaponPos, m_pTransformCom->Get_Position_Store().y));
+	}
 	else 
 		m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
 
@@ -567,15 +582,26 @@ void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 		}
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
 		{
-			//switch (m_pPart_Weapon->Get_ObjType().)
+			//switch (m_pPart_Weapon->Get_ObjType())
 			//{
-			//default:
-			//	break;
+			//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+			//	m_tAnimDesc[PART_UPPER] = { GUN_U_DISARMED, true };				break;
+			//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+			//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+				m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };		//break;
 			//}
-			m_tAnimDesc[PART_UPPER] = { GUN_U_RIFLE_AIM_IDLE, true };
 
 			if (!(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE)))
-				m_tAnimDesc[PART_LOWER] = { GUN_L_RIFLE_AIM_IDLE , true };
+			{
+				//switch (m_pPart_Weapon->Get_ObjType())
+				//{
+				//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+				//	m_tAnimDesc[PART_LOWER] = { GUN_L_DISARMED, true };				break;
+				//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+				//case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+					m_tAnimDesc[PART_LOWER] = { GUN_L_RIFLE_AIM_IDLE, true };		//break;
+				//}
+			}
 		}
 	}
 
@@ -628,10 +654,13 @@ void CEnemy::Update_LogicInterval(_float fTimeDelta)
 
 void CEnemy::Update_Interact(_float fTimeDelta)
 {
+	// 무기 가까이에 있으면 줍도록
+
 	if (!(
 		m_pPart_Weapon == nullptr &&
 		(m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON)) &&
-		m_pNearestWeapon != nullptr
+		m_pNearestWeapon != nullptr &&
+		!m_isDeadStandby
 		))
 		return;
 
@@ -711,7 +740,7 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 		{
 			colDesc = {					// 콜라이더 충돌 레이어 및 대상 정의
 				ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
-				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK),
+				ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK) | ENUM_CLASS(COLLISION_LAYER::THROWN),
 				true, this
 			};
 			SphereDesc.tColDesc = colDesc;
@@ -740,7 +769,7 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 	colDesc = {
 		ENUM_CLASS(COLLISION_LAYER::ENEMY_HIT),
-		ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK),
+		ENUM_CLASS(COLLISION_LAYER::PLAYER_ATK) | ENUM_CLASS(COLLISION_LAYER::PLAYER_BULLET_ATK) | ENUM_CLASS(COLLISION_LAYER::THROWN),
 		true, this
 	};
 	OBBDesc.tColDesc = colDesc;
@@ -800,6 +829,20 @@ void CEnemy::Update_NearestWeapons()
 	{
 		CGameObject* pWeapon = m_pGameInstance->Find_GameObject(iDestLevel, strWeaponLayerTag, iIndex++);
 		if (pWeapon == nullptr) break;
+
+
+		// 콜라이더 있는지 검사. 없으면 throw 된 것으로 간주하고 포함 X
+		_bool isOnColliders = false;
+		vector<CCollider*>* vecColliders = pWeapon->Get_Colliders();
+		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
+			for (auto& collider : vecColliders[i])
+				if (collider->Get_ColDesc().isActive &&
+					isOnColliders == false)
+					isOnColliders = true;
+
+		if (!isOnColliders)
+			continue;
+
 		vecDroppedWeapons.push_back(pWeapon);
 	}
 

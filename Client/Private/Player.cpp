@@ -634,6 +634,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		}
 		else
 		{
+			// 무기 줍기
 			_float fPickupableDist = 20.f;
 
 			RAYCOLLISION_DESC tRayDesc = {};
@@ -688,7 +689,8 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			_float fThrowPower = 3.f;
 
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
-			pWeaponGun->Throw(&m_vLoadShotDir, fThrowPower, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
+			_vector vRot = ROT_TO_QUAT(TO_RAD(50.f), TO_RAD(50.f), TO_RAD(50.f));
+			pWeaponGun->Throw(&m_vLoadShotDir, fThrowPower, vRot, pWeaponGun->Get_ObjType());
 
 			// 현재 사용중인 무기 삭제
 			Remove_PartObject(L"Part_Weapon_Player");

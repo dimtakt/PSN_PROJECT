@@ -57,11 +57,11 @@ private:
 
 	void		Update_BoneColliders();
 
+
 private:
 	void		Update_BoneCollider(CCollider* pCollider, const _char* szBoneName);
 
 	HRESULT		Ready_Colliders(void* pArg);
-
 
 private:
 	void		Update_ToggleColliders();

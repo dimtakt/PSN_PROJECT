@@ -38,6 +38,7 @@ public:
 	void		Late_Update(_float fTimeDelta)		override;
 	HRESULT		Render()							override;
 
+	virtual _bool OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDescTo) override;
 	void		OnCollisionRay(CGameObject* pCollisionHitBy)					override;
 	
 public:
@@ -51,6 +52,8 @@ private:
 	HRESULT		Bind_ShaderResources();
 
 	void		Update_PickingUp(_float fTimeDelta);
+	
+	void		Add_HitEffect();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
