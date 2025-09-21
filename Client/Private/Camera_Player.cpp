@@ -25,6 +25,10 @@ HRESULT CCamera_Player::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_pTransformCom->Set_Rotation_DirectEuler(
+        _float3(TO_DEG(0.f), m_pTransformCom->Get_RotationEuler_Store().y, 0.f)
+    );
+
     return S_OK;
 }
 
@@ -37,7 +41,7 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     if (m_pGameInstance->Get_IsKeyDown(DIK_TAB))
         m_isFreeMode = !m_isFreeMode;
     
-    
+    // Free Move
     if (m_isFreeMode)
     {
         if (m_pGameInstance->Get_IsKeyPressing(DIK_UP))
@@ -49,7 +53,7 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
         if (m_pGameInstance->Get_IsKeyPressing(DIK_RIGHT))
             m_pTransformCom->Go_Right(fRawTimeDelta);
     }
-
+    // Player Attached
     else
     {
         _uint iDestLevel = m_pGameInstance->Get_DestLevel();
