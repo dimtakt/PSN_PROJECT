@@ -183,7 +183,6 @@ void CWeapon_Gun::Drop(_vector* pDir, _float fThrowPower, _vector vRot, _uint iO
 void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
 {
     _vector vZeroDstPos = *pDir * m_fZeroDst;
-    _vector vStartPos = XMVectorZero();
 
     _float fRandRangeX = m_pGameInstance->Rand(-m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
     _float fRandRangeY = m_pGameInstance->Rand(-m_fShotRandRange / 2.0f, m_fShotRandRange / 2.0f);
@@ -211,7 +210,19 @@ void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
     if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
         bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
     else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
-        bulletDesc.matSpawnTransform = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    {
+        _float3 vAdjustPos = {};
+
+        switch (m_iGameObjType)
+        {
+        case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):   vAdjustPos = { 0.f, 0.04f, 3.f * 0.5f / 2.f };      break;
+        case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):    vAdjustPos = { 0.f, 0.04f, 4.f * 0.15f / 2.f };     break;
+        case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):   vAdjustPos = { 0.f, 0.04f, 3.f * 0.7f / 2.f };      break;
+        default:                                                                                                    break;
+        }
+
+        bulletDesc.matSpawnTransform = XMMatrixTranslationFromVector(XMLoadFloat3(&vAdjustPos)) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    }
 
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
         ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))

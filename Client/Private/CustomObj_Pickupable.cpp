@@ -51,18 +51,21 @@ void CCustomObj_Pickupable::Update(_float fTimeDelta)
     if (m_isPickingUp)
         Update_PickingUp(fTimeDelta);
 
-
-
-
     // 벡터분리 해서 현재 transform에 변화주도록
+
+
+    // testdel
+    _float3 vStoreThrowRot = {};
+    XMStoreFloat3(&vStoreThrowRot, m_pThrowRot);
+
 
     m_pTransformCom->Set_Position_Direct(m_pTransformCom->Get_Position() + m_pThrowDir * fTimeDelta);
     
 
     _vector vEulerDelta = m_pThrowRot * fTimeDelta;  // 이번 프레임에 회전할 양 (degree)
-    _vector qDelta = ROT_TO_QUAT(   TO_RAD(XMVectorGetX(vEulerDelta)),
-                                    TO_RAD(XMVectorGetY(vEulerDelta)),
-                                    TO_RAD(XMVectorGetZ(vEulerDelta)));
+    _vector qDelta = ROT_TO_QUAT(   (XMVectorGetX(vEulerDelta)),
+                                    (XMVectorGetY(vEulerDelta)),
+                                    (XMVectorGetZ(vEulerDelta)));
 
     _vector qCur = m_pTransformCom->Get_RotationQuat();
     _vector qCalced = XMQuaternionMultiply(qCur, qDelta);

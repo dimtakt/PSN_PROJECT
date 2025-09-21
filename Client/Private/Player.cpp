@@ -686,10 +686,15 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			// 3. 현재 무기 삭제
 			// 4. 플레이어 애니메이션 중 투척에 가까운 것으로 재생
 			 
-			_float fThrowPower = 3.f;
+			_float fThrowPower = 5.f;
 
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
-			_vector vRot = ROT_TO_QUAT(TO_RAD(50.f), TO_RAD(50.f), TO_RAD(50.f));
+
+			_float fRotX = m_pGameInstance->Rand(-180.f, 180.f);
+			_float fRotY = m_pGameInstance->Rand(-180.f, 180.f);
+			_float fRotZ = m_pGameInstance->Rand(-180.f, 180.f);
+
+			_vector vRot = ROT_TO_QUAT(TO_RAD(fRotX), TO_RAD(fRotY), TO_RAD(fRotZ));
 			pWeaponGun->Throw(&m_vLoadShotDir, fThrowPower, vRot, pWeaponGun->Get_ObjType());
 
 			// 현재 사용중인 무기 삭제
