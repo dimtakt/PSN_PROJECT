@@ -2,6 +2,8 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
+float g_fFadeDeltaRatio = 0.f;
+
 /*재질*/
 texture2D g_DiffuseTexture;
 
@@ -108,7 +110,6 @@ struct PS_IN
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
     float4 vProjPos : TEXCOORD2;
-
 };
 
 struct PS_OUT
@@ -150,6 +151,36 @@ PS_OUT PS_MAIN_NONPICK(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    return Out;
+}
+
+PS_OUT PS_MAIN_FADEOUT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    // Y 좌표 기준 디졸브
+    
+    //const float gSpeed = 0.3f;
+    const float fFadeWidth = 1.f;
+    const float fFadeSpeed = 8.f;
+    
+    float fFadeStartHeight = g_fFadeDeltaRatio * fFadeSpeed;
+    float fHeightDiff = In.vWorldPos.y - fFadeStartHeight;
+    float alpha = smoothstep(-fFadeWidth, fFadeWidth, fHeightDiff);
+    
+    // 알파 적용
+    vMtrlDiffuse.a *= alpha;
+    
+    // 너무 낮으면 버림
+    if (vMtrlDiffuse.a * alpha < 0.01f)
+        discard;
+
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 1.f);
     return Out;
 }
 
@@ -210,5 +241,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+    }
+
+    pass FadeOut
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FADEOUT();
     }
 }

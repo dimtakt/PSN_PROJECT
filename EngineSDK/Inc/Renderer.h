@@ -60,6 +60,8 @@ private:
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
 
+	HRESULT Render_ForwardBlend();
+
 private:
 	HRESULT Ready_Shadow_Depth_Stencil_View();
 	HRESULT SetUp_Viewport(_float fWidth, _float fHeight);

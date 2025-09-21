@@ -94,6 +94,8 @@ private:
 	_float				m_fGroggy_ElapsedTime = {};
 	const _float		m_fGroggyTime		= 0.55f;
 
+	_float				m_fDeadDeltaTime	= 0.f;
+
 public:
 	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CEnemy*			Clone(void* pArg)					override;

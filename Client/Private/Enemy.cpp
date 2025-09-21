@@ -97,18 +97,40 @@ void CEnemy::Update(_float fTimeDelta)
 	//else	
 	//	m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 
+	// »ç¸Á Ã³¸®
+	const _float fDeadTime = 2.f;
+	_float fRawTimeDelta = fTimeDelta / m_pGameInstance->Get_TimeSpeed();
+
+	if (m_isDeadStandby)
+	{
+		m_fDeadDeltaTime += fRawTimeDelta;
+		
+
+		if (m_fDeadDeltaTime >= fDeadTime)
+		{
+			m_isDead = true;
+		}
+	}
 
 	__super::Update(fTimeDelta);
 }
 
 void CEnemy::Late_Update(_float fTimeDelta)
 {
+
 	m_pTransformCom->Set_State(Engine::STATE::POSITION,
 		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(Engine::STATE::POSITION)));
 
+	//RENDERGROUP tNormalGroup = (m_isDeadStandby) ? RENDERGROUP::BLEND : RENDERGROUP::NONBLEND;
+	//if (FAILED(m_pGameInstance->Add_RenderGroup(tNormalGroup, this)))
+	//	return;
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+		return;
+
+
+	if (m_isDeadStandby)
 		return;
 
 #ifdef _DEBUG
@@ -143,7 +165,9 @@ HRESULT CEnemy::Render()
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(0);
+		_uint iShaderIndex = (m_isDeadStandby)? 3 : 0;
+
+		m_pShaderCom->Begin(3);
 
 		m_pModelCom->Render(i);;
 	}
@@ -280,6 +304,28 @@ HRESULT CEnemy::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
+	
+
+	//test
+	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	if (nullptr == pLightDesc)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFadeDeltaRatio", &m_fDeadDeltaTime, sizeof(_float))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
