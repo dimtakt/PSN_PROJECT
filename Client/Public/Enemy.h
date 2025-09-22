@@ -93,7 +93,7 @@ private:
 
 	_bool				m_isGroggy			= false;
 	_float				m_fGroggy_ElapsedTime = {};
-	const _float		m_fGroggyTime		= 0.55f;
+	const _float		m_fGroggyTime		= 0.7f;
 
 	_float				m_fDeadDeltaTime	= 0.f;
 

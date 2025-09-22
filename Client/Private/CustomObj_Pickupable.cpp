@@ -313,6 +313,7 @@ void CCustomObj_Pickupable::Update_PickingUp(_float fTimeDelta)
         if (m_fPickingElapsedTime > m_fPickingMaxTime)  // 일정 시간이 다 지났으면
         {
             dynamic_cast<CWeapon*>(pPlayer->Get_WeaponPart())->Set_toAttached(true);
+            m_pGameInstance->PlaySoundFixed(L"gun_tick.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_EFF));
             m_isDead = true;
             //m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", this);
         }
