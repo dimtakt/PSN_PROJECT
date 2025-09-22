@@ -1,5 +1,6 @@
 #include "Weapon_Shotgun.h"
 #include "GameInstance.h"
+#include "UI_ScreenText.h"
 
 CWeapon_Shotgun::CWeapon_Shotgun(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon_Gun{ pDevice, pContext }
@@ -150,17 +151,30 @@ void CWeapon_Shotgun::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     if (m_iCurBullets == 0)
     {
-        // UI 출력 이벤트
-
+        if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        {
+            m_pGameInstance->PlaySoundFixed(L"wpn_pistol_noammo.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_EFF));
+            // UI 출력 이벤트
+            CUI_ScreenText* pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(m_pGameInstance->Get_DestLevel(), L"Layer_UI_ScreenText"));
+            pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO));
+        }
         return;
     }
 
+
+    if (m_isOnCD)
+        return;
 
     _uint iShotAmount = 10;
     for (_uint i = 0; i < iShotAmount; i++)
     {
         __super::Shot(pDir, iObjTypeIndex);
     }
+
+    if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        m_pGameInstance->PlaySoundFixed(L"shotgun_shot.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_SHOT));
+    else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+        m_pGameInstance->PlaySoundFixed(L"shotgun_shot.wav", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_SHOT));
 
     m_isOnCD = true;
 

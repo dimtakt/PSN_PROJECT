@@ -74,7 +74,8 @@ private:
 
 	CPartObject*					m_pPart_Weapon		= { nullptr };
 
-	CGameObject*					m_pUI_Crosshair		= { nullptr };
+	class CUI_Crosshair*			m_pUI_Crosshair		= { nullptr };
+	class CUI_ScreenText*			m_pUI_ScreenText	= { nullptr };
 
 private:;
 	_uint			m_iState = { };

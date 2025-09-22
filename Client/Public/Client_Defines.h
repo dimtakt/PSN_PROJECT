@@ -22,6 +22,15 @@ namespace Client
 		END
 	};
 
+	enum class SCREENTEXT_INDEX
+	{
+		NOAMMO,
+		TEST,
+
+
+		END
+	};
+
 
 
 	enum class ENEMY_STATE {
@@ -210,6 +219,36 @@ namespace Client
 		END			= (1 << 8)
 	};
 
+
+	typedef enum class SOUND_CHANNEL {
+		// 1. 배경 효과음
+		// 2. 목소리 효과음
+		// 
+		// 3. 6. 총 발사음 x2
+		// 4. 7. 총 효과음 x2
+		// 5. 8. 여분 + 
+		// 
+		// 9. 크로스헤어 효과음
+		// 
+		// 10. UI 효과음
+
+		SOUND_BGM,
+		SOUND_VOICE,
+		
+		SOUND_PLAYERWEAPON_SHOT,
+		SOUND_PLAYERWEAPON_EFF,
+		SOUND_PLAYERWEAPON_ETC,
+
+		SOUND_ENEMYWEAPON_SHOT,
+		SOUND_ENEMYWEAPON_EFF,
+		SOUND_ENEMYWEAPON_ETC,
+
+		SOUND_CROSSHAIR,
+		SOUND_MAINUI,
+
+		SOUND_END
+
+	} SOUNDCH;
 
 }
 

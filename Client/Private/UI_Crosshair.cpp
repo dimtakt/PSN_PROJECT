@@ -124,7 +124,12 @@ void CUI_Crosshair::Change_RotByCD(_float fCDRatio)
 {
     if (fCDRatio == 0.f &&
         m_fRotDeg != 0.f)
+    {
         Change_EnLarge();
+        
+        if (m_pCurTextureCom == m_pTextureCom_Gun)
+            m_pGameInstance->PlaySoundFixed(L"gun_tick.wav", ENUM_CLASS(SOUNDCH::SOUND_CROSSHAIR));
+    }
 
     m_fRotDeg = fCDRatio * 90.f;
 }

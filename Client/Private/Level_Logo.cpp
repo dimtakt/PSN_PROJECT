@@ -18,7 +18,8 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	
+	m_pGameInstance->PlayBGM(L"R_Weird_Digital_Noise.ogg");
+	m_pGameInstance->PlaySoundFixed(L"piOSLaunch.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 	return S_OK;
 }
 
@@ -46,6 +47,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_F_LEVELS):
 				m_iMenuFocusingPath = ENUM_CLASS(LOGO_PATH_MAIN::PATH_LEVEL);
 				m_iMenuFocusingIndex = 0;
+				m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 				break;
 			case ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_GAMEPLAY):
 				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
@@ -84,6 +86,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_FOLDERUP):
 				m_iMenuFocusingPath = ENUM_CLASS(LOGO_PATH_MAIN::PATH_ABSOLUTE);
 				m_iMenuFocusingIndex = ENUM_CLASS(LOGO_INDEX_MAIN::MAIN_F_LEVELS);
+				m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 				break;
 			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST1):
 				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST_EXTRA1))))
@@ -106,8 +109,12 @@ void CLevel_Logo::Update(_float fTimeDelta)
 	}
 
 
-
 	return;
+
+	if (m_pGameInstance->Get_IsKeyDown(DIK_S) ||
+		m_pGameInstance->Get_IsKeyDown(DIK_W))
+		m_pGameInstance->PlaySoundFixed(L"R_terminal_cursor_Space.wav", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
+
 }
 
 HRESULT CLevel_Logo::Render()
@@ -371,7 +378,6 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-
 CLevel_Logo* CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Logo* pInstance = new CLevel_Logo(pDevice, pContext);
@@ -385,11 +391,9 @@ CLevel_Logo* CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	return pInstance;
 }
 
-
 void CLevel_Logo::Free()
 {
+	m_pGameInstance->StopAll();
+
 	__super::Free();
-
-
-
 }

@@ -1,5 +1,6 @@
 #include "Weapon_Pistol.h"
 #include "GameInstance.h"
+#include "UI_ScreenText.h"
 
 CWeapon_Pistol::CWeapon_Pistol(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon_Gun{ pDevice, pContext }
@@ -55,7 +56,7 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
 
     // 총, 탄 관련 초기 설정
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 4 : 20;
-    m_iMaxBullets = 200;
+    m_iMaxBullets = 10; // 200;
     m_iCurBullets = (pDesc->iCurLeftBullets == UINT_MAX)?
         m_iMaxBullets : pDesc->iCurLeftBullets;
 
@@ -152,13 +153,24 @@ void CWeapon_Pistol::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     if (m_iCurBullets == 0)
     {
-        // UI 출력 이벤트
-
+        if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        {
+            m_pGameInstance->PlaySoundFixed(L"wpn_pistol_noammo.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_EFF));
+            // UI 출력 이벤트
+            CUI_ScreenText* pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(m_pGameInstance->Get_DestLevel(), L"Layer_UI_ScreenText"));
+            pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO));
+        }
         return;
     }
 
+    if (m_isOnCD)
+        return;
+
     __super::Shot(pDir, iObjTypeIndex);
-   
+    if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        m_pGameInstance->PlaySoundFixed(L"player_pistol_fire.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_SHOT));
+    else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+        m_pGameInstance->PlaySoundFixed(L"player_pistol_fire.wav", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_SHOT));
 
     m_isOnCD = true;
 

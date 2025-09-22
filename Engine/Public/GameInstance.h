@@ -195,13 +195,16 @@ public:
 
 #pragma region SOUND_MANAGER
 
-	void PlaySoundW(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume);
-	void PlayLoopSound(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume);
-	void PlayBGM(const TCHAR* pSoundKey, float fVolume);
+	// 함수 내에서 StopSound 와 PlaySoundW 를 동시에 호출합니다. 
+	void PlaySoundFixed(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume = 0.5f);
+
+	void PlaySoundW(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume = 0.5f);
+	void PlayLoopSound(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume = 0.5f);
+	void PlayBGM(const TCHAR* pSoundKey, float fVolume = 0.5f);
 	void StopSound(_uint SoundChannel);
 	void StopAll();
-	void SetChannelVolume(_uint SoundChannel, float fVolume);
-	bool IsPlaying(_uint SoundChannel);
+	void SetChannelVolume(_uint SoundChannel, float fVolume = 0.5f);
+	_bool IsPlaying(_uint SoundChannel);
 
 #pragma endregion
 

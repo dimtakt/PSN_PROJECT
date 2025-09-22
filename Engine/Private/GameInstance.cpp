@@ -619,6 +619,11 @@ HRESULT CGameInstance::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 // ==============================
 
 #pragma region SOUND_MANAGER
+void CGameInstance::PlaySoundFixed(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume)
+{
+	m_pSound_Manager->StopSound(SoundChannel);
+	m_pSound_Manager->PlaySoundW(pSoundKey, SoundChannel, fVolume);
+}
 void CGameInstance::PlaySoundW(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume)
 {
 	m_pSound_Manager->PlaySoundW(pSoundKey, SoundChannel, fVolume);
@@ -643,7 +648,7 @@ void CGameInstance::SetChannelVolume(_uint SoundChannel, float fVolume)
 {
 	m_pSound_Manager->SetChannelVolume(SoundChannel, fVolume);
 }
-bool CGameInstance::IsPlaying(_uint SoundChannel)
+_bool CGameInstance::IsPlaying(_uint SoundChannel)
 {
 	return m_pSound_Manager->IsPlaying(SoundChannel);
 }

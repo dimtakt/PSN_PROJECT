@@ -170,12 +170,11 @@ CSound_Manager* CSound_Manager::Create()
 {
 	CSound_Manager* pInstance = new CSound_Manager();
 
-	pInstance->Initialize();
-	/*if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CSound_Manager"));
-		pInstance->Free();
-	}*/
+		Safe_Release(pInstance);
+	}
 
 	return pInstance;
 }

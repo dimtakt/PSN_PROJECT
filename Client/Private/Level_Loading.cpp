@@ -30,6 +30,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	if (FAILED(Ready_LoadingThread()))
 		return E_FAIL;
 	
+	m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 	return S_OK;
 }
 

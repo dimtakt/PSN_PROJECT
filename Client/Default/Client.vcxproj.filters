@@ -142,6 +142,12 @@
     <Filter Include="02.GameObject\Effect\Particle\Hit">
       <UniqueIdentifier>{3ba2fdaf-8ffa-40cf-b025-a0e41056c136}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\UI\Crosshair">
+      <UniqueIdentifier>{d02c5b2b-6109-42af-a229-f13a29bec1c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UI\ScreenText">
+      <UniqueIdentifier>{a05beaf6-ac60-4872-b595-96b56a3e2f6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -191,9 +197,6 @@
     </ClInclude>
     <ClInclude Include="..\public\Bullet.h">
       <Filter>02.GameObject\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\UI_Crosshair.h">
-      <Filter>02.GameObject\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGui_Manager.h">
       <Filter>96.ExternalTool\_Manager</Filter>
@@ -279,6 +282,12 @@
     <ClInclude Include="..\Public\HitParticle.h">
       <Filter>02.GameObject\Effect\Particle\Hit</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_Crosshair.h">
+      <Filter>02.GameObject\UI\Crosshair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_ScreenText.h">
+      <Filter>02.GameObject\UI\ScreenText</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -329,9 +338,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Bullet.cpp">
       <Filter>02.GameObject\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\UI_Crosshair.cpp">
-      <Filter>02.GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ImGui_Manager.cpp">
       <Filter>96.ExternalTool\_Manager</Filter>
@@ -413,6 +419,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\HitParticle.cpp">
       <Filter>02.GameObject\Effect\Particle\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Crosshair.cpp">
+      <Filter>02.GameObject\UI\Crosshair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_ScreenText.cpp">
+      <Filter>02.GameObject\UI\ScreenText</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

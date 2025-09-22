@@ -1,6 +1,7 @@
 #include "Weapon_Karabin.h"
 #include "GameInstance.h"
 #include "Bullet.h"
+#include "UI_ScreenText.h"
 
 CWeapon_Karabin::CWeapon_Karabin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon_Gun{ pDevice, pContext }
@@ -145,8 +146,13 @@ void CWeapon_Karabin::Shot(_vector* pDir, _uint iObjTypeIndex)
 {
     if (m_iCurBullets == 0)
     {
-        // UI 출력 이벤트
-
+        if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+        {
+            m_pGameInstance->PlaySoundFixed(L"wpn_pistol_noammo.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_EFF));
+            // UI 출력 이벤트
+            CUI_ScreenText* pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(m_pGameInstance->Get_DestLevel(), L"Layer_UI_ScreenText"));
+            pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO));
+        }
         return;
     }
 
@@ -188,6 +194,11 @@ void CWeapon_Karabin::Shot_Continuously(_vector* pDir, _uint iObjTypeIndex, _flo
         }
         __super::Shot(pDir, iObjTypeIndex);
         m_iShotIndex++;
+
+        if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))
+            m_pGameInstance->PlaySoundFixed(L"wpn_machinegun_fire.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_SHOT));
+        else if (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
+            m_pGameInstance->PlaySoundFixed(L"wpn_machinegun_fire.wav", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_SHOT));
         //m_iCurBullets--;
         //__super::Add_ShotEffect();
 

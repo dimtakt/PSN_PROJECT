@@ -279,6 +279,8 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 
 	Update_NearestWeapons();
 
+	m_pGameInstance->PlaySoundFixed(L"crystal_crush.ogg", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_ETC));
+
 	return true;
 }
 

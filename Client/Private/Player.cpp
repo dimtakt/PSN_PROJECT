@@ -10,6 +10,7 @@
 #include "Weapon_Shotgun.h"
 
 #include "UI_Crosshair.h"
+#include "UI_ScreenText.h"
 
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -49,8 +50,11 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
-	m_pUI_Crosshair = m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_Crosshair");
-	if (m_pUI_Crosshair == nullptr) return E_FAIL;
+	m_pUI_Crosshair = dynamic_cast<CUI_Crosshair*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_Crosshair"));
+	if (m_pUI_Crosshair == nullptr)		return E_FAIL;
+	m_pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_ScreenText"));
+	if (m_pUI_ScreenText == nullptr)	return E_FAIL;
+
 
 	m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
 
@@ -707,7 +711,6 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 
 void CPlayer::Update_UI(_float fTimeDelta)
 {
-	CUI_Crosshair* pUI_Crosshair = dynamic_cast<CUI_Crosshair*>(m_pUI_Crosshair);
 	_uint iTextureIndex = UINT_MAX;
 
 
@@ -717,7 +720,7 @@ void CPlayer::Update_UI(_float fTimeDelta)
 
 		if (m_pPart_Weapon->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL) ||
 			m_pPart_Weapon->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN))
-			pUI_Crosshair->Change_RotByCD(dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon)->Get_CDRatio());
+			m_pUI_Crosshair->Change_RotByCD(dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon)->Get_CDRatio());
 	}
 	else
 	{
@@ -759,10 +762,10 @@ void CPlayer::Update_UI(_float fTimeDelta)
 		else
 			iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICDOT);
 
-		pUI_Crosshair->Change_RotByCD(0.f);
+		m_pUI_Crosshair->Change_RotByCD(0.f);
 	}
 
-	pUI_Crosshair->Change_Crosshair(iTextureIndex);
+	m_pUI_Crosshair->Change_Crosshair(iTextureIndex);
 }
 
 void CPlayer::Update_BoneColliders()
