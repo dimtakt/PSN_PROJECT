@@ -70,7 +70,7 @@ HRESULT CStage_Test1::Ready_Lights()
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.5f, -1.f, 0.5f, 0.f);	// Light 방향
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 0.5f);		// Light 색상 및 밝기의 세기
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.0f);		// Light 색상 및 밝기의 세기
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);	// Light 환경광으로 가정. 최소 밝기 보장에 관여.
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);		// Light 반사광.
 
