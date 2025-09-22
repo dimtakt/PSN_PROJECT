@@ -21,6 +21,7 @@ HRESULT CCamera_Player::Initialize(void* pArg)
     CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
 
     m_fMouseSensor = pDesc->fMouseSensor;
+    m_fOriginFovy = pDesc->fFovy;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -28,6 +29,7 @@ HRESULT CCamera_Player::Initialize(void* pArg)
     m_pTransformCom->Set_Rotation_DirectEuler(
         _float3(TO_DEG(0.f), m_pTransformCom->Get_RotationEuler_Store().y, 0.f)
     );
+    
 
     return S_OK;
 }
@@ -103,6 +105,9 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
+    // 여기서 시간 경과에 따른 정상화 진행,
+    // 외부에서 함수를 통해 기본값을 망가뜨리고 그에 맞게 흔들림이나 줌인아웃이 진행되는 방식으로
+
 }
 
 void CCamera_Player::Late_Update(_float fTimeDelta)

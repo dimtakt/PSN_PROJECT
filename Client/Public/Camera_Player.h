@@ -36,6 +36,7 @@ private:
 	_bool			m_isFreeMode = false;
 	CTransform*		m_pPlayerTransformCom = { nullptr };
 
+	_float			m_fOriginFovy = {};
 
 private:
 	_float m_fPitch = 0.f;   // 상하 회전 값

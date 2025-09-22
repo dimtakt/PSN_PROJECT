@@ -434,14 +434,6 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 	else 
 		m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
 
-	// 일정 이상 가까워지면 무기를 집어들도록 해야 함.
-	// 이는 로컬에 가까운 무기 찾아 저장시켜두었으니 오래 안 걸릴 것으로 예상
-	// 
-	// 현재는 가까워지면 LookAt 때문인지 바라보던 방향이 이상하게 변화.
-	// 이는 39 ~ 42 주석 해제하여 초기에 무기 쥐어주면 일단은 괜찮음
-
-
-
 }
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
@@ -508,12 +500,12 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 					m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
 					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
 				}
-				else if (IS_BETWEEN(fDist, 10.f, 20.f))
+				else if (IS_BETWEEN(fDist, 6.f, 20.f))
 				{
 					m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
 					m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
 				}
-				else if (IS_BETWEEN(fDist, 0.0f, 10.f))
+				else if (IS_BETWEEN(fDist, 0.0f, 6.f))
 				{
 					m_iState = ENUM_CLASS(ENEMY_STATE::ATK_MELEE);
 					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
@@ -585,6 +577,7 @@ void CEnemy::Update_AnimationIndex(_float fTimeDelta)
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_MELEE))
 		{
 			m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_02, true };
+			m_tAnimDesc[PART_LOWER] = { MOVE_L_IDLE, true };
 			//m_tAnimDesc[PART_UPPER] = { MELEE_U_FIST_03, true };
 		}
 		else if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
@@ -705,6 +698,8 @@ void CEnemy::Update_BoneColliders()
 	Update_BoneCollider(m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][2], "RightHand");
 
 	m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::OBB)][0]->Update(m_pTransformCom->Get_WorldMatrix());	// Direct Update
+
+	Update_ToggleColliders();
 }
 
 void CEnemy::Update_BoneCollider(CCollider* pCollider, const _char* szBoneName)
@@ -804,7 +799,7 @@ void CEnemy::Update_ToggleColliders()
 		isFistPlaying = true;
 
 	// 주먹이 나가는 중이라면
-	if (isFistPlaying && (m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+	if (isFistPlaying && (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_MELEE)))
 	{
 		// isActive 끄고, 콜라이더 내에서 isActive off 시 충돌 처리 안하도록 로직 제작
 		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)][1]->Set_isActive(true);			// LeftHand

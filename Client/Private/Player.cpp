@@ -669,10 +669,13 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 						tGunDesc = dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_GunInfoDesc();
 					}
 
-					if (isGun)	Ready_PartObject(iRayObjType, &tGunDesc);
-					else		Ready_PartObject(iRayObjType);
+					if (isGun && !dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_IsPickingUp())
+					{
+						if (isGun)	Ready_PartObject(iRayObjType, &tGunDesc);
+						else		Ready_PartObject(iRayObjType);
 
-					pRayObj->OnCollisionRay(this);
+						pRayObj->OnCollisionRay(this);
+					}
 				}
 			}
 
@@ -842,9 +845,6 @@ HRESULT CPlayer::Ready_Colliders(void* pArg)
 			return E_FAIL;
 		m_vecCollidersCom[ENUM_CLASS(COLLIDERTYPE::SPHERE)].push_back(tmpColCom);
 	}
-
-
-
 
 	CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
 

@@ -19,6 +19,7 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
+	m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 	m_eNextLevelID = eNextLevelID;	 
 	Update_DestLevel(m_eNextLevelID);	// Level매니저에서 다음 레벨을 갱신. 프로토타입/객체 생성시에 해당 변수를 이용할 것.
 
@@ -30,7 +31,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	if (FAILED(Ready_LoadingThread()))
 		return E_FAIL;
 	
-	m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
+	
 	return S_OK;
 }
 
