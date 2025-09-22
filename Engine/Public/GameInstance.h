@@ -193,6 +193,20 @@ public:
 
 	// ==============================
 
+#pragma region SOUND_MANAGER
+
+	void PlaySoundW(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume);
+	void PlayLoopSound(const TCHAR* pSoundKey, _uint SoundChannel, float fVolume);
+	void PlayBGM(const TCHAR* pSoundKey, float fVolume);
+	void StopSound(_uint SoundChannel);
+	void StopAll();
+	void SetChannelVolume(_uint SoundChannel, float fVolume);
+	bool IsPlaying(_uint SoundChannel);
+
+#pragma endregion
+
+	// ==============================
+
 #pragma region TIMESPEED_MANAGER
 
 public:
@@ -232,6 +246,7 @@ private:
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
 	class CShadow*				m_pShadow = { nullptr };
+	class CSound_Manager*		m_pSound_Manager = { nullptr };
 
 	class CTimeSpeed_Manager*	m_pTimeSpeed_Manager = { nullptr };
 	class CCollision_Manager*	m_pCollision_Manager = { nullptr };
