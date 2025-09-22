@@ -1,8 +1,13 @@
-// 명령어			옵션			원본 파일이 있는 위치		사본 파일을 저장할 위치
+// 명령어			옵션		원본 파일이 있는 위치			사본 파일을 저장할 위치
 
-xcopy			/y/s			.\Engine\Public\*.*		.\EngineSDK\Inc\	
+xcopy			/y/s		.\Engine\Public\*.*			.\EngineSDK\Inc\	
 
-xcopy			/y			.\Engine\Bin\Engine.dll		.\Client\Bin\
-xcopy			/y			.\Engine\Bin\Engine.lib		.\EngineSDK\Lib\
-xcopy			/y			.\Engine\ThirdPartyLib\*.lib	.\EngineSDK\Lib\
-xcopy			/y			.\Engine\Bin\ShaderFiles\*.* 	.\Client\Bin\ShaderFiles\
+xcopy			/y		.\Engine\Bin\Engine.dll			.\Client\Bin\
+xcopy			/y		.\Engine\Bin\Engine.lib			.\EngineSDK\Lib\
+xcopy			/y		.\Engine\ThirdPartyLib\*.lib			.\EngineSDK\Lib\
+xcopy			/y		.\Engine\Bin\ShaderFiles\*.* 		.\Client\Bin\ShaderFiles\
+
+xcopy            		/y            	.\Engine\Bin\fmod.dll                        	.\Client\Bin\
+xcopy            		/y            	.\Engine\Bin\fmodL.dll                        	.\Client\Bin\
+xcopy            		/y            	.\Engine\ThirdPartyLib\fmod\fmod_vc.lib	.\EngineSDK\Lib\
+xcopy            		/y            	.\Engine\ThirdPartyLib\fmod\fmodL_vc.lib	.\EngineSDK\Lib\

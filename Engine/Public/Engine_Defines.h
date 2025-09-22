@@ -22,8 +22,14 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "assimp/Importer.hpp"
-
 using namespace DirectX;
+
+#include <io.h>
+#include "fmod.h"
+#include "fmod.hpp"
+#pragma comment(lib, "fmod_vc.lib")
+#define MAXCHANNEL 32
+
 
 #include <vector>
 #include <list>
