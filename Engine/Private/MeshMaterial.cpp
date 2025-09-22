@@ -57,6 +57,10 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 			}
 			else if (false == strcmp(szExt, ".tga"))	// tga는 지원X
 				return E_FAIL;
+			//else if (false == strcmp(szExt, ".fbm"))
+			//{
+			//	// fbm 넘겨
+			//}
 			else										// 이외 (png, jpg, bmp등) 포맷은 범용 함수 사용 
 			{
 				if (FAILED(CreateWICTextureFromFile(m_pDevice, szFullPath, nullptr, &pSRV)))
