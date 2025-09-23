@@ -21,6 +21,7 @@ public:
 	typedef struct tagEnemyDesc : public GAMEOBJECT_DESC
 	{
 		_uint iDefaultWeaponObjType		= ENUM_CLASS(GAMEOBJ_TYPE::END);	// 기본으로 착용중일 오브젝트의 타입을 정의
+		vector<_float3> vecPremovePoses	= {};
 	}ENEMY_DESC;
 private:
 	CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -50,6 +51,7 @@ private:
 	HRESULT		Ready_PartObject(_uint iObjType, void* pArg = nullptr);
 
 	void		Update_Transform(_float fTimeDelta);		// AI 행동에 의한 "Transform" 제어
+	void		Update_Transform_PreMove(_float fTimeDelta);			// 미리 지정된 위치로 이동시킬 때 필요
 	void		Update_AnimationState(_float fTimeDelta);	// AI 행동에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// AI 행동에 의한 "애니메이션" 제어
 
@@ -100,6 +102,8 @@ private:
 private:
 	// 근처 무기 탐색용
 	CGameObject*		m_pNearestWeapon	= { nullptr };
+
+	list<_float3>		m_listPreMovePoses	= {};
 
 public:
 	static CEnemy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

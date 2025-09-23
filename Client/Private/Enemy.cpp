@@ -59,6 +59,9 @@ HRESULT CEnemy::Initialize(void* pArg)
 	default:			break;	// 무기 기본값이 없거나 잘못된 값이 들어간 경우
 	}
 
+	for (auto& pos : pDesc->vecPremovePoses)
+		m_listPreMovePoses.push_back(pos);
+
 
 	m_fLogic_ElapsedTime = m_pGameInstance->Rand(0.f, m_fLogic_ResetIntervalTime);
 
@@ -76,9 +79,6 @@ void CEnemy::Update(_float fTimeDelta)
 {
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
-
-
-
 
 	Update_NearestWeapons();
 	Update_Transform(fTimeDelta);
@@ -381,6 +381,11 @@ HRESULT CEnemy::Ready_PartObject(_uint iObjType, void* pArg)
 
 void CEnemy::Update_Transform(_float fTimeDelta)
 {
+	if (!m_listPreMovePoses.empty())
+	{
+		Update_Transform_PreMove(fTimeDelta);
+		return;
+	}
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
@@ -439,6 +444,27 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 	else 
 		m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
 
+}
+
+void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
+{
+	if (m_listPreMovePoses.empty())
+		return;
+
+	const _float fTargetDist = 1.5f;		// 목표까지 해당 거리 이하가 되면 도달한 것으로 간주
+
+	// PreMove - 해당 위치로 이동함
+	m_pTransformCom->Chase(XMLoadFloat3(&m_listPreMovePoses.front()), fTimeDelta, fTargetDist / 2.f, m_pNavigationCom);
+	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - XMLoadFloat3(&m_listPreMovePoses.front())));
+
+	// PreMove - 해당 위치를 바라봄
+	m_pTransformCom->LookAt(XMVectorSetY(XMLoadFloat3(&m_listPreMovePoses.front()), m_pTransformCom->Get_Position_Store().y));
+
+	// Premove - 목표 도달 시 맨 앞 원소 제거하여 다음 목표로 전환.
+	if (fDist < fTargetDist)
+	{
+		m_listPreMovePoses.pop_front();
+	}
 }
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
