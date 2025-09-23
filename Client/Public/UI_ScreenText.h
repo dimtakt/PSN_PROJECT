@@ -37,8 +37,8 @@ private:
 	CShader*		m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
-	CTexture*		m_pTextureComNoAmmo = { nullptr };
-	CTexture*		m_pTextureComInfo1/*..*/ = {nullptr};
+	CTexture*		m_pTextureCom_NoAmmo = { nullptr };
+	CTexture*		m_pTextureCom_TimeMoves = {nullptr};
 
 private:
 	CTexture*		m_pCurTextureCom = { nullptr };

@@ -387,7 +387,9 @@ HRESULT CLoader::Loading_For_Stages()
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/NoAmmo.png"), 1))))
 		return E_FAIL;
-
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/TimeMoves.png"), 1))))
+		return E_FAIL;
 
 
 

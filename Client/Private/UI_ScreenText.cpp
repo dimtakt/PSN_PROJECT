@@ -123,10 +123,10 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
 
     switch (iTexIndex)
     {
-    case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):      m_pCurTextureCom = m_pTextureComNoAmmo;     break;
-    case ENUM_CLASS(SCREENTEXT_INDEX::TEST):        m_pCurTextureCom = m_pTextureComInfo1;      break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):              m_pCurTextureCom = m_pTextureCom_NoAmmo;        break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES):           m_pCurTextureCom = m_pTextureCom_TimeMoves;     break;
 
-    default:                                                                                    break;
+    default:                                                                                            break;
     }
 }
 
@@ -167,10 +167,10 @@ HRESULT CUI_ScreenText::Ready_Components()
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),       // Triangle.png
-        TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureComNoAmmo), nullptr)))
+        TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureCom_NoAmmo), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),  // Triangle_.png
-        TEXT("Com_Texture_Info1"), reinterpret_cast<CComponent**>(&m_pTextureComInfo1), nullptr)))
+        TEXT("Com_Texture_Info1"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
         return E_FAIL;
 
 
@@ -210,6 +210,6 @@ void CUI_ScreenText::Free()
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
 
-    Safe_Release(m_pTextureComNoAmmo);
-    Safe_Release(m_pTextureComInfo1);
+    Safe_Release(m_pTextureCom_NoAmmo);
+    Safe_Release(m_pTextureCom_TimeMoves);
 }

@@ -25,7 +25,7 @@ namespace Client
 	enum class SCREENTEXT_INDEX
 	{
 		NOAMMO,
-		TEST,
+		TIMEMOVES,
 
 
 		END
