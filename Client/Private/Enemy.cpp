@@ -877,15 +877,18 @@ void CEnemy::Update_NearestWeapons()
 
 
 		// 콜라이더 있는지 검사. 없으면 throw 된 것으로 간주하고 포함 X
-		_bool isOnColliders = false;
+
+		// !! 이렇게 하면 안되고, 콜라이더의 인덱스 타입이 THROW인지로 확인해야 할 것 같음
+		_bool isThrowColliders = false;
+
 		vector<CCollider*>* vecColliders = pWeapon->Get_Colliders();
 		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
 			for (auto& collider : vecColliders[i])
-				if (collider->Get_ColDesc().isActive &&
-					isOnColliders == false)
-					isOnColliders = true;
+				if ((collider->Get_ColDesc().iLayerIndex & ENUM_CLASS(COLLISION_LAYER::THROWN)) &&
+					isThrowColliders == false)
+					isThrowColliders = true;
 
-		if (!isOnColliders)
+		if (isThrowColliders)
 			continue;
 
 		vecDroppedWeapons.push_back(pWeapon);
