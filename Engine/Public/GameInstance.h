@@ -215,6 +215,7 @@ public:
 public:
 	void Req_EditTimeSpeed(_float fEditValue, _bool isForceChange = false);
 	_float Get_TimeSpeed();
+	_float Get_RawTimeDelta();
 
 #pragma endregion
 

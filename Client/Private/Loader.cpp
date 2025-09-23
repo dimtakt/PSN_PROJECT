@@ -90,11 +90,27 @@ HRESULT CLoader::Loading()
 	case LEVEL::EDITOR:
 		hr = Loading_For_Editor_Level();
 		break;
-	
-	
-	default:
-		hr = Loading_For_Stages();
+
+		
+	case LEVEL::TEST_EXTRA1:
+		hr = Loading_For_Test1();
 		break;
+
+
+	case LEVEL::CH01_KICK:
+		hr = Loading_For_Stage_01Kick();
+		break;
+		
+	case LEVEL::CH09_FIGHTC:
+		hr = Loading_For_Stage_09CageFight();
+		break;
+
+
+		
+	
+	//default:
+	//	hr = Loading_For_Stages();
+	//	break;
 	//case LEVEL::TEST_EXTRA1:
 	//	hr = Loading_For_Test_Extra1_Level();
 	}
@@ -348,6 +364,51 @@ HRESULT CLoader::Loading_For_Editor_Level()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Test1()
+{
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_Test1.datnavmesh")))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Stage_01Kick()
+{
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_01Kick.datnavmesh")))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Stage_09CageFight()
+{
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::CH09_FIGHTC), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_09CageFight.datnavmesh")))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_Stages()
 {
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
@@ -442,15 +503,6 @@ HRESULT CLoader::Loading_For_Stages()
 		return E_FAIL;
 
 
-
-
-	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
-
-	/* Prototype_Component_Navigation */
-	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_Test1.datnavmesh")))))
-		//CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/TestNavigation.dat")))))
-		return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다."));

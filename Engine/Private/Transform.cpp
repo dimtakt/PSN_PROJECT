@@ -168,6 +168,51 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE::LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::LookAt_Smooth(_fvector vAt, _float fDeltaTime)
+{
+	// 1. 현재 위치와 목표 방향 계산
+	_vector vPos = Get_State(STATE::POSITION);
+	_vector vLookTarget = XMVector3Normalize(vAt - vPos);
+
+	// 2. 현재 Look 벡터 가져오기
+	_vector vLookCurrent = XMVector3Normalize(Get_State(STATE::LOOK));
+
+	// 3. 평면 회전 (Y 고정)
+	vLookTarget = XMVectorSetY(vLookTarget, 0.f);
+	vLookCurrent = XMVectorSetY(vLookCurrent, 0.f);
+
+	// 4. 회전 각도 계산
+	_float fCosAngle = XMVectorGetX(XMVector3Dot(vLookCurrent, vLookTarget));
+	fCosAngle = XMMin(fCosAngle, 1.f); // 안전
+	fCosAngle = XMMax(fCosAngle, -1.f);
+	_float fAngle = acosf(fCosAngle);
+
+	// 5. 회전 제한: 초당 회전 속도 기반
+	_float fMaxDelta = m_fRotationPerSec * fDeltaTime;
+	if (fAngle > fMaxDelta)
+		fAngle = fMaxDelta;
+
+	// 6. 회전 축 계산
+	_vector vAxis = XMVector3Normalize(XMVector3Cross(vLookCurrent, vLookTarget));
+	if (XMVector3Equal(vAxis, XMVectorZero())) // 직선상일 때
+		vAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	// 7. 쿼터니언 회전 적용
+	_vector qRot = XMQuaternionRotationAxis(vAxis, fAngle);
+	_vector vLookNew = XMVector3Normalize(XMVector3Rotate(vLookCurrent, qRot));
+
+	// 8. Right, Up 벡터 계산
+	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLookNew));
+	_vector vUp = XMVector3Normalize(XMVector3Cross(vLookNew, vRight));
+
+	// 9. 스케일 적용
+	_float3 vScaled = Get_Scaled();
+	Set_State(STATE::RIGHT, vRight * vScaled.x);
+	Set_State(STATE::UP, vUp * vScaled.y);
+	Set_State(STATE::LOOK, vLookNew * vScaled.z);
+}
+
+
 void CTransform::Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit, CNavigation* pNavigation)
 {
 	_vector		vOriginPos = Get_State(STATE::POSITION);

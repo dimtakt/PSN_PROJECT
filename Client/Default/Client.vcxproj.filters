@@ -148,6 +148,12 @@
     <Filter Include="02.GameObject\UI\ScreenText">
       <UniqueIdentifier>{a05beaf6-ac60-4872-b595-96b56a3e2f6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Stage\Stages\Stage_01Kick">
+      <UniqueIdentifier>{3fe808d5-59c9-4fb7-a732-0907d776b2a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Stage\Stages\Stage_09FightCage">
+      <UniqueIdentifier>{c94765b6-6a5a-403e-9d36-afad100da9cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -288,6 +294,12 @@
     <ClInclude Include="..\public\UI_ScreenText.h">
       <Filter>02.GameObject\UI\ScreenText</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Stage_01Kick.h">
+      <Filter>01.Levels\Stage\Stages\Stage_01Kick</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage_09FightC.h">
+      <Filter>01.Levels\Stage\Stages\Stage_09FightCage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -425,6 +437,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_ScreenText.cpp">
       <Filter>02.GameObject\UI\ScreenText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage_01Kick.cpp">
+      <Filter>01.Levels\Stage\Stages\Stage_01Kick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage_09FightC.cpp">
+      <Filter>01.Levels\Stage\Stages\Stage_09FightCage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

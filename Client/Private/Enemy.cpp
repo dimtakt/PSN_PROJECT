@@ -7,9 +7,6 @@
 #include "CustomObj_Pickupable.h"
 
 
-#define _TESTDEFAULTWEAPON
-
-
 
 CEnemy::CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject( pDevice, pContext )
@@ -28,6 +25,8 @@ HRESULT CEnemy::Initialize_Prototype()
 
 HRESULT CEnemy::Initialize(void* pArg)
 {
+	ENEMY_DESC* pDesc = static_cast<ENEMY_DESC*>(pArg);
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -42,17 +41,26 @@ HRESULT CEnemy::Initialize(void* pArg)
 	m_pModelCom->Add_Animation();
 	m_pModelCom->Set_Animation(MOVE_L_IDLE, PART_LOWER, true);
 
-#ifdef _TESTDEFAULTWEAPON
 
-	if (FAILED(Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL))))
-		return E_FAIL;
-	if (m_pPart_Weapon)
-		static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
-
-#endif // _TESTDEFAULTWEAPON
 	m_iMaxHp	= 3;
 	m_iHp		= 3;	// ksta : 일정 시간 공격받지 않으면 다시 최대 체력으로 회복되어야 함.
 	
+
+
+	switch (pDesc->iDefaultWeaponObjType)
+	{
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
+	case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
+	{
+		Ready_PartObject(pDesc->iDefaultWeaponObjType);
+		static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
+	} break;
+	default:			break;	// 무기 기본값이 없거나 잘못된 값이 들어간 경우
+	}
+
+	for (auto& pos : pDesc->vecPremovePoses)
+		m_listPreMovePoses.push_back(pos);
 
 
 	m_fLogic_ElapsedTime = m_pGameInstance->Rand(0.f, m_fLogic_ResetIntervalTime);
@@ -71,9 +79,6 @@ void CEnemy::Update(_float fTimeDelta)
 {
 	// 행동 패턴 등.. 추후 컴포넌트 등을 이용하여 구현
 	// 함수 꼭 분리해서 난잡하지 않게 만들기
-
-
-
 
 	Update_NearestWeapons();
 	Update_Transform(fTimeDelta);
@@ -376,6 +381,11 @@ HRESULT CEnemy::Ready_PartObject(_uint iObjType, void* pArg)
 
 void CEnemy::Update_Transform(_float fTimeDelta)
 {
+	if (!m_listPreMovePoses.empty())
+	{
+		Update_Transform_PreMove(fTimeDelta);
+		return;
+	}
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
@@ -436,6 +446,28 @@ void CEnemy::Update_Transform(_float fTimeDelta)
 
 }
 
+void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
+{
+	if (m_listPreMovePoses.empty())
+		return;
+
+	const _float fTargetDist = 1.5f;		// 목표까지 해당 거리 이하가 되면 도달한 것으로 간주
+	_vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_listPreMovePoses.front()), 1.f);
+
+	// PreMove - 해당 위치로 이동함
+	m_pTransformCom->Chase(vTargetPos, fTimeDelta, fTargetDist / 2.f, m_pNavigationCom);
+	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - vTargetPos));
+
+	// PreMove - 해당 위치를 바라봄
+	m_pTransformCom->LookAt_Smooth(XMVectorSetY(vTargetPos, m_pTransformCom->Get_Position_Store().y), fTimeDelta);
+
+	// Premove - 목표 도달 시 맨 앞 원소 제거하여 다음 목표로 전환.
+	if (fDist < fTargetDist)
+	{
+		m_listPreMovePoses.pop_front();
+	}
+}
+
 void CEnemy::Update_AnimationState(_float fTimeDelta)
 {
 	// 상태 추가 (켜기) → |=
@@ -444,9 +476,15 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 
+	if (!m_listPreMovePoses.empty())
+	{
+		m_iState = ENUM_CLASS(ENEMY_STATE::MOVE);
+		return;
+	}
+
+
+
 	_float fShotInterval = 3.5f;
-
-
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));

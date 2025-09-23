@@ -184,6 +184,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\Skybox.h" />
+    <ClInclude Include="..\public\Stage_01Kick.h" />
+    <ClInclude Include="..\public\Stage_09FightC.h" />
     <ClInclude Include="..\public\Stage_Test1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
@@ -239,6 +241,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\Skybox.cpp" />
+    <ClCompile Include="..\private\Stage_01Kick.cpp" />
+    <ClCompile Include="..\private\Stage_09FightC.cpp" />
     <ClCompile Include="..\private\Stage_Test1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
