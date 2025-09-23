@@ -49,7 +49,14 @@ private:
 	HRESULT Loading_For_GamePlay_Level();
 	HRESULT Loading_For_Editor_Level();
 
+
+	HRESULT Loading_For_Test1();
+	HRESULT Loading_For_Stage_01Kick();
+	HRESULT Loading_For_Stage_09CageFight();
+
 	HRESULT Loading_For_Stages();
+
+
 
 
 

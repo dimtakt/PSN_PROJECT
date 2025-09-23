@@ -9,6 +9,9 @@
 
 #include "Stage_Test1.h"
 
+#include "Stage_01Kick.h"
+#include "Stage_09FightC.h"
+
 
 #include "BackGround.h"
 
@@ -19,7 +22,6 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
-	m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 	m_eNextLevelID = eNextLevelID;	 
 	Update_DestLevel(m_eNextLevelID);	// Level매니저에서 다음 레벨을 갱신. 프로토타입/객체 생성시에 해당 변수를 이용할 것.
 
@@ -30,7 +32,9 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	/* 다음 레벨을 위한 로딩작업을 시작 한다. */
 	if (FAILED(Ready_LoadingThread()))
 		return E_FAIL;
-	
+
+	if (m_eNextLevelID != LEVEL::LOGO)
+		m_pGameInstance->PlaySoundFixed(L"R_terminal_newline_1.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
 	
 	return S_OK;
 }
@@ -56,6 +60,12 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
 		case LEVEL::TEST_EXTRA1:
 			pNewLevel = CStage_Test1::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL::CH01_KICK:
+			pNewLevel = CStage_01Kick::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL::CH09_FIGHTC:
+			pNewLevel = CStage_09FightC::Create(m_pDevice, m_pContext);
 			break;
 		}
 

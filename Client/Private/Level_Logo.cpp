@@ -100,6 +100,14 @@ void CLevel_Logo::Update(_float fTimeDelta)
 				//if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::EDITOR))))
 				//	return;
 				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_01KICK):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::CH01_KICK))))
+					return;
+				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_09FIGHTC):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::CH09_FIGHTC))))
+					return;
+				break;
 			default:
 				break;
 			}
@@ -301,6 +309,12 @@ HRESULT CLevel_Logo::Render_Folder_Level()
 	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_TEST3):
 		strDescText = L"                       TEST3.. (unavailable)";
 		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_01KICK):
+		strDescText = L"                       01KICK";
+		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_09FIGHTC):
+		strDescText = L"                       09FIGHTC";
+		break;
 
 	default:
 		break;
@@ -325,6 +339,8 @@ HRESULT CLevel_Logo::Render_Folder_Level()
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL1.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL2.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL3.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
+	m_pGameInstance->Render_Font(strFontTag, L" 01Kick.lvl   -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" 09FightC.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L" ------------ --------", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 
 

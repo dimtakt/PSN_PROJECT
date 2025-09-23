@@ -1,4 +1,4 @@
-#include "Stage_Test1.h"
+#include "Stage_01Kick.h"
 
 #include "GameInstance.h"
 #include "Camera_Player.h"
@@ -7,36 +7,36 @@
 
 #include "CustomObj.h"
 
-CStage_Test1::CStage_Test1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CStage_01Kick::CStage_01Kick(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
 {
 }
 
-HRESULT CStage_Test1::Initialize()
+HRESULT CStage_01Kick::Initialize()
 {
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
-	  
+
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
 
-	_wstring strLoadPath = L"../Bin/Resources/_SUPERHOT/_BinaryLevels/Stage_Test1.datmap";
+	_wstring strLoadPath = L"../Bin/Resources/_SUPERHOT/_BinaryLevels/.datmap";
 	if (FAILED(Load_BinaryMap(&strLoadPath)))
 		return E_FAIL;
 
@@ -49,19 +49,19 @@ HRESULT CStage_Test1::Initialize()
 	return S_OK;
 }
 
-void CStage_Test1::Update(_float fTimeDelta)
+void CStage_01Kick::Update(_float fTimeDelta)
 {
 
 }
 
-HRESULT CStage_Test1::Render()
+HRESULT CStage_01Kick::Render()
 {
-	SetWindowText(g_hWnd, TEXT("Level : Stage_Test1 (Temp)"));
+	SetWindowText(g_hWnd, TEXT("Level : CH01_KICK (Temp)"));
 
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Lights()
+HRESULT CStage_01Kick::Ready_Lights()
 {
 	LIGHT_DESC			LightDesc{};
 
@@ -97,7 +97,7 @@ HRESULT CStage_Test1::Ready_Lights()
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_Camera(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
 	CCamera_Player::CAMERA_PLAYER_DESC		CameraDesc{};
 	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
@@ -109,56 +109,56 @@ HRESULT CStage_Test1::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraDesc.fMouseSensor = .2f;
 
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-	//	ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+	//	ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 	//	return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Camera_Player"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+		ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Camera_Player"), &CameraDesc)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_BackGround(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_BackGround(const _wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Terrain"))))
 	//	return E_FAIL; .// !! 필요없을듯>
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-		ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Skybox"))))
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+		ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Skybox"))))
 		return E_FAIL; // !!
 
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_UI(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_UI(const _wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag + L"_Crosshair",
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_Crosshair",
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_Crosshair"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag + L"_ScreenText",
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText",
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"))))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_Player(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_Player(const _wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player"))))
 		return E_FAIL;
-	CGameObject* pPlayer = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag);
+	CGameObject* pPlayer = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
 
-	_float4 pPos = {86.f, 0.f, 60.f, 1.f};
+	_float4 pPos = { 86.f, 0.f, 60.f, 1.f };
 	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
 
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 {
 	// ksta : Enemy는 모든 레벨에서 사용할 것이라, 프로토타입은 Static으로 주는 게 좋을 듯.
 	// 이 부분은 레이어 추가 부분이기에 이미 선언된 프로토타입을 이용하는 것임.
@@ -172,10 +172,10 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 	GameObjDesc.fRotationPerSec = XMConvertToRadians(180.f);
 	GameObjDesc.fSpeedPerSec = 15.f;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
 		return E_FAIL;
-	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag);
+	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
 
 	_float4 pPos = { 86.f, 0.f, 80.f ,1.f };
 	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
@@ -185,10 +185,10 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-	//	ENUM_CLASS(LEVEL::TEST_EXTRA1), TEXT("Prototype_GameObject_Particle_TriEffect"))))
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+	//	ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Particle_TriEffect"))))
 	//	return E_FAIL;
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
@@ -200,7 +200,7 @@ HRESULT CStage_Test1::Ready_Layer_Effect(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
+HRESULT CStage_01Kick::Ready_Pickup_Objects(const _wstring& strLayerTag)
 {
 	_wstring strLoadedTag = L"Layer_Loaded_Object";		// 로드된 오브젝트들이 담긴 레이어 태그
 
@@ -225,13 +225,13 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 		{
 			// 특정 타입이라면..
 			// 여기서 1. 새로 pickupobj 추가, 2. pickupobj의 모티브가 됐던 오브젝트 제거 구현할 것
-		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):		
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
 		{
 			//_wstring strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
 			// strModelPrototypeTag 라는 것은 모델 정의를 위해 Arg로 들어가야 하는 요소이고
 			// 미리 정의되어있을, 픽업오브젝트 기반의 "게임오브젝트" 프로토타입을 사용해야 함
 			// 이미 정의된 건 "모델" 프로토타입임. 그러므로 게임오브젝트 프로토타입은 따로 정의해야 함
-			
+
 			// 기반부터 틀린 것 같은데 그럼..
 
 			// 게임오브젝트 프로토타입을 여기서 말고 그냥 mainapp에서 만들고, 게임오브젝트는 여기서 만들면 되는 것 아님?
@@ -239,7 +239,7 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 			tDesc.strModelComPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
 			tDesc.iGameObjType = pTargetObject->Get_ObjType();
 
-			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", 
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable",
 				ENUM_CLASS(LEVEL::STATIC), L"Prototype_GameObject_Pickupable", &tDesc)))
 				return E_FAIL;
 			CTransform* pObjTransformCom = static_cast<CTransform*>((m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable")->Get_Component(L"Com_Transform")));
@@ -248,12 +248,12 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 				return E_FAIL;
 
 		}break;
-		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):		
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
 		{
 			tDesc.strModelComPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Pistol_Fixed";
 			tDesc.iGameObjType = pTargetObject->Get_ObjType();
 
-			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", 
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable",
 				ENUM_CLASS(LEVEL::STATIC), L"Prototype_GameObject_Pickupable", &tDesc)))
 				return E_FAIL;
 			CTransform* pObjTransformCom = static_cast<CTransform*>((m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable")->Get_Component(L"Com_Transform")));
@@ -261,38 +261,38 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 			if (FAILED(m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object", pTargetObject)))
 				return E_FAIL;
 		}break;
-		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):		
+		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
 		{
 			tDesc.strModelComPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Shotgun_Fixed";
 			tDesc.iGameObjType = pTargetObject->Get_ObjType();
 
-			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable", 
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Loaded_Object_Pickupable",
 				ENUM_CLASS(LEVEL::STATIC), L"Prototype_GameObject_Pickupable", &tDesc)))
 				return E_FAIL;
 			CTransform* pObjTransformCom = static_cast<CTransform*>((m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable")->Get_Component(L"Com_Transform")));
 			pObjTransformCom->Set_WorldMatrix(static_cast<CTransform*>(pTargetObject->Get_Component(L"Com_Transform"))->Get_WorldMatrix());
-			if(FAILED(m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object", pTargetObject)))
+			if (FAILED(m_pGameInstance->Remove_GameObject_FromLayer(iDestLevel, L"Layer_Loaded_Object", pTargetObject)))
 				return E_FAIL;
 		}break;
 		default:
 			iIndex++;
 			break;
 		}
-		
-		
+
+
 	}
-	
+
 	return S_OK;
 }
 
 
-CStage_Test1* CStage_Test1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CStage_01Kick* CStage_01Kick::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CStage_Test1* pInstance = new CStage_Test1(pDevice, pContext);
+	CStage_01Kick* pInstance = new CStage_01Kick(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CStage_Test1"));
+		MSG_BOX(TEXT("Failed to Created : CStage_01Kick"));
 		Safe_Release(pInstance);
 	}
 
@@ -300,7 +300,7 @@ CStage_Test1* CStage_Test1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 }
 
 
-void CStage_Test1::Free()
+void CStage_01Kick::Free()
 {
 	__super::Free();
 

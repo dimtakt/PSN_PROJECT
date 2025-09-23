@@ -55,6 +55,13 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_ScreenText"));
 	if (m_pUI_ScreenText == nullptr)	return E_FAIL;
 
+	switch (iDestLevel)
+	{
+	case ENUM_CLASS(LEVEL::CH01_KICK):
+		Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL));			break;
+	default:																		break;
+	}
+
 
 	m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
 
@@ -260,6 +267,8 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	switch (iDestLevelIndex)
 	{
 	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25;	break;
+	case ENUM_CLASS(LEVEL::CH01_KICK):		NaviDesc.iCurrentCellIndex = 0;		break;
+	case ENUM_CLASS(LEVEL::CH09_FIGHTC):	NaviDesc.iCurrentCellIndex = 3;		break;
 
 	default:								NaviDesc.iCurrentCellIndex = 0;		break;
 	}
@@ -754,7 +763,8 @@ void CPlayer::Update_UI(_float fTimeDelta)
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
-					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND);		break;
+					if (!dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_IsPickingUp())
+						iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND);		break;
 				case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
 					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICPUNCH);	break;
 				default:
