@@ -20,6 +20,7 @@ public:
     {
         _float followSpeed = 3.0f; // 클수록 더 빨리 목표에 붙음
         _float factor = 1.0f - expf(-followSpeed * fRawTimeDelta);
+        m_fRawTimeDelta = fRawTimeDelta;
 
         fTimeSpeed_Multiplier = fTimeSpeed_Multiplier * (1.0f - factor)
             + fTimeSpeed_ReqTarget * factor;
@@ -28,9 +29,11 @@ public:
         if (fTimeSpeed_Multiplier > fTimeSpeed_Max) fTimeSpeed_Multiplier = fTimeSpeed_Max;
     };
 
-    void Req_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue;  };
+    void Req_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue;  }
     void Set_EditTimeSpeed(_float fEditValue)           {   fTimeSpeed_ReqTarget = fEditValue; 
-                                                            fTimeSpeed_Multiplier = fEditValue; };
+                                                            fTimeSpeed_Multiplier = fEditValue; }
+    
+    _float Get_RawTimeDelta()                           {   return m_fRawTimeDelta; }
     _float Get_TimeSpeed()                              {   return fTimeSpeed_Multiplier;   }
 
 private:
@@ -39,6 +42,8 @@ private:
 
     const _float fTimeSpeed_Min = 0.01f;
     const _float fTimeSpeed_Max = 1.f;
+
+    _float m_fRawTimeDelta = {};
 
 public:
     static CTimeSpeed_Manager* Create()                 { return new CTimeSpeed_Manager(); }

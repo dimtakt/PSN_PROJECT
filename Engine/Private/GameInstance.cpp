@@ -673,6 +673,11 @@ _float CGameInstance::Get_TimeSpeed()
 	return m_pTimeSpeed_Manager->Get_TimeSpeed();
 }
 
+_float CGameInstance::Get_RawTimeDelta()
+{
+	return m_pTimeSpeed_Manager->Get_RawTimeDelta();
+}
+
 #pragma endregion
 
 // ==============================
