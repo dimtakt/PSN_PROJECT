@@ -58,7 +58,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	switch (iDestLevel)
 	{
 	case ENUM_CLASS(LEVEL::CH01_KICK):
-		Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL));			break;
+		Ready_PartObject(ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL));	static_cast<CWeapon_Gun*>(m_pPart_Weapon)->Set_toAttached(true);	break;
 	default:																		break;
 	}
 

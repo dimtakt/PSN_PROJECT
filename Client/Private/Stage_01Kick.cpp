@@ -6,6 +6,7 @@
 #include "CustomObj_Pickupable.h"
 
 #include "CustomObj.h"
+#include "Enemy.h"
 
 CStage_01Kick::CStage_01Kick(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
@@ -167,18 +168,23 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Monster"))))
 	//	return E_FAIL;
 
-	CGameObject::GAMEOBJECT_DESC GameObjDesc{};
+	CEnemy::ENEMY_DESC EnemyDesc{};
 
-	GameObjDesc.fRotationPerSec = XMConvertToRadians(180.f);
-	GameObjDesc.fSpeedPerSec = 15.f;
+	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
+	EnemyDesc.fSpeedPerSec = 15.f;
+
+	_float4 vStartPos = { 77.289f, 115.175f, 10.144f ,1.f };
+	EnemyDesc.vecPremovePoses = {
+		_float3{156.480f, 96.716f, 11.569f},
+		_float3{156.953f, 96.716f, 49.787f}
+	};
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 		return E_FAIL;
 	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
 
-	_float4 pPos = { 86.f, 0.f, 80.f ,1.f };
-	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(180));
 
 

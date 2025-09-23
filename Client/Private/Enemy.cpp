@@ -452,13 +452,14 @@ void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
 		return;
 
 	const _float fTargetDist = 1.5f;		// 목표까지 해당 거리 이하가 되면 도달한 것으로 간주
+	_vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_listPreMovePoses.front()), 1.f);
 
 	// PreMove - 해당 위치로 이동함
-	m_pTransformCom->Chase(XMLoadFloat3(&m_listPreMovePoses.front()), fTimeDelta, fTargetDist / 2.f, m_pNavigationCom);
-	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - XMLoadFloat3(&m_listPreMovePoses.front())));
+	m_pTransformCom->Chase(vTargetPos, fTimeDelta, fTargetDist / 2.f, m_pNavigationCom);
+	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - vTargetPos));
 
 	// PreMove - 해당 위치를 바라봄
-	m_pTransformCom->LookAt(XMVectorSetY(XMLoadFloat3(&m_listPreMovePoses.front()), m_pTransformCom->Get_Position_Store().y));
+	m_pTransformCom->LookAt_Smooth(XMVectorSetY(vTargetPos, m_pTransformCom->Get_Position_Store().y), fTimeDelta);
 
 	// Premove - 목표 도달 시 맨 앞 원소 제거하여 다음 목표로 전환.
 	if (fDist < fTargetDist)
@@ -475,9 +476,15 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 	// 상태 토글 (반전) → ^=
 	// 상태 확인 (켜져 있는지 검사) → &
 
+	if (!m_listPreMovePoses.empty())
+	{
+		m_iState = ENUM_CLASS(ENEMY_STATE::MOVE);
+		return;
+	}
+
+
+
 	_float fShotInterval = 3.5f;
-
-
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
