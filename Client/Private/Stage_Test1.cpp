@@ -42,8 +42,8 @@ HRESULT CStage_Test1::Initialize()
 		return E_FAIL;
 
 	// 맵 데이터를 통해 로드된 오브젝트들을 참고하여, 픽업 오브젝트로써 재정의 (로드 후 기존 것 삭제)
-	//if (FAILED(Ready_Pickup_Objects(TEXT("Layer_Pickup"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Pickup_Objects(TEXT("Layer_Pickup"))))
+		return E_FAIL;
 
 
 

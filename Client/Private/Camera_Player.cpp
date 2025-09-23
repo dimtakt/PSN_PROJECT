@@ -78,11 +78,15 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     _int    iMouseMove = {};
 
 
-    if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f),
-            fRawTimeDelta * iMouseMove * m_fMouseSensor);
-
-    if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
+    //if (iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+    //{
+    //    m_pPlayerTransformCom->Turn(
+    //        XMVectorSet(0.f, 1.f, 0.f, 0.f),
+    //        fRawTimeDelta * iMouseMove * m_fMouseSensor
+    //    );
+    //}
+    iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
+    iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);
     {
         _float fDeltaPitch = fRawTimeDelta * iMouseMove * m_fMouseSensor;
 
@@ -94,12 +98,17 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
         if (m_fPitch > TO_RAD(fAngleLimit)) m_fPitch = TO_RAD(fAngleLimit);
         if (m_fPitch < -TO_RAD(fAngleLimit)) m_fPitch = -TO_RAD(fAngleLimit);
 
-        // 제한된 Pitch 기준으로 회전
+        // 제한된 Pitch 기준으로 회전..
+        // 플레이어 회전값 가져와서
+        _float3 vPlayerEuler = m_pPlayerTransformCom->Get_RotationEuler_Store();
+
+        // 카메라에 직접 적용 (Pitch, PlayerYaw, 0)
         m_pTransformCom->Set_Rotation_DirectEuler(
-            _float3(TO_DEG(m_fPitch), m_pTransformCom->Get_RotationEuler_Store().y, 0.f)
+            _float3(TO_DEG(m_fPitch), vPlayerEuler.y, 0.f)
         );
 
     }
+
     __super::Update_PipeLines();
 }
 

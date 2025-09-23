@@ -40,6 +40,11 @@ HRESULT CUI_ScreenText::Initialize(void* pArg)
 
 void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 {
+    if (m_isActive)
+    {
+        m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
+    }
+
     int a = 10;
 }
 
@@ -48,10 +53,11 @@ void CUI_ScreenText::Update(_float fTimeDelta)
     _float fRawTimeDelta = fTimeDelta / m_pGameInstance->Get_TimeSpeed();
     
     const _float fActiveTime = 0.8f;
+    const _float fSizeTo = 0.95f;
     m_fActiveElapsed;
 
     // 시간이 지남에 따라 1.0 -> 0.8
-    Change_Size(1.f - (min((m_fActiveElapsed / fActiveTime), 1.f) * 0.2f));
+    Change_Size(1.f - (min((m_fActiveElapsed / fActiveTime), 1.f) * (1.f - fSizeTo)));
     
 
     if (m_isActive)
@@ -160,7 +166,7 @@ HRESULT CUI_ScreenText::Ready_Components()
     // 나중에 텍스쳐 할당 필요
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
-    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect"),       // Triangle.png
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),       // Triangle.png
         TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureComNoAmmo), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),  // Triangle_.png

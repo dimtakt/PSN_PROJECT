@@ -382,6 +382,15 @@ HRESULT CLoader::Loading_For_Stages()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
 		return E_FAIL;
 
+
+	/* UI_ScreenText */
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/NoAmmo.png"), 1))))
+		return E_FAIL;
+
+
+
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
 	/* Prototype_Component_VIBuffer_Terrain */
