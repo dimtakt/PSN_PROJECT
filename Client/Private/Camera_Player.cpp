@@ -87,6 +87,8 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     //}
     iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
     iMouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);
+
+
     {
         _float fDeltaPitch = fRawTimeDelta * iMouseMove * m_fMouseSensor;
 

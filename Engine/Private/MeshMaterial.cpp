@@ -61,6 +61,10 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 			//{
 			//	// fbm 넘겨
 			//}
+			//else if (false == strcmp(szExt, "."))
+			//{
+			//
+			//}
 			else										// 이외 (png, jpg, bmp등) 포맷은 범용 함수 사용 
 			{
 				if (FAILED(CreateWICTextureFromFile(m_pDevice, szFullPath, nullptr, &pSRV)))
