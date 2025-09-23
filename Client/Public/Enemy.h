@@ -20,7 +20,7 @@ class CEnemy final : public CContainerObject
 public:
 	typedef struct tagEnemyDesc : public GAMEOBJECT_DESC
 	{
-
+		_uint iDefaultWeaponObjType		= ENUM_CLASS(GAMEOBJ_TYPE::END);	// 기본으로 착용중일 오브젝트의 타입을 정의
 	}ENEMY_DESC;
 private:
 	CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

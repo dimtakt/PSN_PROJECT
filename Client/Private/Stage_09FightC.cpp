@@ -6,6 +6,7 @@
 #include "CustomObj_Pickupable.h"
 
 #include "CustomObj.h"
+#include "Enemy.h"
 
 CStage_09FightC::CStage_09FightC(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
@@ -168,19 +169,22 @@ HRESULT CStage_09FightC::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Monster"))))
 	//	return E_FAIL;
 
-	CGameObject::GAMEOBJECT_DESC GameObjDesc{};
+	CEnemy::ENEMY_DESC EnemyDesc{};
 
-	GameObjDesc.fRotationPerSec = XMConvertToRadians(180.f);
-	GameObjDesc.fSpeedPerSec = 15.f;
+	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
+	EnemyDesc.fSpeedPerSec = 15.f;
+	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
 
 	vector<_float4> vecEnemyPos = { 
 		_float4{ 86.f, 0.f, 80.f, 1.f } 
 	};
 
+	
+
 	for (_uint i = 0; i < vecEnemyPos.size(); i++)
 	{
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH09_FIGHTC), strLayerTag,
-			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
+			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
 		CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH09_FIGHTC), strLayerTag);
 
