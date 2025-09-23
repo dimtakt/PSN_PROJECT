@@ -123,6 +123,7 @@ void CWeapon_Gun::Throw(_vector* pDir, _float fThrowPower, _vector vRot, _uint i
     CGameObject* pPickupObj = m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Loaded_Object_Pickupable");
     CTransform* pObjTransformCom = static_cast<CTransform*>((pPickupObj->Get_Component(L"Com_Transform")));
     pObjTransformCom->Set_WorldMatrix(m_CombinedWorldMatrix);
+    pObjTransformCom->Set_Scale_Direct(_float3{5.f, 5.f, 5.f});
 
     // 생성한 pickupable 오브젝트의 콜라이더 설정. 플레이어가 던진다 가정
     vector<CCollider*>* vecObjColliders = pPickupObj->Get_Colliders();

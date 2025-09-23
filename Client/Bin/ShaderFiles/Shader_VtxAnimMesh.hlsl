@@ -1,6 +1,7 @@
 #include "Engine_Shader_Defines.hlsli"
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix g_WorldMatrixInv;
 
 float g_fFadeDeltaRatio = 0.f;
 
@@ -164,10 +165,13 @@ PS_OUT PS_MAIN_FADEOUT(PS_IN In)
     
     //const float gSpeed = 0.3f;
     const float fFadeWidth = 1.f;
-    const float fFadeSpeed = 12.f;
+    const float fFadeSpeed = 6.f;
     
     float fFadeStartHeight = g_fFadeDeltaRatio * fFadeSpeed;
-    float fHeightDiff = In.vWorldPos.y - fFadeStartHeight;
+
+    float4 vLocalPos = mul(float4(In.vWorldPos.xyz, 1.f), g_WorldMatrixInv);
+
+    float fHeightDiff = vLocalPos.y - fFadeStartHeight;
     float alpha = smoothstep(-fFadeWidth, fFadeWidth, fHeightDiff);
     
     // 알파 적용

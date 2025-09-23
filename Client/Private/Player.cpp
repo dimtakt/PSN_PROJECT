@@ -97,6 +97,12 @@ void CPlayer::Update(_float fTimeDelta)
 				static_cast<CWeapon*>(m_pPart_Weapon)->Set_toAttached(true);
 		}
 
+	if (m_pGameInstance->Get_IsKeyDown(DIK_L))
+	{
+		_float3 vPlayerPosDebug = m_pTransformCom->Get_Position_Store();
+		std::cout << "[CPlayer::Update] Player Current Pos : ( X : " << (_int)vPlayerPosDebug.x << ", Y : " << (_int)vPlayerPosDebug.y << ", Z : " << (_int)vPlayerPosDebug.z << " )" << std::endl;
+	}
+
 #endif // _DEBUG
 
 

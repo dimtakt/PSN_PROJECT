@@ -153,8 +153,9 @@ HRESULT CStage_01Kick::Ready_Layer_Player(const _wstring& strLayerTag)
 		return E_FAIL;
 	CGameObject* pPlayer = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
 
-	_float4 pPos = { 86.f, 0.f, 60.f, 1.f };
+	_float4 pPos = { 49.f, 96.f, 80.f, 1.f };
 	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
+	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(120));
 
 	return S_OK;
 }
@@ -173,20 +174,54 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
 	EnemyDesc.fSpeedPerSec = 15.f;
 
-	_float4 vStartPos = { 77.289f, 115.175f, 10.144f ,1.f };
+	_float4 vStartPos = {};
+	CGameObject* pEnemy = nullptr;
+
+	
+	// 1번 적 - 멀리서 뛰어옴.
+	vStartPos = { 77.289f, 115.175f, 10.144f, 1.f };
 	EnemyDesc.vecPremovePoses = {
-		_float3{156.480f, 96.716f, 11.569f},
-		_float3{156.953f, 96.716f, 49.787f}
+		_float3{156.4f, 96.7f, 11.5f},
+		_float3{156.9f, 96.7f, 49.7f},
+		_float3{144.1f, 96.7f, 53.0f}
 	};
+	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::END);
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 		return E_FAIL;
-	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
+	pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
 
 	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(180));
 
+
+	// 2번 적 - 원거리에서 사격.
+	vStartPos = { 158.f, 96.f, 58.f, 1.f };
+	EnemyDesc.vecPremovePoses = {};
+	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
+		return E_FAIL;
+	pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
+
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(180));
+
+
+	// 3번 적 - 시작하자마자 죽는 해당 위치
+	vStartPos = { 72.f, 96.f, 71.f, 1.f };
+	EnemyDesc.vecPremovePoses = {};
+	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::END);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
+		return E_FAIL;
+	pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag);
+
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
+	dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(180));
 
 	return S_OK;
 }

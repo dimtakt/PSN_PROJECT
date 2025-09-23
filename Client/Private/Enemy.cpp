@@ -342,6 +342,11 @@ HRESULT CEnemy::Bind_ShaderResources()
 		return E_FAIL;
 
 
+	_float4x4 matWorldInv = {};
+	XMStoreFloat4x4(&matWorldInv, m_pTransformCom->Get_WorldMatrix_Inverse());
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrixInv", &matWorldInv)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
