@@ -37,7 +37,7 @@ HRESULT CStage_09FightC::Initialize()
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
 
-	_wstring strLoadPath = L"../Bin/Resources/_SUPERHOT/_BinaryLevels/Stage_CageFight.datmap";
+	_wstring strLoadPath = L"../Bin/Resources/_SUPERHOT/_BinaryLevels/Stage_09CageFight.datmap";
 	if (FAILED(Load_BinaryMap(&strLoadPath)))
 		return E_FAIL;
 
@@ -219,30 +219,16 @@ HRESULT CStage_09FightC::Ready_Pickup_Objects(const _wstring& strLayerTag)
 	_uint iIndex = 0;
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
-	// 현재 맵에 무기 오브젝트들이 없는 경우에는 해당 모델이 로드되어 있지 않아서 문제가 생김
-	// 그냥 픽업오브젝트용 모델 및 프로토타입 오브젝트 미리 로드해두면 될 것 같은데..
-
+	// 현재 맵에 무기 오브젝트들이 없는 경우에는 해당 모델이 로드되어 있지 않음으로 인한 문제가 생기므로 미리 로드
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	if FAILED(Add_Prototype_Direct(
-		iDestLevel,
-		L"Weapon_Karabin_Fixed",
-		&PreTransformMatrix
-	))
-		std::cout << L"[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Karabin_Fixed)" << std::endl;
-	if FAILED(Add_Prototype_Direct(
-		iDestLevel,
-		L"Weapon_Pistol_Fixed",
-		&PreTransformMatrix
-	))
-		std::cout << L"[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Pistol_Fixed)" << std::endl;
-	if FAILED(Add_Prototype_Direct(
-		iDestLevel,
-		L"Weapon_Shotgun_Fixed",
-		&PreTransformMatrix
-	))
-		std::cout << L"[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Shotgun_Fixed)" << std::endl;
+	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Karabin_Fixed", &PreTransformMatrix))
+		std::cout << "[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Karabin_Fixed)" << std::endl;
+	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Pistol_Fixed", &PreTransformMatrix))
+		std::cout << "[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Pistol_Fixed)" << std::endl;
+	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Shotgun_Fixed", &PreTransformMatrix))
+		std::cout << "[CStage_09FightC::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Shotgun_Fixed)" << std::endl;
 
 	
 	// 오브젝트 검사 순회. 

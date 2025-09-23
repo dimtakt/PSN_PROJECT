@@ -207,6 +207,18 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 	_uint iIndex = 0;
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
+	// 현재 맵에 무기 오브젝트들이 없는 경우에는 해당 모델이 로드되어 있지 않음으로 인한 문제가 생기므로 미리 로드
+	//_matrix		PreTransformMatrix = XMMatrixIdentity();
+	//PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//
+	//if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Karabin_Fixed", &PreTransformMatrix))
+	//	std::cout << "[CStage_Test1::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Karabin_Fixed)" << std::endl;
+	//if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Pistol_Fixed", &PreTransformMatrix))
+	//	std::cout << "[CStage_Test1::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Pistol_Fixed)" << std::endl;
+	//if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Shotgun_Fixed", &PreTransformMatrix))
+	//	std::cout << "[CStage_Test1::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Shotgun_Fixed)" << std::endl;
+
+
 	// 오브젝트 검사 순회. 
 	// 로드된 오브젝트들 중 무기와 같이 pickupable 해야하는 오브젝트들은 해당 오브젝트로 교체 (타입 재생성 후 원본삭제)
 	while (true)
@@ -227,15 +239,6 @@ HRESULT CStage_Test1::Ready_Pickup_Objects(const _wstring& strLayerTag)
 			// 여기서 1. 새로 pickupobj 추가, 2. pickupobj의 모티브가 됐던 오브젝트 제거 구현할 것
 		case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):		
 		{
-			//_wstring strModelPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
-			// strModelPrototypeTag 라는 것은 모델 정의를 위해 Arg로 들어가야 하는 요소이고
-			// 미리 정의되어있을, 픽업오브젝트 기반의 "게임오브젝트" 프로토타입을 사용해야 함
-			// 이미 정의된 건 "모델" 프로토타입임. 그러므로 게임오브젝트 프로토타입은 따로 정의해야 함
-			
-			// 기반부터 틀린 것 같은데 그럼..
-
-			// 게임오브젝트 프로토타입을 여기서 말고 그냥 mainapp에서 만들고, 게임오브젝트는 여기서 만들면 되는 것 아님?
-			// 좌표 정보도 옮겨야 함
 			tDesc.strModelComPrototypeTag = L"Prototype_Component_Model_Custom_Weapon_Karabin_Fixed";
 			tDesc.iGameObjType = pTargetObject->Get_ObjType();
 
