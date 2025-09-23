@@ -50,7 +50,7 @@ private:
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
-	_uint				m_iGameObjType = { };
+	//_uint				m_iGameObjType = { };
 	_vector				m_vMoveDir = { };
 
 	CShader*			m_pShaderCom = { nullptr };

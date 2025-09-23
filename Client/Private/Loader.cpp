@@ -435,9 +435,9 @@ HRESULT CLoader::Loading_For_Stages()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle.png"), 1))))
 		return E_FAIL;
 	/* Prototype_Component_Texture_Particle_Triangle_Test */
-	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle_.png"), 1))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),
+	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle_.png"), 1))))
+	//	return E_FAIL;
 	/* Prototype_Component_Texture_Snow */
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_Snow"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))

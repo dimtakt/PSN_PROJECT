@@ -27,6 +27,18 @@ private:
 
 	HRESULT Ready_Pickup_Objects(const _wstring& strLayerTag);
 
+private:
+	void	Update_TriggerOnce();
+
+private:
+	_bool	m_isTriggered = false;
+
+	_float	m_fUIEventDeltaTime = 0.f;
+	_bool	m_isUIEventTriggered = false;
+
+private:
+	class CUI_ScreenText* m_pUIScreenText = nullptr;
+
 public:
 	static CStage_01Kick* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

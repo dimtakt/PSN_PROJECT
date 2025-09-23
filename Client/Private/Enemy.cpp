@@ -121,7 +121,7 @@ void CEnemy::Update(_float fTimeDelta)
 
 	if (m_isDeadStandby)
 	{
-		m_fDeadDeltaTime += fRawTimeDelta;
+		m_fDeadDeltaTime += fTimeDelta;
 		
 
 		if (m_fDeadDeltaTime >= fDeadTime)
@@ -231,6 +231,15 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 	// 이는 피격 당 1회 (정확히는 최소 0.2초 간격) 로만 발동됨.
 
 	// 맞은 desc와 공격한 desc 정보 둘 다를 받아와야 할 듯
+
+
+	// 총에는 한 방에 죽음
+	if (pColDescFrom->pOwner->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+	{
+		m_iHp = 0;
+		m_isDeadStandby = true;
+	}
+
 	
 	CCollider* pHitCom = pColDescTo->pColCom;	// 공격받은 콜라이더
 
@@ -877,18 +886,24 @@ void CEnemy::Update_NearestWeapons()
 
 
 		// 콜라이더 있는지 검사. 없으면 throw 된 것으로 간주하고 포함 X
-
 		// !! 이렇게 하면 안되고, 콜라이더의 인덱스 타입이 THROW인지로 확인해야 할 것 같음
-		_bool isThrowColliders = false;
+		// !! 또한 pickingup중인 것도 제외해야 함
+		_bool isNotPickupable = false;
 
 		vector<CCollider*>* vecColliders = pWeapon->Get_Colliders();
 		for (_uint i = 0; i < ENUM_CLASS(COLLIDERTYPE::END); i++)
 			for (auto& collider : vecColliders[i])
 				if ((collider->Get_ColDesc().iLayerIndex & ENUM_CLASS(COLLISION_LAYER::THROWN)) &&
-					isThrowColliders == false)
-					isThrowColliders = true;
+					isNotPickupable == false)
+				{
+					isNotPickupable = true;
+					break;
+				}
 
-		if (isThrowColliders)
+		if (isNotPickupable == false)
+			isNotPickupable = static_cast<CCustomObj_Pickupable*>(pWeapon)->Get_IsPickingUp();
+
+		if (isNotPickupable)
 			continue;
 
 		vecDroppedWeapons.push_back(pWeapon);

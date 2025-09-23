@@ -50,9 +50,10 @@ void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 
 void CUI_ScreenText::Update(_float fTimeDelta)
 {
-    _float fRawTimeDelta = fTimeDelta / m_pGameInstance->Get_TimeSpeed();
+    //_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+    _float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
     
-    const _float fActiveTime = 0.8f;
+    const _float fActiveTime = 1.2f;
     const _float fSizeTo = 0.95f;
     m_fActiveElapsed;
 
@@ -60,6 +61,7 @@ void CUI_ScreenText::Update(_float fTimeDelta)
     Change_Size(1.f - (min((m_fActiveElapsed / fActiveTime), 1.f) * (1.f - fSizeTo)));
     
 
+    // 이동안에는 플레이어도 느려지게 해야 할 듯?
     if (m_isActive)
     {
         m_fActiveElapsed += fRawTimeDelta;
@@ -169,8 +171,8 @@ HRESULT CUI_ScreenText::Ready_Components()
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),       // Triangle.png
         TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureCom_NoAmmo), nullptr)))
         return E_FAIL;
-    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),  // Triangle_.png
-        TEXT("Com_Texture_Info1"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),  // Triangle_.png
+        TEXT("Com_Texture_TimeMoves"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
         return E_FAIL;
 
 

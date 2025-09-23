@@ -8,6 +8,8 @@
 #include "CustomObj.h"
 #include "Enemy.h"
 
+#include "UI_ScreenText.h"
+
 CStage_01Kick::CStage_01Kick(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
 {
@@ -45,13 +47,28 @@ HRESULT CStage_01Kick::Initialize()
 	if (FAILED(Ready_Pickup_Objects(TEXT("Layer_Pickup"))))
 		return E_FAIL;
 
-
-
 	return S_OK;
 }
 
 void CStage_01Kick::Update(_float fTimeDelta)
 {
+	if (!m_isTriggered)
+	{
+		Update_TriggerOnce();
+		m_isTriggered = true;
+	}
+
+	if (!m_isUIEventTriggered)
+	{
+		m_fUIEventDeltaTime += fTimeDelta;
+
+		if (m_fUIEventDeltaTime >= 0.8f)
+		{
+			m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES));
+			m_isUIEventTriggered = true;
+		}
+	}
+
 
 }
 
@@ -143,6 +160,8 @@ HRESULT CStage_01Kick::Ready_Layer_UI(const _wstring& strLayerTag)
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"))))
 		return E_FAIL;
 
+	m_pUIScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText"));
+
 	return S_OK;
 }
 
@@ -155,7 +174,7 @@ HRESULT CStage_01Kick::Ready_Layer_Player(const _wstring& strLayerTag)
 
 	_float4 pPos = { 49.f, 96.f, 80.f, 1.f };
 	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&pPos));
-	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(120));
+	dynamic_cast<CTransform*>(pPlayer->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(114));
 
 	return S_OK;
 }
@@ -327,6 +346,26 @@ HRESULT CStage_01Kick::Ready_Pickup_Objects(const _wstring& strLayerTag)
 	}
 
 	return S_OK;
+}
+
+void CStage_01Kick::Update_TriggerOnce()
+{
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	CPlayer* pPlayer = dynamic_cast<CPlayer*> (m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
+	CEnemy* pFirstEnemy = dynamic_cast<CEnemy*> (m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Monster", 2U));
+
+	_vector vStartPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+	_vector vTargetPos = static_cast<CTransform*>(pFirstEnemy->CGameObject::Get_Component(L"Com_Transform"))->Get_Position();
+	vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + 5.f);
+
+
+	//_vector vDir = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW).r[2];
+	_vector vDir = vTargetPos - vStartPos;
+	vDir = XMVector3Normalize(vDir);
+
+	static_cast<CWeapon_Gun*>(pPlayer->Get_WeaponPart())->Shot(&vDir, ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
+	m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
+	m_pGameInstance->Req_EditTimeSpeed(0.01f);
 }
 
 
