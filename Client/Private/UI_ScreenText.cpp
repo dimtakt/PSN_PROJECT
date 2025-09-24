@@ -164,10 +164,6 @@ HRESULT CUI_ScreenText::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_UI_Crosshair"),
-    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-    //    return E_FAIL;
-
 
     // 나중에 텍스쳐 할당 필요
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();

@@ -35,6 +35,14 @@ namespace Client
 		END
 	};
 
+	enum class SCREENFONT_INDEX
+	{
+		TUTORIAL_LMBTOSHOOT,
+
+		LVLEND_SPACETO,
+
+		END
+	};
 
 
 	enum class ENEMY_STATE {

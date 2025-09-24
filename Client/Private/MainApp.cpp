@@ -27,6 +27,8 @@
 // UI
 #include "UI_Crosshair.h"
 #include "UI_ScreenText.h"
+#include "UI_ScreenFont.h"
+
 
 
 // Particle 
@@ -290,6 +292,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"),
 		CUI_ScreenText::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenFont"),
+		CUI_ScreenFont::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Transform"),

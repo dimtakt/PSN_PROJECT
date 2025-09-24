@@ -189,6 +189,7 @@
     <ClInclude Include="..\public\Stage_Test1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
+    <ClInclude Include="..\public\UI_ScreenFont.h" />
     <ClInclude Include="..\public\UI_ScreenText.h" />
     <ClInclude Include="..\public\Weapon.h" />
     <ClInclude Include="..\public\Weapon_Gun.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="..\private\Stage_Test1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
+    <ClCompile Include="..\private\UI_ScreenFont.cpp" />
     <ClCompile Include="..\private\UI_ScreenText.cpp" />
     <ClCompile Include="..\private\Weapon.cpp" />
     <ClCompile Include="..\private\Weapon_Gun.cpp" />

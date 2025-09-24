@@ -108,6 +108,7 @@ protected:
 	_uint					m_iSuperHot = 0;
 
 	class CUI_ScreenText*	m_pUIScreenText = { nullptr };
+	class CUI_ScreenFont*	m_pUIScreenFont = { nullptr };
 
 public:
 	virtual void Free() override;

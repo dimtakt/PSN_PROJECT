@@ -10,6 +10,7 @@
 #include "Enemy.h"
 
 #include "UI_ScreenText.h"
+#include "UI_ScreenFont.h"
 
 CStage_01Kick::CStage_01Kick(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
@@ -67,6 +68,9 @@ void CStage_01Kick::Update(_float fTimeDelta)
 			m_isUIEventTriggered = true;
 		}
 	}
+
+	// 특정 시간 구간에 걸쳐 일어나는 이벤트
+	Update_Trigger_OnTime(fTimeDelta);
 
 	// 레벨 종료 조건 검사
 	Update_CheckEndLevel(fTimeDelta);
@@ -152,6 +156,7 @@ HRESULT CStage_01Kick::Ready_Layer_BackGround(const _wstring& strLayerTag)
 
 HRESULT CStage_01Kick::Ready_Layer_UI(const _wstring& strLayerTag)
 {
+
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_Crosshair",
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_Crosshair"))))
 		return E_FAIL;
@@ -159,9 +164,12 @@ HRESULT CStage_01Kick::Ready_Layer_UI(const _wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText",
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"))))
 		return E_FAIL;
-
 	m_pUIScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText"));
-	CLevel_Stage::m_pUIScreenText = m_pUIScreenText;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenFont",
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenFont"))))
+		return E_FAIL;
+	m_pUIScreenFont = dynamic_cast<CUI_ScreenFont*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenFont"));
 
 	return S_OK;
 }
@@ -374,6 +382,16 @@ void CStage_01Kick::Update_TriggerOnce()
 	// ==============================
 
 	m_isTriggered = true;
+}
+
+void CStage_01Kick::Update_Trigger_OnTime(_float fTimeDelta)
+{
+	m_fTimeEventDeltaTime += fTimeDelta;
+
+	//if (IS_BETWEEN(m_fTimeEventDeltaTime, 2.0f, 7.0f) && !m_isEndLevelStandby)
+	//{
+	m_pUIScreenFont->Render_ScreenFont(ENUM_CLASS(SCREENFONT_INDEX::TUTORIAL_LMBTOSHOOT));
+	//}
 }
 
 CStage_01Kick* CStage_01Kick::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

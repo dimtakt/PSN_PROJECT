@@ -29,16 +29,19 @@ private:
 
 private:
 	void	Update_TriggerOnce();
+	void	Update_Trigger_OnTime(_float fTimeDelta);
 
 private:
 	_bool	m_isTriggered			= false;
+	_float	m_fTimeEventDeltaTime	= 0.f;
 
 	_bool	m_isUIEventTriggered	= false;
 	_float	m_fUIEventDeltaTime		= 0.f;
 
 
 private:
-	class CUI_ScreenText* m_pUIScreenText = nullptr;
+	//class CUI_ScreenText* m_pUIScreenText = nullptr;
+	//class CUI_ScreenFont* m_pUIScreenFont = nullptr;
 
 public:
 	static CStage_01Kick* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
