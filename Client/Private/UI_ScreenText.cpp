@@ -51,7 +51,7 @@ void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 void CUI_ScreenText::Update(_float fTimeDelta)
 {
     //_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
-    _float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+    _float fRawTimeDelta = m_pGameInstance->Get_RawTimeDelta();
     
     const _float fActiveTime = 1.2f;
     const _float fSizeTo = 0.95f;
@@ -128,7 +128,11 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
     case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):              m_pCurTextureCom = m_pTextureCom_NoAmmo;        break;
     case ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES):           m_pCurTextureCom = m_pTextureCom_TimeMoves;     break;
 
-    default:                                                                                            break;
+
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER):        m_pCurTextureCom = m_pTextureCom_LVLEnd_Super;  break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT):          m_pCurTextureCom = m_pTextureCom_LVLEnd_Hot;    break;
+
+    default:                                                                                                break;
     }
 }
 
@@ -168,11 +172,17 @@ HRESULT CUI_ScreenText::Ready_Components()
     // 나중에 텍스쳐 할당 필요
     _uint iDestLevel = m_pGameInstance->Get_DestLevel();
 
-    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),       // Triangle.png
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),
         TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureCom_NoAmmo), nullptr)))
         return E_FAIL;
-    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),  // Triangle_.png
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),
         TEXT("Com_Texture_TimeMoves"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Super"),
+        TEXT("Com_Texture_LVLEnd_Super"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_Super), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Hot"),
+        TEXT("Com_Texture_LVLEnd_Hot"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_Hot), nullptr)))
         return E_FAIL;
 
 
@@ -214,4 +224,6 @@ void CUI_ScreenText::Free()
 
     Safe_Release(m_pTextureCom_NoAmmo);
     Safe_Release(m_pTextureCom_TimeMoves);
+    Safe_Release(m_pTextureCom_LVLEnd_Super);
+    Safe_Release(m_pTextureCom_LVLEnd_Hot);
 }

@@ -1,4 +1,5 @@
 #include "Stage_01Kick.h"
+#include "Level_Loading.h"
 
 #include "GameInstance.h"
 #include "Camera_Player.h"
@@ -52,12 +53,10 @@ HRESULT CStage_01Kick::Initialize()
 
 void CStage_01Kick::Update(_float fTimeDelta)
 {
-	if (!m_isTriggered)
-	{
-		Update_TriggerOnce();
-		m_isTriggered = true;
-	}
+	// 레벨 시작 시 최초 이벤트
+	Update_TriggerOnce();
 
+	// 레벨 시작 후 n초 뒤 일어날 이벤트
 	if (!m_isUIEventTriggered)
 	{
 		m_fUIEventDeltaTime += fTimeDelta;
@@ -69,7 +68,8 @@ void CStage_01Kick::Update(_float fTimeDelta)
 		}
 	}
 
-
+	// 레벨 종료 조건 검사
+	Update_CheckEndLevel(fTimeDelta);
 }
 
 HRESULT CStage_01Kick::Render()
@@ -350,6 +350,10 @@ HRESULT CStage_01Kick::Ready_Pickup_Objects(const _wstring& strLayerTag)
 
 void CStage_01Kick::Update_TriggerOnce()
 {
+	if (m_isTriggered)
+		return;
+
+	// ==============================
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
 	CPlayer* pPlayer = dynamic_cast<CPlayer*> (m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
 	CEnemy* pFirstEnemy = dynamic_cast<CEnemy*> (m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Monster", 2U));
@@ -366,8 +370,61 @@ void CStage_01Kick::Update_TriggerOnce()
 	static_cast<CWeapon_Gun*>(pPlayer->Get_WeaponPart())->Shot(&vDir, ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET));
 	m_pGameInstance->Req_EditTimeSpeed(1.0f, true);
 	m_pGameInstance->Req_EditTimeSpeed(0.01f);
+	// ==============================
+
+	m_isTriggered = true;
 }
 
+void CStage_01Kick::Update_CheckEndLevel(_float fTimeDelta)
+{
+	// 현재 스테이지에 적이 더이상 남아있지 않다면, 레벨의 종료 준비
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+	CGameObject* pFrontEnemy = m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Monster");
+
+	// 종료 준비 활성화, 종료 준비 중 돌릴 작업 수행 (UI효과 등)
+	if (pFrontEnemy == nullptr)
+		m_isEndLevelStandby = true;					
+	if (m_isEndLevelStandby)
+		Update_EndLevelStandby(fTimeDelta);
+
+	if (m_isEndLevel)							// 종료 조건 시
+		Change_ToNextLevel(LEVEL::CH09_FIGHTC);	// 전환
+}
+
+void CStage_01Kick::Update_EndLevelStandby(_float fTimeDelta)
+{
+	m_fEndLevelDeltaTime += (m_pGameInstance->Get_RawTimeDelta());	
+
+	if		(m_fEndLevelDeltaTime < 1.2f && (iSuperHot != 1))
+	{
+		iSuperHot = 1;
+		m_pUIScreenText->Change_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER));
+	}
+	else if (m_fEndLevelDeltaTime < 2.5f && (iSuperHot == 1))
+	{
+		iSuperHot = 2;
+		m_pUIScreenText->Change_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT));
+
+		m_fEndLevelDeltaTime = 0;
+	}
+
+		
+		
+
+	// 키 입력 시 레벨 넘김
+	if (m_pGameInstance->Get_IsKeyDown(DIK_SPACE) ||
+		m_pGameInstance->Get_IsKeyDown(DIK_RETURN))
+	{
+		m_isEndLevel = true;
+	}
+}
+
+void CStage_01Kick::Change_ToNextLevel(LEVEL eLevel)
+{
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eLevel))))
+		MSG_BOX(L"[CStage_01Kick::Change_Level] Changing Level Failed.");
+}
 
 CStage_01Kick* CStage_01Kick::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

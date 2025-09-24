@@ -127,6 +127,12 @@ void CWeapon_Pistol::Late_Update(_float fTimeDelta)
     // weapon.cpp 에서 렌더그룹 및 디버그용 렌더 준비중 
     __super::Late_Update(fTimeDelta);
 
+#ifdef _DEBUG
+    for (auto& vecColliders : m_vecCollidersCom)
+        for (auto& collider : vecColliders)
+            if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
+                return;
+#endif
 }
 
 HRESULT CWeapon_Pistol::Render()
@@ -198,6 +204,12 @@ HRESULT CWeapon_Pistol::Ready_Components()
     OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
     OBBDesc.vExtents = _float3(.03f, .10f, .15f);
     OBBDesc.vCenter = _float3(0.f, 0.f, +(OBBDesc.vExtents.z * 0.4f));
+    OBBDesc.tColDesc = {
+        ENUM_CLASS(COLLISION_LAYER::NONE),
+        ENUM_CLASS(COLLISION_LAYER::NONE),
+        true,
+        this
+    };
 
     CCollider* tmpColCom = nullptr;
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),

@@ -381,9 +381,6 @@ HRESULT CLoader::Loading_For_Test1()
 
 HRESULT CLoader::Loading_For_Stage_01Kick()
 {
-	if (FAILED(Loading_For_Stages()))
-		return E_FAIL;
-
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
 
 	/* Prototype_Component_Navigation */
@@ -391,19 +388,22 @@ HRESULT CLoader::Loading_For_Stage_01Kick()
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_01Kick.datnavmesh")))))
 		return E_FAIL;
 
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
 HRESULT CLoader::Loading_For_Stage_09CageFight()
 {
-	if (FAILED(Loading_For_Stages()))
-		return E_FAIL;
-
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
 
 	/* Prototype_Component_Navigation */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::CH09_FIGHTC), TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_09CageFight.datnavmesh")))))
+		return E_FAIL;
+
+	if (FAILED(Loading_For_Stages()))
 		return E_FAIL;
 
 	return S_OK;
@@ -450,6 +450,12 @@ HRESULT CLoader::Loading_For_Stages()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/TimeMoves.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Super"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/LVLEnd_SUPER.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Hot"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/LVLEnd_HOT.png"), 1))))
 		return E_FAIL;
 
 

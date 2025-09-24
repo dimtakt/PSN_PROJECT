@@ -29,12 +29,22 @@ private:
 
 private:
 	void	Update_TriggerOnce();
+	void	Update_CheckEndLevel(_float fTimeDelta);
+	void	Update_EndLevelStandby(_float fTimeDelta);
+
+	void	Change_ToNextLevel(LEVEL eLevel);
 
 private:
-	_bool	m_isTriggered = false;
+	_bool	m_isTriggered			= false;
 
-	_float	m_fUIEventDeltaTime = 0.f;
-	_bool	m_isUIEventTriggered = false;
+	_float	m_fUIEventDeltaTime		= 0.f;
+	_float	m_fEndLevelDeltaTime	= 0.f;
+
+	_bool	m_isUIEventTriggered	= false;
+
+	_bool	m_isEndLevelStandby		= false;
+	_bool	m_isEndLevel			= false;
+	_uint	iSuperHot				= 0;
 
 private:
 	class CUI_ScreenText* m_pUIScreenText = nullptr;

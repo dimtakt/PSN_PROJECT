@@ -74,13 +74,6 @@ void CWeapon::Late_Update(_float fTimeDelta)
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
-
-#ifdef _DEBUG
-    for (auto& vecColliders : m_vecCollidersCom)
-        for (auto& collider : vecColliders)
-            if (FAILED(m_pGameInstance->Add_DebugComponent(collider)))
-                return;
-#endif
 }
 
 HRESULT CWeapon::Render()
@@ -164,9 +157,6 @@ void CWeapon::Free()
 {
     __super::Free();
 
-    for (auto& vecColliders : m_vecCollidersCom)
-        for (auto& collider : vecColliders)
-            Safe_Release(collider);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

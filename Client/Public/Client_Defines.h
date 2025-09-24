@@ -28,6 +28,10 @@ namespace Client
 		TIMEMOVES,
 
 
+
+		LVLEND_SUPER,
+		LVLEND_HOT,
+
 		END
 	};
 
