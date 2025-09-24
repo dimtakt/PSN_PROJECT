@@ -22,6 +22,7 @@ public:
 	{
 		_uint iDefaultWeaponObjType		= ENUM_CLASS(GAMEOBJ_TYPE::END);	// 기본으로 착용중일 오브젝트의 타입을 정의
 		vector<_float3> vecPremovePoses	= {};
+		_uint iFirstCellIndex = 0;
 	}ENEMY_DESC;
 private:
 	CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

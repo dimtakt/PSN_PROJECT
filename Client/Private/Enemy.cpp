@@ -303,6 +303,8 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 {
 	// 컴포넌트 준비
 	_uint iDestLevelIndex = m_pGameInstance->Get_DestLevel();
+	ENEMY_DESC* pDesc = static_cast<ENEMY_DESC*>(pArg);
+
 
 	m_pTransformCom->Scale(_float3{ 5.f, 5.f, 5.f });
 
@@ -322,6 +324,8 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 
 	default:								NaviDesc.iCurrentCellIndex = 0;		break;
 	}
+
+	NaviDesc.iCurrentCellIndex = pDesc->iFirstCellIndex;
 
 	if (FAILED(CGameObject::Add_Component(iDestLevelIndex, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))

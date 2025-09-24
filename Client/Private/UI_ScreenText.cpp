@@ -40,43 +40,44 @@ HRESULT CUI_ScreenText::Initialize(void* pArg)
 
 void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 {
-    if (m_isActive)
+    if (!m_isActive)
+    {
+        return;
+    }
+
+    
+    if (
+        m_pCurTextureCom == m_pTextureCom_NoAmmo
+        )
     {
         m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
     }
 
-    int a = 10;
+    
 }
 
 void CUI_ScreenText::Update(_float fTimeDelta)
 {
-    //_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
-    _float fRawTimeDelta = m_pGameInstance->Get_RawTimeDelta();
-    
-    const _float fActiveTime = 1.2f;
-    const _float fSizeTo = 0.95f;
-    m_fActiveElapsed;
-
-    // 시간이 지남에 따라 1.0 -> 0.8
-    Change_Size(1.f - (min((m_fActiveElapsed / fActiveTime), 1.f) * (1.f - fSizeTo)));
-    
-
-    // 이동안에는 플레이어도 느려지게 해야 할 듯?
-    if (m_isActive)
+    if (
+        m_pCurTextureCom == m_pTextureCom_NoAmmo ||
+        m_pCurTextureCom == m_pTextureCom_TimeMoves ||
+        m_pCurTextureCom == m_pTextureCom_LVLEnd_Super ||
+        m_pCurTextureCom == m_pTextureCom_LVLEnd_Hot
+        )
     {
-        m_fActiveElapsed += fRawTimeDelta;
-    
-        if (m_fActiveElapsed > fActiveTime)
-        {
-            m_fActiveElapsed = 0.f;
-            m_isActive = false;
-        }
-        else if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && (m_fActiveElapsed > (fActiveTime / 2.f)))
-        {
-            m_fActiveElapsed = 0.f;
-            m_isActive = false;
-        }
+        Update_PopupUI(fTimeDelta);
     }
+
+    else if (
+        m_pCurTextureCom == m_pTextureCom_TUTO_LeftClick
+        )
+    {
+        Update_FloatUI(fTimeDelta);
+    }
+
+
+
+
 }
 
 void CUI_ScreenText::Late_Update(_float fTimeDelta)
@@ -125,14 +126,15 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
 
     switch (iTexIndex)
     {
-    case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):              m_pCurTextureCom = m_pTextureCom_NoAmmo;        break;
-    case ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES):           m_pCurTextureCom = m_pTextureCom_TimeMoves;     break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):              m_pCurTextureCom = m_pTextureCom_NoAmmo;            break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES):           m_pCurTextureCom = m_pTextureCom_TimeMoves;         break;
 
+    case ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK):      m_pCurTextureCom = m_pTextureCom_TUTO_LeftClick;    break;
 
-    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER):        m_pCurTextureCom = m_pTextureCom_LVLEnd_Super;  break;
-    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT):          m_pCurTextureCom = m_pTextureCom_LVLEnd_Hot;    break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER):        m_pCurTextureCom = m_pTextureCom_LVLEnd_Super;      break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT):          m_pCurTextureCom = m_pTextureCom_LVLEnd_Hot;        break;
 
-    default:                                                                                                break;
+    default:                                                                                                    break;
     }
 }
 
@@ -149,7 +151,16 @@ void CUI_ScreenText::Show_ScreenText(_uint iTexIndex)
 
     Change_ScreenText(iTexIndex);
 
-    m_pGameInstance->PlaySoundFixed(L"R_Migawka_L.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI));
+    switch (iTexIndex)
+    {
+    case ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK):     
+        break;
+
+    default:
+        m_pGameInstance->PlaySoundFixed(L"R_Migawka_L.ogg", ENUM_CLASS(SOUNDCH::SOUND_MAINUI)); 
+        break;
+    }
+    
 }
 
 HRESULT CUI_ScreenText::Ready_Components()
@@ -178,6 +189,9 @@ HRESULT CUI_ScreenText::Ready_Components()
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),
         TEXT("Com_Texture_TimeMoves"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
         return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TUTO_LeftClick"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_TUTO_LeftClick), nullptr)))
+        return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Super"),
         TEXT("Com_Texture_LVLEnd_Super"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_Super), nullptr)))
         return E_FAIL;
@@ -187,6 +201,60 @@ HRESULT CUI_ScreenText::Ready_Components()
 
 
     return S_OK;
+}
+
+void CUI_ScreenText::Update_PopupUI(_float fTimeDelta)
+{
+    //_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+    _float fRawTimeDelta = m_pGameInstance->Get_RawTimeDelta();
+
+    const _float fActiveTime = 1.2f;
+    const _float fSizeTo = 0.95f;
+    m_fActiveElapsed;
+
+    // 시간이 지남에 따라 1.0 -> 0.8
+    Change_Size(1.f - (min((m_fActiveElapsed / fActiveTime), 1.f) * (1.f - fSizeTo)));
+
+
+    // 이동안에는 플레이어도 느려지게 해야 할 듯?
+    if (m_isActive)
+    {
+        m_fActiveElapsed += fRawTimeDelta;
+
+        if (m_fActiveElapsed > fActiveTime)
+        {
+            m_fActiveElapsed = 0.f;
+            m_isActive = false;
+        }
+        else if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && (m_fActiveElapsed > (fActiveTime / 2.f)))
+        {
+            m_fActiveElapsed = 0.f;
+            m_isActive = false;
+        }
+    }
+}
+
+void CUI_ScreenText::Update_FloatUI(_float fTimeDelta)
+{
+    //_float fRawTimeDelta = fTimeDelta / (m_pGameInstance->Get_TimeSpeed());
+    _float fRawTimeDelta = m_pGameInstance->Get_RawTimeDelta();
+
+    const _float fMoveTime = 1.2f;
+    const _float fSizeTo = 1.f;
+    m_fActiveElapsed;
+
+    // 시간이 지남에 따라 1.5 -> 1.0
+    Change_Size(1.f - (min((m_fActiveElapsed / fMoveTime), 1.f) * (1.5f - fSizeTo)));
+
+    // 이동안에는 플레이어도 느려지게 해야 할 듯?
+    if (m_isActive)
+    {
+        if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) && (m_fActiveElapsed > (fMoveTime / 2.f)))
+        {
+            m_fActiveElapsed = 0.f;
+            m_isActive = false;
+        }
+    }
 }
 
 CUI_ScreenText* CUI_ScreenText::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -224,6 +292,7 @@ void CUI_ScreenText::Free()
 
     Safe_Release(m_pTextureCom_NoAmmo);
     Safe_Release(m_pTextureCom_TimeMoves);
+    Safe_Release(m_pTextureCom_TUTO_LeftClick);
     Safe_Release(m_pTextureCom_LVLEnd_Super);
     Safe_Release(m_pTextureCom_LVLEnd_Hot);
 }

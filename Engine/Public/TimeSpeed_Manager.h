@@ -18,7 +18,7 @@ private:
 public:
     void Update_TimeSpeed(_float fRawTimeDelta)
     {
-        _float followSpeed = 10.0f; // 클수록 더 빨리 목표에 붙음
+        _float followSpeed = 7.0f; // 클수록 더 빨리 목표에 붙음
         _float factor = 1.0f - expf(-followSpeed * fRawTimeDelta);
         m_fRawTimeDelta = fRawTimeDelta;
 

@@ -29,9 +29,11 @@ private:
 
 private:
 	void	Update_TriggerOnce();
+	void	Update_Trigger_OnTime(_float fTimeDelta);
 
 private:
 	_bool	m_isTriggered			= false;
+	_float	m_fTimeEventDeltaTime	= 0.f;
 
 	_bool	m_isUIEventTriggered	= false;
 	_float	m_fUIEventDeltaTime		= 0.f;

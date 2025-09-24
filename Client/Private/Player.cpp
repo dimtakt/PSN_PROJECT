@@ -141,6 +141,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 	m_pTransformCom->Set_State(Engine::STATE::POSITION,
 		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(Engine::STATE::POSITION)));
 
+
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 
@@ -411,7 +412,8 @@ void CPlayer::Update_AnimationState(_float fTimeDelta)
 		fFistProgressTime += fRawTimeDelta;
 
 	if (m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB) &&
-		!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))
+		!(m_iState & ENUM_CLASS(PLAYER_STATE::ATK)) &&
+		m_pPart_Weapon == nullptr)
 	{
 		m_iState |= ENUM_CLASS(PLAYER_STATE::ATK);
 	}
@@ -708,13 +710,17 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 			// 3. 현재 무기 삭제
 			// 4. 플레이어 애니메이션 중 투척에 가까운 것으로 재생
 			 
-			_float fThrowPower = 5.f;
 
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
 
-			_float fRotX = m_pGameInstance->Rand(-180.f, 180.f);
-			_float fRotY = m_pGameInstance->Rand(-180.f, 180.f);
-			_float fRotZ = m_pGameInstance->Rand(-180.f, 180.f);
+			const _float fThrowPower = 10.f;
+			const _float fThrowRotMultiply = 3.f;
+
+
+
+			_float fRotX = m_pGameInstance->Rand(-180.f * fThrowRotMultiply, 180.f * fThrowRotMultiply);
+			_float fRotY = m_pGameInstance->Rand(-180.f * fThrowRotMultiply, 180.f * fThrowRotMultiply);
+			_float fRotZ = m_pGameInstance->Rand(-180.f * fThrowRotMultiply, 180.f * fThrowRotMultiply);
 
 			_vector vRot = ROT_TO_QUAT(TO_RAD(fRotX), TO_RAD(fRotY), TO_RAD(fRotZ));
 			pWeaponGun->Throw(&m_vLoadShotDir, fThrowPower, vRot, pWeaponGun->Get_ObjType());

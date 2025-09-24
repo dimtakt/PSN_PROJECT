@@ -6,6 +6,7 @@
 #include "CustomObj_Pickupable.h"
 
 #include "CustomObj.h"
+#include "Enemy.h"
 
 CStage_Test1::CStage_Test1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
@@ -167,13 +168,14 @@ HRESULT CStage_Test1::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Monster"))))
 	//	return E_FAIL;
 
-	CGameObject::GAMEOBJECT_DESC GameObjDesc{};
+	CEnemy::ENEMY_DESC EnemyDesc{};
 
-	GameObjDesc.fRotationPerSec = XMConvertToRadians(180.f);
-	GameObjDesc.fSpeedPerSec = 15.f;
+	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
+	EnemyDesc.fSpeedPerSec = 15.f;
+	EnemyDesc.iFirstCellIndex = 25;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &GameObjDesc)))
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 		return E_FAIL;
 	CGameObject* pEnemy = m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::TEST_EXTRA1), strLayerTag);
 

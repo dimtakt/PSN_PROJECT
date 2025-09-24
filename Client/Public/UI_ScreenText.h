@@ -30,11 +30,18 @@ public:
 private:
 	void Change_ScreenText(_uint iTexIndex);
 
+private:
+	void Update_PopupUI(_float fTimeDelta);
+	void Update_FloatUI(_float fTimeDelta);
+
 public:
 	// change textsize.. ¿Ã∑±∞≈
 	void Change_Size(_float fSize);
 
 	void Show_ScreenText(_uint iTexIndex);
+	void Hide_ScreenText() { m_isActive = false; }
+
+
 
 private:
 	CShader*		m_pShaderCom				= { nullptr };
@@ -42,6 +49,9 @@ private:
 
 	CTexture*		m_pTextureCom_NoAmmo		= { nullptr };
 	CTexture*		m_pTextureCom_TimeMoves		= { nullptr };
+
+	CTexture*		m_pTextureCom_TUTO_LeftClick= { nullptr };
+
 	CTexture*		m_pTextureCom_LVLEnd_Super	= { nullptr };
 	CTexture*		m_pTextureCom_LVLEnd_Hot	= { nullptr };
 

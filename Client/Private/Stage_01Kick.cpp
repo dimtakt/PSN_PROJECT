@@ -68,6 +68,9 @@ void CStage_01Kick::Update(_float fTimeDelta)
 		}
 	}
 
+	// 특정 시간 구간에 걸쳐 일어나는 이벤트
+	Update_Trigger_OnTime(fTimeDelta);
+
 	// 레벨 종료 조건 검사
 	Update_CheckEndLevel(fTimeDelta);
 }
@@ -206,6 +209,7 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 		_float3{144.1f, 96.7f, 53.0f}
 	};
 	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::END);
+	EnemyDesc.iFirstCellIndex = 0;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
@@ -220,6 +224,7 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 	vStartPos = { 158.f, 96.f, 58.f, 1.f };
 	EnemyDesc.vecPremovePoses = {};
 	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
+	EnemyDesc.iFirstCellIndex = 12;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
@@ -234,6 +239,8 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 	vStartPos = { 72.f, 96.f, 71.f, 1.f };
 	EnemyDesc.vecPremovePoses = {};
 	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::END);
+	EnemyDesc.iFirstCellIndex = 0;
+
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
@@ -361,7 +368,7 @@ void CStage_01Kick::Update_TriggerOnce()
 
 	_vector vStartPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
 	_vector vTargetPos = static_cast<CTransform*>(pFirstEnemy->CGameObject::Get_Component(L"Com_Transform"))->Get_Position();
-	vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + 5.f);
+	vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + 7.f);
 
 
 	//_vector vDir = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW).r[2];
@@ -374,6 +381,16 @@ void CStage_01Kick::Update_TriggerOnce()
 	// ==============================
 
 	m_isTriggered = true;
+}
+
+void CStage_01Kick::Update_Trigger_OnTime(_float fTimeDelta)
+{
+	m_fTimeEventDeltaTime += fTimeDelta;
+
+	if (IS_BETWEEN(m_fTimeEventDeltaTime, 2.0f, 7.0f) && !m_isEndLevelStandby)
+		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK));
+	else if ((IS_BETWEEN(m_fTimeEventDeltaTime, 7.0f, 8.0f) && !m_isEndLevelStandby))
+		m_pUIScreenText->Hide_ScreenText();
 }
 
 CStage_01Kick* CStage_01Kick::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

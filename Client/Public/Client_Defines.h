@@ -27,7 +27,7 @@ namespace Client
 		NOAMMO,
 		TIMEMOVES,
 
-
+		TUTO_LEFTCLICK,
 
 		LVLEND_SUPER,
 		LVLEND_HOT,
