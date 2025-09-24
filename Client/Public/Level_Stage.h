@@ -96,6 +96,19 @@ protected:
 	vector<CGameObject*>	m_pObject = {};						// 로드된 실제 객체 정보가 담김.
 	vector<CGameObject*>	m_pTerrainObject = {};				// 로드된 실제 터레인 정보가 담김.
 
+protected:
+	// 맵 전환 및 효과에 필요
+	void	Update_CheckEndLevel(_float fTimeDelta);
+	void	Update_EndLevelStandby(_float fTimeDelta);
+	void	Change_ToNextLevel(LEVEL eLevel);
+
+	_float					m_fEndLevelDeltaTime = 0.f;
+	_bool					m_isEndLevelStandby = false;
+	_bool					m_isEndLevel = false;
+	_uint					m_iSuperHot = 0;
+
+	class CUI_ScreenText*	m_pUIScreenText = { nullptr };
+
 public:
 	virtual void Free() override;
 };

@@ -6,6 +6,9 @@
 
 #include "CustomObj.h"
 
+#include "Level_Loading.h"
+#include "UI_ScreenText.h"
+
 
 
 
@@ -175,6 +178,59 @@ HRESULT CLevel_Stage::Load_BinaryMap(_wstring* strLoadPath)
 	}
 
 	return S_OK;
+}
+
+void CLevel_Stage::Update_CheckEndLevel(_float fTimeDelta)
+{
+	// 현재 스테이지에 적이 더이상 남아있지 않다면, 레벨의 종료 준비
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
+	CGameObject* pFrontEnemy = m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Monster");
+
+	// 종료 준비 활성화, 종료 준비 중 돌릴 작업 수행 (UI효과 등)
+	if (pFrontEnemy == nullptr)
+		m_isEndLevelStandby = true;
+	if (m_isEndLevelStandby)
+		Update_EndLevelStandby(fTimeDelta);
+
+	if (m_isEndLevel)							// 종료 조건 시
+		Change_ToNextLevel(LEVEL::CH09_FIGHTC);	// 전환
+}
+
+void CLevel_Stage::Update_EndLevelStandby(_float fTimeDelta)
+{
+	m_fEndLevelDeltaTime += (m_pGameInstance->Get_RawTimeDelta());
+
+	if (m_fEndLevelDeltaTime > 1.2f && (m_iSuperHot != 1))
+	{
+		m_iSuperHot = 1;
+		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER));
+		m_pGameInstance->PlaySoundFixed(L"hot.wav", ENUM_CLASS(SOUND_CHANNEL::SOUND_MAINUI));
+	}
+	else if (m_fEndLevelDeltaTime > 2.4f && (m_iSuperHot == 1))
+	{
+		m_iSuperHot = 2;
+		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT));
+		m_pGameInstance->PlaySoundFixed(L"super.wav", ENUM_CLASS(SOUND_CHANNEL::SOUND_MAINUI));
+
+		m_fEndLevelDeltaTime = 0;
+	}
+
+
+
+
+	// 키 입력 시 레벨 넘김
+	if (m_pGameInstance->Get_IsKeyDown(DIK_SPACE) ||
+		m_pGameInstance->Get_IsKeyDown(DIK_RETURN))
+	{
+		m_isEndLevel = true;
+	}
+}
+
+void CLevel_Stage::Change_ToNextLevel(LEVEL eLevel)
+{
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eLevel))))
+		MSG_BOX(L"[CLevel_Stage::Change_Level] Changing Level Failed.");
 }
 
 void CLevel_Stage::Free()

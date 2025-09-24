@@ -26,9 +26,12 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+
+private:
+	void Change_ScreenText(_uint iTexIndex);
+
 public:
 	// change textsize.. ¿Ã∑±∞≈
-	void Change_ScreenText(_uint iTexIndex);
 	void Change_Size(_float fSize);
 
 	void Show_ScreenText(_uint iTexIndex);
