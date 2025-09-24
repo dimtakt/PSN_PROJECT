@@ -101,6 +101,11 @@ void CPlayer::Update(_float fTimeDelta)
 	{
 		_float3 vPlayerPosDebug = m_pTransformCom->Get_Position_Store();
 		std::cout << "[CPlayer::Update] Player Current Pos : ( X : " << (_int)vPlayerPosDebug.x << ", Y : " << (_int)vPlayerPosDebug.y << ", Z : " << (_int)vPlayerPosDebug.z << " )" << std::endl;
+
+#ifdef _DEBUG
+		std::cout << "[CPlayer::Update] Player Current NavIndex : " << m_pNavigationCom->Get_CurrentCellIndex() << "." << std::endl;
+#endif // _DEBUG
+
 	}
 
 #endif // _DEBUG
@@ -155,6 +160,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 	if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
 		return;
+
+
 #endif
 
 	__super::Late_Update(fTimeDelta);

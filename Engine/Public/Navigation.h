@@ -32,7 +32,7 @@ private:
 
 public:
 	HRESULT Render();
-
+	_uint	Get_CurrentCellIndex() { return m_iCurrentCellIndex; }
 #endif
 
 private:
