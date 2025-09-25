@@ -56,11 +56,11 @@ HRESULT CWeapon_Shotgun::Initialize(void* pArg)
 
     // ÃÑ, Åº °ü·Ã ÃÊ±â ¼³Á¤
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER))? 20 : 100;
-    m_iMaxBullets = 200;
+    m_iMaxBullets = 20;
     m_iCurBullets = (pDesc->iCurLeftBullets == UINT_MAX) ?
         m_iMaxBullets : pDesc->iCurLeftBullets;
-    m_fShotRandRange = 15.f;
-    m_fZeroDst = 50.f;
+    m_fShotRandRange = 10.f;
+    m_fZeroDst = 75.f;
 
     m_iGameObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN);
 

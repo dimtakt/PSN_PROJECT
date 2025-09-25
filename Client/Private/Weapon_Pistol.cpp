@@ -56,7 +56,7 @@ HRESULT CWeapon_Pistol::Initialize(void* pArg)
 
     // ÃÑ, Åº °ü·Ã ÃÊ±â ¼³Á¤
     //m_iMaxBullets = (m_pParentTarget->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::PLAYER)) ? 4 : 20;
-    m_iMaxBullets = 10; // 200;
+    m_iMaxBullets = 5; // 200;
     m_iCurBullets = (pDesc->iCurLeftBullets == UINT_MAX)?
         m_iMaxBullets : pDesc->iCurLeftBullets;
 

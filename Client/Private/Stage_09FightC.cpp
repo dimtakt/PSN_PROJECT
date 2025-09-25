@@ -70,6 +70,8 @@ HRESULT CStage_09FightC::Render()
 
 HRESULT CStage_09FightC::Ready_Lights()
 {
+	return S_OK;
+
 	LIGHT_DESC			LightDesc{};
 
 	//(LightDesc.Diffuse * MtrlDesc.Diffuse) * (fShade(0 ~ 1) + (LightDesc.Ambient * MtrlDesc.Ambient))

@@ -88,6 +88,8 @@ HRESULT CStage_10Desper::Render()
 
 HRESULT CStage_10Desper::Ready_Lights()
 {
+	return S_OK;
+
 	LIGHT_DESC			LightDesc{};
 
 	//(LightDesc.Diffuse * MtrlDesc.Diffuse) * (fShade(0 ~ 1) + (LightDesc.Ambient * MtrlDesc.Ambient))
@@ -455,6 +457,28 @@ void CStage_10Desper::Update_Trigger_OnTime(_float fTimeDelta)
 	else if ((m_fTimeEventDeltaTime >= 1.5f) && (m_iStartTextIndex == 1))
 	{
 		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10_2));
+		m_iStartTextIndex++;
+	}
+
+
+	if (m_iPhase == 2 && m_iStartTextIndex == 2)
+	{
+		m_fTimeEventDeltaTime = 0.f;
+		m_iStartTextIndex++;
+	}
+	else if ((m_fTimeEventDeltaTime >= 0.f) && (m_iStartTextIndex == 3))
+	{
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_1));
+		m_iStartTextIndex++;
+	}
+	else if ((m_fTimeEventDeltaTime >= 0.5f) && (m_iStartTextIndex == 4))
+	{
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_2));
+		m_iStartTextIndex++;
+	}
+	else if ((m_fTimeEventDeltaTime >= 0.9f) && (m_iStartTextIndex == 5))
+	{
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_3));
 		m_iStartTextIndex++;
 	}
 }

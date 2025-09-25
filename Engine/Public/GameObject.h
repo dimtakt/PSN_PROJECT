@@ -68,6 +68,7 @@ public:
 	_uint Get_ObjType() { return m_iGameObjType; }
 	void Set_ObjType(_uint iObjType) { m_iGameObjType = iObjType; }
 	_bool Get_isDead() { return m_isDead; }
+	_bool Get_isDeadStandby() { return m_isDeadStandby; }
 
 	vector<class CCollider*>* Get_Colliders() { return m_vecCollidersCom; };
 
