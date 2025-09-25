@@ -504,7 +504,7 @@ HRESULT CLoader::Loading_For_Stages()
 	HitEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
 	HitEffectDesc.vRange		= _float3(0.5f, 0.5f, 0.5f);
 	HitEffectDesc.vSize			= _float2(0.24f, 0.4f);
-	HitEffectDesc.vLifeTime		= _float2(0.6f, 1.0f);
+	HitEffectDesc.vLifeTime		= _float2(0.1f, 1.0f);
 	HitEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
 	HitEffectDesc.vSpeed		= _float2(0.08f, 0.12f);
 	HitEffectDesc.isLoop		= false;
@@ -518,11 +518,11 @@ HRESULT CLoader::Loading_For_Stages()
 
 	// Trail
 	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		TrailEffectDesc{};
-	TrailEffectDesc.iNumInstance= 100;
+	TrailEffectDesc.iNumInstance= 500;
 	TrailEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
 	TrailEffectDesc.vRange		= _float3(0.0f, 0.0f, 0.3f);
 	TrailEffectDesc.vSize		= _float2(0.03f, 0.03f);
-	TrailEffectDesc.vLifeTime	= _float2(0.03f, 0.05f);
+	TrailEffectDesc.vLifeTime	= _float2(0.30f, 0.50f);
 	TrailEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
 	TrailEffectDesc.vSpeed		= _float2(1.f, 8.f);
 	TrailEffectDesc.isLoop		= true;
