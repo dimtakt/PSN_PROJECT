@@ -82,7 +82,11 @@ _bool CGameObject::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pCo
 	if (m_isHitCD)						// 이미 쿨 상태라면 충돌 무시
 		return false;
 
+#ifdef _DEBUG
+
 	std::cout << "[CGameObject::OnCollision] Collision Detect! Hp Reduced!" << std::endl;
+#endif // _DEBUG
+
 	m_iHp--;
 	m_isHitCD = true;
 

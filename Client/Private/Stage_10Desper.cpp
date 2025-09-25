@@ -368,11 +368,23 @@ HRESULT CStage_10Desper::Ready_Pickup_Objects(const _wstring& strLayerTag)
 	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Karabin_Fixed", &PreTransformMatrix))
+	{
+#ifdef _DEBUG
 		std::cout << "[CStage_10Desper::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Karabin_Fixed)" << std::endl;
+#endif
+	}
 	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Pistol_Fixed", &PreTransformMatrix))
+	{
+#ifdef _DEBUG
 		std::cout << "[CStage_10Desper::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Pistol_Fixed)" << std::endl;
+#endif
+	}
 	if FAILED(Add_Prototype_Direct(iDestLevel, L"Weapon_Shotgun_Fixed", &PreTransformMatrix))
-		std::cout << "[CStage_10Desper::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Shotgun_Fixed)" << std::endl;
+	{
+#ifdef _DEBUG
+			std::cout << "[CStage_10Desper::Ready_Pickup_Objects] Prototype Create Failed. (Weapon_Shotgun_Fixed)" << std::endl;
+#endif
+	}
 
 
 	// 오브젝트 검사 순회. 

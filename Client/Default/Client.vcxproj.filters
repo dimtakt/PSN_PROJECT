@@ -237,9 +237,6 @@
     <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_win32.h">
       <Filter>96.ExternalTool\sources</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Level_Editor.h">
-      <Filter>01.Levels\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Camera_Editor.h">
       <Filter>02.GameObject\Camera\Editor</Filter>
     </ClInclude>
@@ -387,9 +384,6 @@
     <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_win32.cpp">
       <Filter>96.ExternalTool\sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Level_Editor.cpp">
-      <Filter>01.Levels\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Camera_Editor.cpp">
       <Filter>02.GameObject\Camera\Editor</Filter>
     </ClCompile>
@@ -461,6 +455,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage_10Desper.cpp">
       <Filter>01.Levels\Stage\Stages\Stage_10Desper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Editor.cpp">
+      <Filter>01.Levels\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Level_Editor.h">
+      <Filter>01.Levels\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

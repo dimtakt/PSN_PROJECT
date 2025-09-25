@@ -160,8 +160,9 @@ void CCustomObj_Pickupable::OnCollisionRay(CGameObject* pCollisionHitBy)
     {
         m_isPickingUp = true;
         m_pCollByTarget = pCollisionHitBy;
-
+#ifdef _DEBUG
         std::cout << "[CustomObj_Pickupable::OnCollisionRay] CollisionRay Event Called. by Enemy!" << std::endl;
+#endif
     }
     //else if (iCollisionObjType == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY))
     //{

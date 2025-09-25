@@ -197,7 +197,9 @@ HRESULT CBullet::Ready_Components(void* pArg)
 		break;
 
 	default:
+#ifdef _DEBUG
 		std::cout << "[CBullet::Ready_Components] Type of Bullet is undefined. Collision Checking Failed." << std::endl;
+#endif
 		break;
 	}
 	

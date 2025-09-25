@@ -7,8 +7,11 @@
 
 #include "MainApp.h"
 #include "GameInstance.h"
+
+#ifdef _DEBUG
 #include "Imgui_Manager.h"
 #include "imgui_impl_win32.h"
+#endif
 
 #define MAX_LOADSTRING 100
 
@@ -183,13 +186,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+#ifdef _DEBUG
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+#ifdef _DEBUG
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
         return true;
-
+#endif
     switch (message)
     {
     case WM_COMMAND:

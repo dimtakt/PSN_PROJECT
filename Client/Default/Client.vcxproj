@@ -140,7 +140,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../Engine/Public/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
@@ -168,9 +168,13 @@
     <ClInclude Include="..\Public\Props_Pot.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="..\public\Level_Editor.h" />
+    <ClCompile Include="..\public\Level_Editor.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClInclude Include="..\public\Enemy.h" />
-    <ClInclude Include="..\Public\ImGui_Manager.h" />
+    <ClInclude Include="..\Public\ImGui_Manager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -197,14 +201,30 @@
     <ClInclude Include="..\public\Weapon_Karabin.h" />
     <ClInclude Include="..\public\Weapon_Pistol.h" />
     <ClInclude Include="..\public\Weapon_Shotgun.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_win32.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_internal.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_rectpack.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_textedit.h" />
-    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_truetype.h" />
+    <ClInclude Include="..\ThirdPartyCode\imGui\imconfig.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_impl_win32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imgui_internal.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_rectpack.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_textedit.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdPartyCode\imGui\imstb_truetype.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -227,9 +247,13 @@
     <ClCompile Include="..\Private\Props_Pot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\private\Level_Editor.cpp" />
+    <ClCompile Include="..\private\Level_Editor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\private\Enemy.cpp" />
-    <ClCompile Include="..\Private\ImGui_Manager.cpp" />
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -256,13 +280,27 @@
     <ClCompile Include="..\private\Weapon_Karabin.cpp" />
     <ClCompile Include="..\private\Weapon_Pistol.cpp" />
     <ClCompile Include="..\private\Weapon_Shotgun.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_tables.cpp" />
-    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_widgets.cpp" />
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_demo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_draw.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_dx11.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_impl_win32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_tables.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdPartyCode\imGui\imgui_widgets.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -281,7 +319,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />

@@ -7,6 +7,8 @@
 #ifdef new
 #undef new
 #endif
+
+#ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
@@ -18,7 +20,7 @@
 //#include "MeshMaterial.h"
 //#include "Model.h"
 //#include "ModelRenderer.h"
-
+#endif
 
 NS_BEGIN(Client)
 

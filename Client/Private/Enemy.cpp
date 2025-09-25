@@ -262,8 +262,9 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 		pHitCom == CGameObject::Get_Component(L"Com_Collider_RightHand"))
 	{
 		// 몸통에 맞음
+#ifdef _DEBUG
 		std::cout << "[CEnemy::OnCollision] Body Collision Detected." << std::endl;
-		
+#endif
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
 			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
 		{
@@ -279,8 +280,9 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 	else if (pHitCom == CGameObject::Get_Component(L"Com_Collider_Head"))
 	{
 		// 머리에 맞음
-
+#ifdef _DEBUG
 		std::cout << "[CEnemy::OnCollision] Head Collision Detected." << std::endl;
+#endif
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
 			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
 		{
