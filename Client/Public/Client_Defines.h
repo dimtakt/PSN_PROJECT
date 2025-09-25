@@ -25,6 +25,7 @@ namespace Client
 	enum class SCREENTEXT_INDEX
 	{
 		NOAMMO,
+		MAGEMPTY,
 		TIMEMOVES,
 
 		TUTO_LEFTCLICK,

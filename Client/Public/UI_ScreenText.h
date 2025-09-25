@@ -48,6 +48,7 @@ private:
 	CVIBuffer_Rect* m_pVIBufferCom				= { nullptr };
 
 	CTexture*		m_pTextureCom_NoAmmo		= { nullptr };
+	CTexture*		m_pTextureCom_MagEmpty		= { nullptr };
 	CTexture*		m_pTextureCom_TimeMoves		= { nullptr };
 
 	CTexture*		m_pTextureCom_TUTO_LeftClick= { nullptr };

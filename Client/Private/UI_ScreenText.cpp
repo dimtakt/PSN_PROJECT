@@ -47,7 +47,8 @@ void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 
     
     if (
-        m_pCurTextureCom == m_pTextureCom_NoAmmo
+        m_pCurTextureCom == m_pTextureCom_NoAmmo ||
+        m_pCurTextureCom == m_pTextureCom_MagEmpty
         )
     {
         m_pGameInstance->Req_EditTimeSpeed(0.01f, true);
@@ -128,6 +129,7 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
     switch (iTexIndex)
     {
     case ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO):              m_pCurTextureCom = m_pTextureCom_NoAmmo;            break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::MAGEMPTY):            m_pCurTextureCom = m_pTextureCom_MagEmpty;          break;
     case ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES):           m_pCurTextureCom = m_pTextureCom_TimeMoves;         break;
 
     case ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK):      m_pCurTextureCom = m_pTextureCom_TUTO_LeftClick;    break;
@@ -192,6 +194,9 @@ HRESULT CUI_ScreenText::Ready_Components()
 
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_NoAmmo"),
         TEXT("Com_Texture_NoAmmo"), reinterpret_cast<CComponent**>(&m_pTextureCom_NoAmmo), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_MagEmpty"),
+        TEXT("Com_Texture_MagEmpty"), reinterpret_cast<CComponent**>(&m_pTextureCom_MagEmpty), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TimeMoves"),
         TEXT("Com_Texture_TimeMoves"), reinterpret_cast<CComponent**>(&m_pTextureCom_TimeMoves), nullptr)))
@@ -321,6 +326,7 @@ void CUI_ScreenText::Free()
     Safe_Release(m_pTextureCom_LVLMid_10_3);
 
     Safe_Release(m_pTextureCom_NoAmmo);
+    Safe_Release(m_pTextureCom_MagEmpty);
     Safe_Release(m_pTextureCom_TimeMoves);
     Safe_Release(m_pTextureCom_TUTO_LeftClick);
     Safe_Release(m_pTextureCom_LVLEnd_Super);

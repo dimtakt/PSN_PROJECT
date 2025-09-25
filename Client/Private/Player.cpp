@@ -724,7 +724,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 
 			// 바라보는 방향 및 일정 회전값을 주어 날아가도록 함.
 
-			const _float fThrowPower = 10.f;
+			const _float fThrowPower = 15.f;
 			const _float fThrowRotMultiply = 3.f;
 
 

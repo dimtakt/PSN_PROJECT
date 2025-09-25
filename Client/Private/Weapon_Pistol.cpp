@@ -164,7 +164,9 @@ void CWeapon_Pistol::Shot(_vector* pDir, _uint iObjTypeIndex)
             m_pGameInstance->PlaySoundFixed(L"wpn_pistol_noammo.wav", ENUM_CLASS(SOUNDCH::SOUND_PLAYERWEAPON_EFF));
             // UI 출력 이벤트
             CUI_ScreenText* pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(m_pGameInstance->Get_DestLevel(), L"Layer_UI_ScreenText"));
-            pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO));
+            _uint iRandNum = static_cast<_uint>(m_pGameInstance->Rand(0.f, 1.99f));
+            if (iRandNum == 0)  pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::NOAMMO));
+            else                pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::MAGEMPTY));
         }
         return;
     }

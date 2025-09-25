@@ -5,9 +5,9 @@
 
 #include "Level_Logo.h"
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #include "Level_Editor.h"
-#endif
+//#endif
 
 #include "Level_GamePlay.h"
 
@@ -57,9 +57,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 			pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 			break;
 		case LEVEL::EDITOR:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 			pNewLevel = CLevel_Editor::Create(m_pDevice, m_pContext);
-#endif
+//#endif
 			break;
 		case LEVEL::GAMEPLAY:
 			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);

@@ -309,6 +309,9 @@
     <ClInclude Include="..\public\Stage_10Desper.h">
       <Filter>01.Levels\Stage\Stages\Stage_10Desper</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Level_Editor.h">
+      <Filter>01.Levels\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -457,9 +460,6 @@
       <Filter>01.Levels\Stage\Stages\Stage_10Desper</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Editor.cpp">
-      <Filter>01.Levels\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\public\Level_Editor.h">
       <Filter>01.Levels\Editor</Filter>
     </ClCompile>
   </ItemGroup>

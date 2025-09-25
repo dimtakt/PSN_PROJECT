@@ -168,9 +168,9 @@
     <ClInclude Include="..\Public\Props_Pot.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClCompile Include="..\public\Level_Editor.h">
+    <ClInclude Include="..\public\Level_Editor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    </ClInclude>
     <ClInclude Include="..\public\Enemy.h" />
     <ClInclude Include="..\Public\ImGui_Manager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

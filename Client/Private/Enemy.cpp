@@ -299,7 +299,7 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 	if (pWeaponGun)
 	{
-		_float fThrowPower = 2.5f;
+		_float fThrowPower = 4.f;
 		pWeaponGun->Drop(&m_vLoadShotDir, fThrowPower, XMVectorSet(0.f, 0.f, 0.f, 0.f), pWeaponGun->Get_ObjType());
 
 		// 현재 사용중인 무기 삭제
