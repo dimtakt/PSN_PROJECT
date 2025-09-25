@@ -76,6 +76,7 @@ private:
 
 	class CUI_Crosshair*			m_pUI_Crosshair		= { nullptr };
 	class CUI_ScreenText*			m_pUI_ScreenText	= { nullptr };
+	class CCamera_Player*			m_pCameraPlayer		= { nullptr };
 
 private:;
 	_uint			m_iState = { };

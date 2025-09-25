@@ -1,6 +1,7 @@
 #include "VIBuffer_Rect_Instance.h"
 
 #include "GameInstance.h"
+#include "GameObject.h"
 
 CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer_Instance{ pDevice, pContext }
@@ -18,6 +19,7 @@ CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& 
 	, m_pTurnSpeeds{ Prototype.m_pTurnSpeeds }
 	, m_pAxises{ Prototype.m_pAxises }
 	, m_fMaxLifetime{ Prototype.m_fMaxLifetime }
+	, m_pScales{ Prototype.m_pScales }
 {
 }
 
@@ -119,6 +121,7 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 	m_pSpeeds			= new _float[m_iNumInstance];
 	m_pTurnSpeeds		= new _float[m_iNumInstance];
 	m_pAxises			= new _vector[m_iNumInstance];
+	m_pScales			= new _float[m_iNumInstance];
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -159,6 +162,8 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 		else
 #pragma region Initialize Scale
 		{
+			m_pScales[i] = m_pGameInstance->Rand(pRectDesc->vSize.x, pRectDesc->vSize.y);
+
 			pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
 			pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
 			pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
@@ -226,6 +231,7 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
 
 	// 단순히 인스턴스의 생성 위치에 따라, 중앙 위치의 반대 방향으로 이동하는 코드
 	// 그 외의 세부사항은 셰이더 및 desc 값에 따라 조절
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		// 단순 방사 방향 구함
@@ -266,31 +272,24 @@ void CVIBuffer_Rect_Instance::Spread_Turn(_float fTimeDelta)
 	// 그 외의 세부사항은 셰이더 및 desc 값에 따라 조절
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		// 단순 방사 방향 구함
+		// 단순 방사 방향 구함... : 현재 피벗(기준점) 대비 위치에 따라 방향을 정함.
 		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
 
 		_matrix matDeltaRot = XMMatrixRotationAxis(m_pAxises[i], TO_RAD(m_pTurnSpeeds[i] * fTimeDelta));
 
-		if (m_isTurn)
-		{
-			// 현재 인스턴스의 로컬 회전 행렬 구성
-			_matrix matCurrent = XMMatrixSet(
-				pVertices[i].vRight.x	, pVertices[i].vRight.y	, pVertices[i].vRight.z	, 0.f,
-				pVertices[i].vUp.x		, pVertices[i].vUp.y	, pVertices[i].vUp.z	, 0.f,
-				pVertices[i].vLook.x	, pVertices[i].vLook.y	, pVertices[i].vLook.z	, 0.f,
-				0.f, 0.f, 0.f, 1.f
-			);
-
-			// 회전 적용
-			_matrix matCalced = matDeltaRot * matCurrent;
-
-			// 다시 vRight, vUp, vLook에 저장
-			XMStoreFloat4(&pVertices[i].vRight	, matCalced.r[0]);
-			XMStoreFloat4(&pVertices[i].vUp		, matCalced.r[1]);
-			XMStoreFloat4(&pVertices[i].vLook	, matCalced.r[2]);
-		}
+		//if (m_isTurn)
+		//{
+		//	// 현재 인스턴스의 로컬 회전 행렬 구성
+		//	_matrix matCurrent = XMMatrixSet(
+		//		pVertices[i].vRight.x	, pVertices[i].vRight.y	, pVertices[i].vRight.z	, 0.f,
+		//		pVertices[i].vUp.x		, pVertices[i].vUp.y	, pVertices[i].vUp.z	, 0.f,
+		//		pVertices[i].vLook.x	, pVertices[i].vLook.y	, pVertices[i].vLook.z	, 0.f,
+		//		0.f, 0.f, 0.f, 1.f
+		//	);
+		//}
 
 
+		// 시간이 지남에 따라 움직임.
 		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
 		pVertices[i].vLifeTime.x += fTimeDelta;
 
@@ -307,6 +306,75 @@ void CVIBuffer_Rect_Instance::Spread_Turn(_float fTimeDelta)
 
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
+
+void CVIBuffer_Rect_Instance::Trail(_float fTimeDelta, CGameObject* pOwner)
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	/*m_pVB->Lock(0, 0, (void**)&pVertex, 0);*/
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+
+	CTransform* pOwnerTransformCom = dynamic_cast<CTransform*>(pOwner->Get_Component(L"Com_Transform"));
+	m_pGameInstance->Get_CamPosition();
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		pInstanceVertices[i].vTranslation = _float4(
+			m_pGameInstance->Rand(m_vCenter.x - m_vRange.x * 0.5f, m_vCenter.x + m_vRange.x * 0.5f),
+			m_pGameInstance->Rand(m_vCenter.y - m_vRange.y * 0.5f, m_vCenter.y + m_vRange.y * 0.5f),
+			m_pGameInstance->Rand(m_vCenter.z - m_vRange.z * 0.5f, m_vCenter.z),
+			1.f
+		);
+
+		// 인스턴스 기준 월드 위치 계산
+		_vector vWorldPos = XMLoadFloat4(&pVertices[i].vTranslation) + pOwnerTransformCom->Get_Position();
+
+		// 카메라 방향 계산
+		_matrix mOwnerWorldInv = pOwnerTransformCom->Get_WorldMatrix_Inverse();	// 
+
+		_vector vLook = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vWorldPos);
+		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+		vUp = XMVector3Cross(vLook, vRight);
+
+		vLook = XMVector3TransformNormal(vLook, mOwnerWorldInv);
+		vRight = XMVector3TransformNormal(vRight, mOwnerWorldInv);
+		vUp = XMVector3TransformNormal(vUp, mOwnerWorldInv);
+
+		vRight	= vRight	* m_pScales[i];
+		vUp		= vUp		* m_pScales[i];
+		vLook	= vLook		* m_pScales[i];
+
+		XMStoreFloat4(&pVertices[i].vRight, vRight);
+		XMStoreFloat4(&pVertices[i].vUp, vUp);
+		XMStoreFloat4(&pVertices[i].vLook, vLook);
+
+
+
+		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
+
+		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+		pVertices[i].vLifeTime.x += fTimeDelta;
+
+		if (true == m_isLoop)
+		{
+			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			{
+				pVertices[i].vLifeTime.x = 0.f;
+				pVertices[i].vTranslation = _float4{ pVertices[i].vTranslation.x, pVertices[i].vTranslation.y, pInstanceVertices[i].vTranslation.z, 1.f };
+			}
+		}
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
 
 void CVIBuffer_Rect_Instance::Drop(_float fTimeDelta)
 {
@@ -346,5 +414,6 @@ void CVIBuffer_Rect_Instance::Free()
 		Safe_Delete_Array(m_pSpeeds);
 		Safe_Delete_Array(m_pTurnSpeeds);
 		Safe_Delete_Array(m_pAxises);
+		Safe_Delete_Array(m_pScales);
 	}
 }

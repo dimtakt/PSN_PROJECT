@@ -63,7 +63,8 @@ void CStage_01Kick::Update(_float fTimeDelta)
 
 		if (m_fUIEventDeltaTime >= 0.8f)
 		{
-			m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES));
+			m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TIMEMOVES));
+			m_pCameraPlayer->Camera_ShortZoom(-10.f);
 			m_isUIEventTriggered = true;
 		}
 	}
@@ -78,7 +79,7 @@ void CStage_01Kick::Update(_float fTimeDelta)
 HRESULT CStage_01Kick::Render()
 {
 	SetWindowText(g_hWnd, TEXT("Level : CH01_KICK (Temp)"));
-
+	
 	return S_OK;
 }
 
@@ -120,6 +121,8 @@ HRESULT CStage_01Kick::Ready_Lights()
 
 HRESULT CStage_01Kick::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
 	CCamera_Player::CAMERA_PLAYER_DESC		CameraDesc{};
 	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
@@ -133,9 +136,10 @@ HRESULT CStage_01Kick::Ready_Layer_Camera(const _wstring& strLayerTag)
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 	//	ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 	//	return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strLayerTag,
 		ENUM_CLASS(LEVEL::CH01_KICK), TEXT("Prototype_GameObject_Camera_Player"), &CameraDesc)))
 		return E_FAIL;
+	m_pCameraPlayer = dynamic_cast<CCamera_Player*>(m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag));
 
 	return S_OK;
 }
@@ -163,8 +167,8 @@ HRESULT CStage_01Kick::Ready_Layer_UI(const _wstring& strLayerTag)
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"))))
 		return E_FAIL;
 
-	m_pUIScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText"));
-	CLevel_Stage::m_pUIScreenText = m_pUIScreenText;
+	m_pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag + L"_ScreenText"));
+	CLevel_Stage::m_pUI_ScreenText = m_pUI_ScreenText;
 
 	return S_OK;
 }
@@ -202,14 +206,14 @@ HRESULT CStage_01Kick::Ready_Layer_Monster(const _wstring& strLayerTag)
 
 	
 	// 1¹ø Àû - ¸Ö¸®¼­ ¶Ù¾î¿È.
-	vStartPos = { 77.289f, 115.175f, 10.144f, 1.f };
+	vStartPos = { 65.1799f, 118.674f, 10.1108f, 1.f };
 	EnemyDesc.vecPremovePoses = {
 		_float3{156.4f, 96.7f, 11.5f},
 		_float3{156.9f, 96.7f, 49.7f},
 		_float3{144.1f, 96.7f, 53.0f}
 	};
 	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::END);
-	EnemyDesc.iFirstCellIndex = 0;
+	EnemyDesc.iFirstCellIndex = 23;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH01_KICK), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
@@ -388,9 +392,9 @@ void CStage_01Kick::Update_Trigger_OnTime(_float fTimeDelta)
 	m_fTimeEventDeltaTime += fTimeDelta;
 
 	if (IS_BETWEEN(m_fTimeEventDeltaTime, 2.0f, 7.0f) && !m_isEndLevelStandby)
-		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK));
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK));
 	else if ((IS_BETWEEN(m_fTimeEventDeltaTime, 7.0f, 8.0f) && !m_isEndLevelStandby))
-		m_pUIScreenText->Hide_ScreenText();
+		m_pUI_ScreenText->Hide_ScreenText();
 }
 
 CStage_01Kick* CStage_01Kick::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

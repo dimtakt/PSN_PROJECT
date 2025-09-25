@@ -30,6 +30,7 @@ public:
 public:
 	void Spread(_float fTimeDelta);
 	void Spread_Turn(_float fTimeDelta);
+	void Trail(_float fTimeDelta, class CGameObject* pOwner);
 
 	void Drop(_float fTimeDelta);
 
@@ -50,9 +51,14 @@ private:
 	_bool					m_isTurn = false;
 	_vector*				m_pAxises = {};
 	_float*					m_pTurnSpeeds = {};
+	_float*					m_pScales = {};
 
 	_float					m_fElapsedTime = {};
 	_float					m_fMaxLifetime = {};
+
+
+	vector<_vector>			m_vTrailPoints = {};
+	_uint					m_iTrailIndex = 0;
 
 public:
 	static CVIBuffer_Rect_Instance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc);

@@ -111,6 +111,24 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
     }
 
+
+    // fov restore 
+    if (m_fFovy != m_fOriginFovy)
+    {
+        const _float fRestorePower = TO_RAD(90.f);
+
+        if      (m_fFovy > m_fOriginFovy)
+        {
+            m_fFovy = m_fFovy - fRestorePower * fRawTimeDelta;
+            if (m_fFovy < m_fOriginFovy) m_fFovy = m_fOriginFovy;
+        }
+        else if (m_fFovy < m_fOriginFovy)
+        {
+            m_fFovy = m_fFovy + fRestorePower * fRawTimeDelta;
+            if (m_fFovy > m_fOriginFovy) m_fFovy = m_fOriginFovy;
+        }
+    }
+
     __super::Update_PipeLines();
 }
 
@@ -141,6 +159,11 @@ void CCamera_Player::Cursor_Lock()
     POINT pt{ iX, iY };
     ClientToScreen(g_hWnd, &pt);
     SetCursorPos(pt.x, pt.y);
+}
+
+void CCamera_Player::Camera_ShortZoom(_float fZoomStrength)
+{
+    m_fFovy = m_fFovy + TO_RAD(fZoomStrength);
 }
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

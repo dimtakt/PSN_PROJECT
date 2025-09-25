@@ -38,9 +38,11 @@ private:
 	_bool	m_isUIEventTriggered	= false;
 	_float	m_fUIEventDeltaTime		= 0.f;
 
+	class CCamera_Player*	m_pCameraPlayer = { nullptr };
+
 
 private:
-	class CUI_ScreenText* m_pUIScreenText = nullptr;
+	class CUI_ScreenText* m_pUI_ScreenText = nullptr;
 
 public:
 	static CStage_01Kick* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

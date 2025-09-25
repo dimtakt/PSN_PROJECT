@@ -154,6 +154,9 @@
     <Filter Include="01.Levels\Stage\Stages\Stage_09FightCage">
       <UniqueIdentifier>{c94765b6-6a5a-403e-9d36-afad100da9cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Effect\Particle\Trail">
+      <UniqueIdentifier>{cadfb06b-71ff-4416-9f0f-0abc49e68b01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -300,6 +303,9 @@
     <ClInclude Include="..\public\Stage_09FightC.h">
       <Filter>01.Levels\Stage\Stages\Stage_09FightCage</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TrailParticle.h">
+      <Filter>02.GameObject\Effect\Particle\Trail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -443,6 +449,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage_09FightC.cpp">
       <Filter>01.Levels\Stage\Stages\Stage_09FightCage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TrailParticle.cpp">
+      <Filter>02.GameObject\Effect\Particle\Trail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

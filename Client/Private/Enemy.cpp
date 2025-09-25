@@ -293,7 +293,16 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 
 	Update_NearestWeapons();
 
-	m_pGameInstance->PlaySoundFixed(L"crystal_crush.ogg", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_ETC));
+	_uint iSoundRand = static_cast<_uint>(m_pGameInstance->Rand(0.f, 2.99f));
+	switch (iSoundRand)
+	{
+	case 0: m_pGameInstance->PlaySoundFixed(L"crystal_crush.ogg", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_ETC)); break;
+	case 1: m_pGameInstance->PlaySoundFixed(L"crystal_crush2.ogg", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_ETC)); break;
+	case 2: m_pGameInstance->PlaySoundFixed(L"crystal_crush3.ogg", ENUM_CLASS(SOUNDCH::SOUND_ENEMYWEAPON_ETC)); break;
+	default:
+		break;
+	}
+	
 
 	return true;
 }

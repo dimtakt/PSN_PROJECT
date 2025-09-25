@@ -107,7 +107,7 @@ protected:
 	_bool					m_isEndLevel = false;
 	_uint					m_iSuperHot = 0;
 
-	class CUI_ScreenText*	m_pUIScreenText = { nullptr };
+	class CUI_ScreenText*	m_pUI_ScreenText = { nullptr };
 
 public:
 	virtual void Free() override;

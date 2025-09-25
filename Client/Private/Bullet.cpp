@@ -5,6 +5,8 @@
 #include "Player.h"
 #include "Enemy.h"
 
+#include "TrailParticle.h"
+
 
 CBullet::CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject(pDevice, pContext)
@@ -48,6 +50,9 @@ HRESULT CBullet::Initialize(void* pArg)
 
 	_float fScaled = 2.f;
 	m_pTransformCom->Set_Scale_Direct(XMVectorSet(fScaled, fScaled, fScaled, 1.f));
+
+
+	Add_TrailEffect();
 
 	//std::cout << "[CBullet::Initialize]BulletIndex " << m_iIndex << " Created!" << std::endl;
 
@@ -251,6 +256,23 @@ void CBullet::Add_HitEffect()
 	pEffectTransform->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix());
 }
 
+void CBullet::Add_TrailEffect()
+{
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	const _wstring strEffectTag = L"Layer_Particle_TrailEffect";
+
+	CTrailParticle::TRAIL_DESC tDesc = { this };
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, strEffectTag,
+		iDestLevel, TEXT("Prototype_GameObject_Particle_TrailEffect"), &tDesc)))
+		MSG_BOX(L"이펙트 생성 실패");
+
+	CGameObject* pEffectObj = m_pGameInstance->Get_LastGameObject(iDestLevel, strEffectTag);
+	m_pEffectObj = pEffectObj;
+	CTransform* pEffectTransform = dynamic_cast<CTransform*>(pEffectObj->Get_Component(L"Com_Transform"));
+	pEffectTransform->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix());
+}
+
 CBullet* CBullet::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CBullet* pInstance = new CBullet(pDevice, pContext);
@@ -279,7 +301,7 @@ CBullet* CBullet::Clone(void* pArg)
 
 void CBullet::Free()
 {
-
+	m_pGameInstance->Remove_GameObject_FromLayer(m_pGameInstance->Get_DestLevel(), L"Layer_Particle_TrailEffect", m_pEffectObj);
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

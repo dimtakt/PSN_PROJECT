@@ -188,6 +188,7 @@
     <ClInclude Include="..\public\Stage_09FightC.h" />
     <ClInclude Include="..\public\Stage_Test1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\TrailParticle.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
     <ClInclude Include="..\public\UI_ScreenText.h" />
     <ClInclude Include="..\public\Weapon.h" />
@@ -245,6 +246,7 @@
     <ClCompile Include="..\private\Stage_09FightC.cpp" />
     <ClCompile Include="..\private\Stage_Test1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\TrailParticle.cpp" />
     <ClCompile Include="..\private\UI_Crosshair.cpp" />
     <ClCompile Include="..\private\UI_ScreenText.cpp" />
     <ClCompile Include="..\private\Weapon.cpp" />

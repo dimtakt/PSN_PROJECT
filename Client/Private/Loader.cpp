@@ -22,6 +22,7 @@
 // Effects...
 #include "ShotParticle.h"
 #include "HitParticle.h"
+#include "TrailParticle.h"
 #include "Skybox.h"
 
 
@@ -434,6 +435,10 @@ HRESULT CLoader::Loading_For_Stages()
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle.png"), 1))))
 		return E_FAIL;
+	/* Prototype_Component_Texture_Particle_Circle */
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_CircleEffect"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Circle.png"), 1))))
+		return E_FAIL;
 	/* Prototype_Component_Texture_Particle_Triangle_Test */
 	//if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_TriEffect_Test"),
 	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/Particle/Triangle_.png"), 1))))
@@ -511,6 +516,20 @@ HRESULT CLoader::Loading_For_Stages()
 		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &HitEffectDesc))))
 		return E_FAIL;
 
+	// Trail
+	CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC		TrailEffectDesc{};
+	TrailEffectDesc.iNumInstance= 100;
+	TrailEffectDesc.vCenter		= _float3(0.f, 0.f, 0.f);
+	TrailEffectDesc.vRange		= _float3(0.0f, 0.0f, 0.3f);
+	TrailEffectDesc.vSize		= _float2(0.03f, 0.03f);
+	TrailEffectDesc.vLifeTime	= _float2(0.03f, 0.05f);
+	TrailEffectDesc.vPivot		= _float3(0.f, 0.f, 0.f);
+	TrailEffectDesc.vSpeed		= _float2(1.f, 8.f);
+	TrailEffectDesc.isLoop		= true;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_VIBuffer_Particle_TrailEffect"),
+		CVIBuffer_Rect_Instance::Create(m_pDevice, m_pContext, &TrailEffectDesc))))
+		return E_FAIL;
 
 
 
@@ -575,6 +594,10 @@ HRESULT CLoader::Loading_For_Stages()
 	// Hit
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_HitEffect"),
 		CHitParticle::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	// Trail
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_GameObject_Particle_TrailEffect"),
+		CTrailParticle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

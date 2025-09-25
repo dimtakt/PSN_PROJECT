@@ -30,6 +30,9 @@ public:
 private:
 	void Cursor_Lock();
 
+public:
+	void Camera_ShortZoom(_float fZoomStrength);
+
 private:
 	_float			m_fMouseSensor = { };
 
@@ -37,6 +40,7 @@ private:
 	CTransform*		m_pPlayerTransformCom = { nullptr };
 
 	_float			m_fOriginFovy = {};
+
 
 private:
 	_float m_fPitch = 0.f;   // 상하 회전 값

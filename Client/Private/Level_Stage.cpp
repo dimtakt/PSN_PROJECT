@@ -204,13 +204,13 @@ void CLevel_Stage::Update_EndLevelStandby(_float fTimeDelta)
 	if		(m_fEndLevelDeltaTime > 0.f && (m_iSuperHot == 0))
 	{
 		m_iSuperHot = 1;
-		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER));
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER));
 		m_pGameInstance->PlaySoundFixed(L"super.wav", ENUM_CLASS(SOUND_CHANNEL::SOUND_MAINUI));
 	}
 	else if (m_fEndLevelDeltaTime > 1.2f && (m_iSuperHot == 1))
 	{
 		m_iSuperHot = 2;
-		m_pUIScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT));
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT));
 		m_pGameInstance->PlaySoundFixed(L"hot.wav", ENUM_CLASS(SOUND_CHANNEL::SOUND_MAINUI));
 	}
 	else if (m_fEndLevelDeltaTime > 2.4f && (m_iSuperHot == 2))

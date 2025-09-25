@@ -12,6 +12,7 @@
 #include "UI_Crosshair.h"
 #include "UI_ScreenText.h"
 
+#include "Camera_Player.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject (pDevice, pContext)
@@ -54,6 +55,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (m_pUI_Crosshair == nullptr)		return E_FAIL;
 	m_pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_UI_ScreenText"));
 	if (m_pUI_ScreenText == nullptr)	return E_FAIL;
+	m_pCameraPlayer = dynamic_cast<CCamera_Player*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Camera"));
+	if (m_pCameraPlayer == nullptr)	return E_FAIL;
 
 	switch (iDestLevel)
 	{
@@ -100,12 +103,9 @@ void CPlayer::Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_IsKeyDown(DIK_L))
 	{
 		_float3 vPlayerPosDebug = m_pTransformCom->Get_Position_Store();
-		std::cout << "[CPlayer::Update] Player Current Pos : ( X : " << (_int)vPlayerPosDebug.x << ", Y : " << (_int)vPlayerPosDebug.y << ", Z : " << (_int)vPlayerPosDebug.z << " )" << std::endl;
+		std::cout << "[CPlayer::Update] Player Current Pos : { " << vPlayerPosDebug.x << "f, " << vPlayerPosDebug.y << "f, " << vPlayerPosDebug.z << "}" << std::endl;
 
-#ifdef _DEBUG
-		std::cout << "[CPlayer::Update] Player Current NavIndex : " << m_pNavigationCom->Get_CurrentCellIndex() << "." << std::endl;
-#endif // _DEBUG
-
+		std::cout << "[CPlayer::Update] Player Current NavIndex : " << m_pNavigationCom->Get_CurrentCellIndex() << std::endl;
 	}
 
 #endif // _DEBUG

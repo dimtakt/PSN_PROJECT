@@ -47,6 +47,7 @@ private:
 	void		Check_Destroy(_float fTimeDelta);
 
 	void		Add_HitEffect();
+	void		Add_TrailEffect();
 
 private:
 	// 로컬 변수들 (타입, 컴포넌트 등..)
@@ -60,7 +61,7 @@ private:
 
 	_uint				m_iIndex = 0;	// tmp
 
-
+	CGameObject*		m_pEffectObj = nullptr;
 
 public:
 	static CBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
