@@ -106,6 +106,10 @@ HRESULT CLoader::Loading()
 		hr = Loading_For_Stage_09CageFight();
 		break;
 
+	case LEVEL::CH10_DESPER:
+		hr = Loading_For_Stage_10DesperadoBar();
+		break;
+
 
 		
 	
@@ -402,6 +406,21 @@ HRESULT CLoader::Loading_For_Stage_09CageFight()
 	/* Prototype_Component_Navigation */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::CH09_FIGHTC), TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_09CageFight.datnavmesh")))))
+		return E_FAIL;
+
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Stage_10DesperadoBar()
+{
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::CH10_DESPER), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/Stage_10Desper.datnavmesh")))))
 		return E_FAIL;
 
 	if (FAILED(Loading_For_Stages()))

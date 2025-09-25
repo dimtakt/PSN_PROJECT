@@ -85,6 +85,11 @@ private:;
 
 	_vector			m_vLoadShotDir = {};
 
+private:
+	CGameObject*	m_pRayObj = { nullptr };
+	_float			m_fRayDist = {};
+	const _float	m_fPickupableDist = 20.f;
+
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGameObject*	Clone(void* pArg)				override;

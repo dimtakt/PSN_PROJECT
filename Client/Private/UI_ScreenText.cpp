@@ -131,6 +131,12 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
 
     case ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK):      m_pCurTextureCom = m_pTextureCom_TUTO_LeftClick;    break;
 
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10_1):       m_pCurTextureCom = m_pTextureCom_LVLStart_10_1;     break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10_2):       m_pCurTextureCom = m_pTextureCom_LVLStart_10_2;     break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_1):         m_pCurTextureCom = m_pTextureCom_LVLMid_10_1;       break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_2):         m_pCurTextureCom = m_pTextureCom_LVLMid_10_2;       break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLMID_10_3):         m_pCurTextureCom = m_pTextureCom_LVLMid_10_3;       break;
+
     case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER):        m_pCurTextureCom = m_pTextureCom_LVLEnd_Super;      break;
     case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT):          m_pCurTextureCom = m_pTextureCom_LVLEnd_Hot;        break;
 
@@ -192,6 +198,23 @@ HRESULT CUI_ScreenText::Ready_Components()
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_TUTO_LeftClick"),
         TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_TUTO_LeftClick), nullptr)))
         return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLSTART_10_1"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_1), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLSTART_10_2"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_2), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_1"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_1), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_2"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_2), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_3"),
+        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_3), nullptr)))
+        return E_FAIL;
+
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Super"),
         TEXT("Com_Texture_LVLEnd_Super"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_Super), nullptr)))
         return E_FAIL;
@@ -289,6 +312,12 @@ void CUI_ScreenText::Free()
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
+
+    Safe_Release(m_pTextureCom_LVLStart_10_1);
+    Safe_Release(m_pTextureCom_LVLStart_10_2);
+    Safe_Release(m_pTextureCom_LVLMid_10_1);
+    Safe_Release(m_pTextureCom_LVLMid_10_2);
+    Safe_Release(m_pTextureCom_LVLMid_10_3);
 
     Safe_Release(m_pTextureCom_NoAmmo);
     Safe_Release(m_pTextureCom_TimeMoves);

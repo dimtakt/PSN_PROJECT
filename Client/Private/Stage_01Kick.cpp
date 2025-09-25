@@ -73,7 +73,7 @@ void CStage_01Kick::Update(_float fTimeDelta)
 	Update_Trigger_OnTime(fTimeDelta);
 
 	// 레벨 종료 조건 검사
-	Update_CheckEndLevel(fTimeDelta);
+	Update_CheckEndLevel(fTimeDelta, LEVEL::CH09_FIGHTC);
 }
 
 HRESULT CStage_01Kick::Render()

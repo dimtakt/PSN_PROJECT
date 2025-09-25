@@ -108,6 +108,10 @@ void CLevel_Logo::Update(_float fTimeDelta)
 				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::CH09_FIGHTC))))
 					return;
 				break;
+			case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_10DESPER):
+				if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::CH10_DESPER))))
+					return;
+				break;
 			default:
 				break;
 			}
@@ -315,6 +319,9 @@ HRESULT CLevel_Logo::Render_Folder_Level()
 	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_09FIGHTC):
 		strDescText = L"                       09FIGHTC";
 		break;
+	case ENUM_CLASS(LOGO_INDEX_LEVEL::MAINLVL_10DESPER):
+		strDescText = L"                       10DESPER";
+		break;
 
 	default:
 		break;
@@ -339,8 +346,9 @@ HRESULT CLevel_Logo::Render_Folder_Level()
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL1.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL2.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
 	m_pGameInstance->Render_Font(strFontTag, L" TESTLVL3.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadUnFocusedColor);
-	m_pGameInstance->Render_Font(strFontTag, L" 01Kick.lvl   -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
-	m_pGameInstance->Render_Font(strFontTag, L" 09FightC.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" 01KICK.lvl   -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" 09FIGHTC.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
+	m_pGameInstance->Render_Font(strFontTag, L" 10DESPER.lvl -LEVEL->", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 	m_pGameInstance->Render_Font(strFontTag, L" ------------ --------", _float2(iRenderStartX, iRenderStartY + iRenderSpaceY * (iFileNamePosY++)), vLoadColor);
 
 

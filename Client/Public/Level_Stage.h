@@ -98,7 +98,7 @@ protected:
 
 protected:
 	// 맵 전환 및 효과에 필요
-	void	Update_CheckEndLevel(_float fTimeDelta);
+	void	Update_CheckEndLevel(_float fTimeDelta, LEVEL eNextLevel);
 	void	Update_EndLevelStandby(_float fTimeDelta);
 	void	Change_ToNextLevel(LEVEL eLevel);
 

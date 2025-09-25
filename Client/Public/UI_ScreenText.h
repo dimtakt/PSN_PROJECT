@@ -52,6 +52,12 @@ private:
 
 	CTexture*		m_pTextureCom_TUTO_LeftClick= { nullptr };
 
+	CTexture*		m_pTextureCom_LVLStart_10_1	= { nullptr };
+	CTexture*		m_pTextureCom_LVLStart_10_2	= { nullptr };
+	CTexture*		m_pTextureCom_LVLMid_10_1	= { nullptr };
+	CTexture*		m_pTextureCom_LVLMid_10_2	= { nullptr };
+	CTexture*		m_pTextureCom_LVLMid_10_3	= { nullptr };
+
 	CTexture*		m_pTextureCom_LVLEnd_Super	= { nullptr };
 	CTexture*		m_pTextureCom_LVLEnd_Hot	= { nullptr };
 

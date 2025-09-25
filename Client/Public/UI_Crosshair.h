@@ -31,7 +31,6 @@ public:
 	void Change_RotByCD(_float fCDRatio);
 	void Change_EnLarge();
 
-private:
 
 private:
 	CShader*		m_pShaderCom = { nullptr };

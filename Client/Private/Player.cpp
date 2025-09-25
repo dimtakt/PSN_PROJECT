@@ -103,9 +103,12 @@ void CPlayer::Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_IsKeyDown(DIK_L))
 	{
 		_float3 vPlayerPosDebug = m_pTransformCom->Get_Position_Store();
-		std::cout << "[CPlayer::Update] Player Current Pos : { " << vPlayerPosDebug.x << "f, " << vPlayerPosDebug.y << "f, " << vPlayerPosDebug.z << "}" << std::endl;
+		std::cout << "[CPlayer::Update] Player Current Pos : { " << vPlayerPosDebug.x << "f, " << vPlayerPosDebug.y << "f, " << vPlayerPosDebug.z << "f }" << std::endl;
 
 		std::cout << "[CPlayer::Update] Player Current NavIndex : " << m_pNavigationCom->Get_CurrentCellIndex() << std::endl;
+
+
+		std::cout << "[CPlayer::Update] Player Current ZRot(Deg) : " << m_pTransformCom->Get_RotationEuler_Store().y << std::endl;
 	}
 
 #endif // _DEBUG
@@ -283,6 +286,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	case ENUM_CLASS(LEVEL::TEST_EXTRA1):	NaviDesc.iCurrentCellIndex = 25;	break;
 	case ENUM_CLASS(LEVEL::CH01_KICK):		NaviDesc.iCurrentCellIndex = 0;		break;
 	case ENUM_CLASS(LEVEL::CH09_FIGHTC):	NaviDesc.iCurrentCellIndex = 3;		break;
+	case ENUM_CLASS(LEVEL::CH10_DESPER):	NaviDesc.iCurrentCellIndex = 1;		break;
 
 	default:								NaviDesc.iCurrentCellIndex = 0;		break;
 	}
@@ -663,7 +667,7 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 		else
 		{
 			// 무기 줍기
-			_float fPickupableDist = 20.f;
+			const _float fPickupableDist = m_fPickupableDist;
 
 			RAYCOLLISION_DESC tRayDesc = {};
 			tRayDesc.vRayPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
@@ -742,6 +746,9 @@ void CPlayer::Update_Interact(_float fTimeDelta)
 
 void CPlayer::Update_UI(_float fTimeDelta)
 {
+	// 픽업 가능 최소거리
+	const _float fPickupableDist = m_fPickupableDist;
+
 	_uint iTextureIndex = UINT_MAX;
 
 
@@ -766,23 +773,20 @@ void CPlayer::Update_UI(_float fTimeDelta)
 		tRayDesc.pOwner = this;
 
 
-		_float fPickupableDist = 20.f;
 
-
-		CGameObject* pRayObj = nullptr;
 		_float fRayDist = FLT_MAX;
-		if (m_pGameInstance->Check_RayCollisions(&tRayDesc, pRayObj, fRayDist))
+		if (m_pGameInstance->Check_RayCollisions(&tRayDesc, m_pRayObj, m_fRayDist))
 		{
-			if (pRayObj && fRayDist < fPickupableDist)
+			if (m_pRayObj && (m_fRayDist < fPickupableDist))
 			{
-				_uint iRayObjType = pRayObj->Get_ObjType();		// 이거 가져와서 레이 대상에 따라 바뀌도록
+				_uint iRayObjType = m_pRayObj->Get_ObjType();		// 이거 가져와서 레이 대상에 따라 바뀌도록
 
 				switch (iRayObjType)
 				{
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_KARABIN):
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL):
 				case ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_SHOTGUN):
-					if (!dynamic_cast<CCustomObj_Pickupable*>(pRayObj)->Get_IsPickingUp())
+					if (!dynamic_cast<CCustomObj_Pickupable*>(m_pRayObj)->Get_IsPickingUp())
 						iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICHAND);		break;
 				case ENUM_CLASS(GAMEOBJ_TYPE::ENEMY):
 					iTextureIndex = ENUM_CLASS(CROSSHAIR_INDEX::BASICPUNCH);	break;
@@ -905,8 +909,9 @@ void CPlayer::Update_ToggleColliders()
 		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_02 ||
 		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_03 ||
 		tCurAnimDesc.iCurAnimIndex == MELEE_U_FIST_04)
-
+	{
 		isFistPlaying = true;
+	}
 
 	// 주먹이 나가는 중이라면
 	if (isFistPlaying && (m_iState & ENUM_CLASS(PLAYER_STATE::ATK)))

@@ -11,6 +11,7 @@
 
 #include "Stage_01Kick.h"
 #include "Stage_09FightC.h"
+#include "Stage_10Desper.h"
 
 
 #include "BackGround.h"
@@ -66,6 +67,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 			break;
 		case LEVEL::CH09_FIGHTC:
 			pNewLevel = CStage_09FightC::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL::CH10_DESPER:
+			pNewLevel = CStage_10Desper::Create(m_pDevice, m_pContext);
 			break;
 		}
 

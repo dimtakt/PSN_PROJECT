@@ -157,6 +157,9 @@
     <Filter Include="02.GameObject\Effect\Particle\Trail">
       <UniqueIdentifier>{cadfb06b-71ff-4416-9f0f-0abc49e68b01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Stage\Stages\Stage_10Desper">
+      <UniqueIdentifier>{49cdd245-1291-4b91-9f3d-87f5369742cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -306,6 +309,9 @@
     <ClInclude Include="..\Public\TrailParticle.h">
       <Filter>02.GameObject\Effect\Particle\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Stage_10Desper.h">
+      <Filter>01.Levels\Stage\Stages\Stage_10Desper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -452,6 +458,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TrailParticle.cpp">
       <Filter>02.GameObject\Effect\Particle\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage_10Desper.cpp">
+      <Filter>01.Levels\Stage\Stages\Stage_10Desper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

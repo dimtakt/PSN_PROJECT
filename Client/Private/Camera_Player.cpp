@@ -163,6 +163,9 @@ void CCamera_Player::Cursor_Lock()
 
 void CCamera_Player::Camera_ShortZoom(_float fZoomStrength)
 {
+    if (m_fFovy != m_fOriginFovy)
+        return;
+
     m_fFovy = m_fFovy + TO_RAD(fZoomStrength);
 }
 

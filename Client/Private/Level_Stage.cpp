@@ -180,7 +180,7 @@ HRESULT CLevel_Stage::Load_BinaryMap(_wstring* strLoadPath)
 	return S_OK;
 }
 
-void CLevel_Stage::Update_CheckEndLevel(_float fTimeDelta)
+void CLevel_Stage::Update_CheckEndLevel(_float fTimeDelta, LEVEL eNextLevel)
 {
 	// 현재 스테이지에 적이 더이상 남아있지 않다면, 레벨의 종료 준비
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
@@ -194,7 +194,7 @@ void CLevel_Stage::Update_CheckEndLevel(_float fTimeDelta)
 		Update_EndLevelStandby(fTimeDelta);
 
 	if (m_isEndLevel)							// 종료 조건 시
-		Change_ToNextLevel(LEVEL::CH09_FIGHTC);	// 전환
+		Change_ToNextLevel(eNextLevel);	// 전환
 }
 
 void CLevel_Stage::Update_EndLevelStandby(_float fTimeDelta)

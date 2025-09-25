@@ -29,8 +29,21 @@ namespace Client
 
 		TUTO_LEFTCLICK,
 
+
+
+		LVLSTART_10_1,
+		LVLSTART_10_2,
+
+		LVLMID_10_1,
+		LVLMID_10_2,
+		LVLMID_10_3,
+
+
+
+
 		LVLEND_SUPER,
 		LVLEND_HOT,
+
 
 		END
 	};

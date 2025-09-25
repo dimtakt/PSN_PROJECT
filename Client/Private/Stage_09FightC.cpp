@@ -8,6 +8,8 @@
 #include "CustomObj.h"
 #include "Enemy.h"
 
+#include "UI_ScreenText.h"
+
 CStage_09FightC::CStage_09FightC(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_Stage{ pDevice, pContext }
 {
@@ -53,6 +55,10 @@ HRESULT CStage_09FightC::Initialize()
 void CStage_09FightC::Update(_float fTimeDelta)
 {
 
+
+
+
+	Update_CheckEndLevel(fTimeDelta, LEVEL::CH10_DESPER);	// case 정의 필요
 }
 
 HRESULT CStage_09FightC::Render()
@@ -143,6 +149,9 @@ HRESULT CStage_09FightC::Ready_Layer_UI(const _wstring& strLayerTag)
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_UI_ScreenText"))))
 		return E_FAIL;
 
+	m_pUI_ScreenText = dynamic_cast<CUI_ScreenText*>(m_pGameInstance->Get_LastGameObject(ENUM_CLASS(LEVEL::CH09_FIGHTC), strLayerTag + L"_ScreenText"));
+	CLevel_Stage::m_pUI_ScreenText = m_pUI_ScreenText;
+
 	return S_OK;
 }
 
@@ -173,16 +182,35 @@ HRESULT CStage_09FightC::Ready_Layer_Monster(const _wstring& strLayerTag)
 
 	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
 	EnemyDesc.fSpeedPerSec = 15.f;
-	EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
+	//EnemyDesc.iDefaultWeaponObjType = ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL);
 
-	vector<_float4> vecEnemyPos = { 
-		_float4{ 86.f, 0.f, 80.f, 1.f } 
+	vector<_uint> vecEnemyDefaultWeaponTypes = {
+		ENUM_CLASS(GAMEOBJ_TYPE::WEAPON_RANGED_PISTOL),
+		ENUM_CLASS(GAMEOBJ_TYPE::END),
+		ENUM_CLASS(GAMEOBJ_TYPE::END),
+		ENUM_CLASS(GAMEOBJ_TYPE::END),
+		ENUM_CLASS(GAMEOBJ_TYPE::END),
+		ENUM_CLASS(GAMEOBJ_TYPE::END)
 	};
 
-	
+	vector<_float4> vecEnemyPos = {
+		_float4{ 83.2244f, 0.499977f, 71.7733f, 1.f},
+		_float4{ 74.2833f, 0.499982f, 90.4307f , 1.f},
+		_float4{ 83.946f, 0.499993f, 119.088f , 1.f},
+		_float4{ 70.7839f, 0.500004f, 148.576f , 1.f},
+		_float4{ 64.0938f, 0.500011f, 165.41f , 1.f},
+		_float4{ 89.4751f, 0.500007f, 158.567f, 1.f }
+	};
+
+	vector<_uint> vecEnemyNavIndices = { 7, 6, 7, 3, 4, 1 };
+
+
 
 	for (_uint i = 0; i < vecEnemyPos.size(); i++)
 	{
+		EnemyDesc.iFirstCellIndex = vecEnemyNavIndices[i];
+		EnemyDesc.iDefaultWeaponObjType = vecEnemyDefaultWeaponTypes[i];
+
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH09_FIGHTC), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
