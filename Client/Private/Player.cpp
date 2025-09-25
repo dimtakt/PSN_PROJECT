@@ -802,6 +802,15 @@ void CPlayer::Update_UI(_float fTimeDelta)
 	}
 
 	m_pUI_Crosshair->Change_Crosshair(iTextureIndex);
+
+
+	//if ((m_pRayObj != nullptr) &&
+	//	(m_pRayObj->Get_ObjType() == ENUM_CLASS(GAMEOBJ_TYPE::ENEMY)) &&
+	//	(m_fRayDist < m_fPickupableDist) &&
+	//	(m_pPart_Weapon == nullptr) &&
+	//	(m_pGameInstance->Get_IsKeyDown(MOUSEKEYSTATE::LB)))
+	//	m_pCameraPlayer->Camera_Shake(5.f);
+
 }
 
 void CPlayer::Update_BoneColliders()

@@ -6,6 +6,8 @@
 #include "Weapon_Shotgun.h"
 #include "CustomObj_Pickupable.h"
 
+#include "Camera_Player.h"
+
 
 
 CEnemy::CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -240,7 +242,19 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 		m_isDeadStandby = true;
 	}
 
-	
+
+
+	CCollider* pAtkCom = pColDescFrom->pColCom;
+	CGameObject* pAtkObj = pColDescFrom->pOwner;
+	// 플레이어 손 콜라이더면 플레이어에게 카메라 흔들림 처리
+	if (pAtkCom == pAtkObj->Get_Component(L"Com_Collider_LeftHand") ||
+		pAtkCom == pAtkObj->Get_Component(L"Com_Collider_RightHand"))
+	{
+		dynamic_cast<CCamera_Player*>(m_pGameInstance->Find_GameObject(m_pGameInstance->Get_DestLevel(), L"Layer_Camera"))->Camera_Shake(10.f);
+	}
+
+
+
 	CCollider* pHitCom = pColDescTo->pColCom;	// 공격받은 콜라이더
 
 	if (pHitCom == CGameObject::Get_Component(L"Com_Collider_BodyAll") ||

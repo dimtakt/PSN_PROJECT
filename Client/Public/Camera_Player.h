@@ -32,6 +32,8 @@ private:
 
 public:
 	void Camera_ShortZoom(_float fZoomStrength);
+	void Camera_Shake(_float fShakeStrength);
+
 
 private:
 	_float			m_fMouseSensor = { };
@@ -41,6 +43,9 @@ private:
 
 	_float			m_fOriginFovy = {};
 
+
+
+	_float			m_fShakeDegree = { };
 
 private:
 	_float m_fPitch = 0.f;   // 상하 회전 값

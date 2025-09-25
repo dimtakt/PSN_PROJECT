@@ -112,6 +112,11 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
     }
 
 
+
+
+
+
+
     // fov restore 
     if (m_fFovy != m_fOriginFovy)
     {
@@ -129,7 +134,52 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
         }
     }
 
+
+
+
+    // for Skake
+
+    // 원본 값 저장
+    _matrix matOrigin = m_pTransformCom->Get_WorldMatrix();
+
+    // 원본 행렬 정보 가져온 뒤, 랜덤 값 구함
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
+    _vector vUp = m_pTransformCom->Get_State(STATE::UP);
+    _float fRandX = m_pGameInstance->Rand(TO_RAD(-m_fShakeDegree), TO_RAD(m_fShakeDegree));
+    _float fRandY = m_pGameInstance->Rand(TO_RAD(-m_fShakeDegree), TO_RAD(m_fShakeDegree));
+    _float fRandZ = m_pGameInstance->Rand(TO_RAD(-m_fShakeDegree), TO_RAD(m_fShakeDegree));
+
+    // 오일러 랜덤값 기반 회전행렬 생성, 각 벡터에 계산
+    _matrix mRot = XMMatrixRotationRollPitchYaw(fRandX, fRandY, fRandZ);
+    vLook = XMVector3TransformNormal(vLook, mRot);
+    vUp = XMVector3TransformNormal(vUp, mRot);
+    vRight = XMVector3TransformNormal(vRight, mRot);
+
+    // 정규화 후 적용
+    vLook = XMVector3Normalize(vLook);
+    vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vUp = XMVector3Cross(vLook, vRight);
+    m_pTransformCom->Set_State(STATE::LOOK, vLook);
+    m_pTransformCom->Set_State(STATE::RIGHT, vRight);
+    m_pTransformCom->Set_State(STATE::UP, vUp);
+
+    // 카메라 값 적용 타이밍
     __super::Update_PipeLines();
+
+    // 복구
+    m_pTransformCom->Set_WorldMatrix(matOrigin);
+
+    if (m_fShakeDegree != 0)
+    {
+        m_fShakeDegree = m_fShakeDegree * 0.8f;
+
+        if (IS_BETWEEN(m_fShakeDegree, -1.f, 1.f))
+            m_fShakeDegree = 0.f;
+    }
+
+    if (m_pGameInstance->Get_IsKeyDown(DIK_M))
+        m_fShakeDegree = 10.f;
 }
 
 void CCamera_Player::Update(_float fTimeDelta)
@@ -167,6 +217,11 @@ void CCamera_Player::Camera_ShortZoom(_float fZoomStrength)
         return;
 
     m_fFovy = m_fFovy + TO_RAD(fZoomStrength);
+}
+
+void CCamera_Player::Camera_Shake(_float fShakeStrength)
+{
+    m_fShakeDegree = fShakeStrength;
 }
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
