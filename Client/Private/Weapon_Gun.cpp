@@ -208,10 +208,10 @@ void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
     // 주체가 플레이어면 카메라에서 나가도록
     // 적이라면 무기좌표에서 나가도록
     bulletDesc.matSpawnTransform;
-    if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
-        bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
-    else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
-    {
+    //if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::PLAYERBULLET))
+    //    bulletDesc.matSpawnTransform = m_pGameInstance->Get_Transform_Matrix_Inverse(D3DTS::VIEW);
+    //else if (iObjTypeIndex == ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET))
+    //{
         _float3 vAdjustPos = {};
 
         switch (m_iGameObjType)
@@ -223,7 +223,7 @@ void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
         }
 
         bulletDesc.matSpawnTransform = XMMatrixTranslationFromVector(XMLoadFloat3(&vAdjustPos)) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
-    }
+    //}
 
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
         ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))

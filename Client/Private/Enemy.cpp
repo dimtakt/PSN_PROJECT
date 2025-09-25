@@ -531,12 +531,12 @@ void CEnemy::Update_AnimationState(_float fTimeDelta)
 
 		if (pWeaponGun)		// [총]		무기 들고 있음
 		{
-			if (IS_BETWEEN(fDist, 50.f, 80.f))				// [Track]	적당히 가까이 있음
+			if (IS_BETWEEN(fDist, 60.f, 80.f))				// [Track]	적당히 가까이 있음
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
 				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
 			}
-			else if (IS_BETWEEN(fDist, 0.f, 50.f))			// [Aiming]	가까이 있음
+			else if (IS_BETWEEN(fDist, 0.f, 60.f))			// [Aiming]	가까이 있음
 			{
 				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
 				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
