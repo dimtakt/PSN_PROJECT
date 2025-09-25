@@ -29,7 +29,7 @@ private:
 
 private:
 	//void	Update_TriggerOnce();
-	//void	Update_Trigger_OnTime(_float fTimeDelta);
+	void	Update_Trigger_OnTime(_float fTimeDelta);
 
 private:
 	_bool	m_isTriggered = false;
@@ -40,9 +40,10 @@ private:
 
 	_uint	m_iPhase = 0.f;
 
+	_uint	m_iStartTextIndex = 0;
+
 private:
 	class CCamera_Player* m_pCameraPlayer = { nullptr };
-	class CUI_ScreenText* m_pUI_ScreenText = nullptr;
 
 public:
 	static CStage_10Desper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

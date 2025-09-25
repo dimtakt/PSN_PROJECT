@@ -59,21 +59,22 @@ void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 void CUI_ScreenText::Update(_float fTimeDelta)
 {
     if (
-        m_pCurTextureCom == m_pTextureCom_NoAmmo ||
-        m_pCurTextureCom == m_pTextureCom_TimeMoves ||
-        m_pCurTextureCom == m_pTextureCom_LVLEnd_Super ||
-        m_pCurTextureCom == m_pTextureCom_LVLEnd_Hot
-        )
-    {
-        Update_PopupUI(fTimeDelta);
-    }
-
-    else if (
         m_pCurTextureCom == m_pTextureCom_TUTO_LeftClick
         )
     {
         Update_FloatUI(fTimeDelta);
     }
+    else
+    //    (
+    //    m_pCurTextureCom == m_pTextureCom_NoAmmo ||
+    //    m_pCurTextureCom == m_pTextureCom_TimeMoves ||
+    //    m_pCurTextureCom == m_pTextureCom_LVLEnd_Super ||
+    //    m_pCurTextureCom == m_pTextureCom_LVLEnd_Hot
+    //    )
+    {
+        Update_PopupUI(fTimeDelta);
+    }
+
 
 
 
@@ -200,19 +201,19 @@ HRESULT CUI_ScreenText::Ready_Components()
         return E_FAIL;
 
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLSTART_10_1"),
-        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_1), nullptr)))
+        TEXT("Com_Texture_LVLStart_10_1"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_1), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLSTART_10_2"),
-        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_2), nullptr)))
+        TEXT("Com_Texture_LVLStart_10_2"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLStart_10_2), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_1"),
-        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_1), nullptr)))
+        TEXT("Com_Texture_LVLMid_10_1"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_1), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_2"),
-        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_2), nullptr)))
+        TEXT("Com_Texture_LVLMid_10_2"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_2), nullptr)))
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLMID_10_3"),
-        TEXT("Com_Texture_TUTO_LeftClick"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_3), nullptr)))
+        TEXT("Com_Texture_LVLMid_10_3"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLMid_10_3), nullptr)))
         return E_FAIL;
 
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Super"),

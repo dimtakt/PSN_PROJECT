@@ -228,6 +228,17 @@ void CWeapon_Gun::Add_Bullet(_vector* pDir, _uint iObjTypeIndex)
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(iDestLevel, L"Layer_Bullet",
         ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon_Bullet"), &bulletDesc)))
         MSG_BOX(L"총알 생성 실패");
+
+    CTransform* pBulletTransform = dynamic_cast<CTransform*>(m_pGameInstance->Get_LastGameObject(iDestLevel, L"Layer_Bullet")->Get_Component(L"Com_Transform"));
+
+    _vector vLook = XMVector3Normalize(*pDir);
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vUp = XMVector3Cross(vLook, vRight);
+
+    pBulletTransform->Set_State(STATE::RIGHT, vRight);
+    pBulletTransform->Set_State(STATE::UP, vUp);
+    pBulletTransform->Set_State(STATE::LOOK, vLook);
 }
 
 void CWeapon_Gun::Add_ShotEffect()

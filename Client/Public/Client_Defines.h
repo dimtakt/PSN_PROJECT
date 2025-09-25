@@ -33,7 +33,6 @@ namespace Client
 
 		LVLSTART_10_1,
 		LVLSTART_10_2,
-
 		LVLMID_10_1,
 		LVLMID_10_2,
 		LVLMID_10_3,

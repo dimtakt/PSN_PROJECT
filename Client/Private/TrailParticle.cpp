@@ -27,6 +27,8 @@ HRESULT CTrailParticle::Initialize(void* pArg)
     TRAIL_DESC* pDesc = static_cast<TRAIL_DESC*>(pArg);
 
     m_pTargetObj = pDesc->pOwner;
+    CTransform* pTargetTransformCom = dynamic_cast<CTransform*>(m_pTargetObj->Get_Component(L"Com_Transform"));
+    m_pTransformCom->Set_Position_Direct(pTargetTransformCom->Get_Position());
 
     return S_OK;
 }
@@ -40,6 +42,7 @@ void CTrailParticle::Update(_float fTimeDelta)
 {
     CTransform* pTargetTransformCom = dynamic_cast<CTransform*>(m_pTargetObj->Get_Component(L"Com_Transform"));
     m_pTransformCom->Set_Position_Direct(pTargetTransformCom->Get_Position());
+    m_pTransformCom->Set_Rotation_DirectEuler(pTargetTransformCom->Get_RotationEuler_Store());
     
     _vector vTargetPos = pTargetTransformCom->Get_Position();
     m_pVIBufferCom->Trail(fTimeDelta, m_pTargetObj);

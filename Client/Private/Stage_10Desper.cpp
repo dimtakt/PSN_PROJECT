@@ -70,7 +70,7 @@ void CStage_10Desper::Update(_float fTimeDelta)
 		}
 	}
 
-	Update_TriggerOnce();
+	//Update_TriggerOnce();
 
 	if (!m_isEndLevelStandby)
 		Update_Trigger_OnTime(fTimeDelta);
@@ -199,6 +199,8 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Monster"))))
 	//	return E_FAIL;
 
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+
 	CEnemy::ENEMY_DESC EnemyDesc{};
 
 	EnemyDesc.fRotationPerSec = XMConvertToRadians(180.f);
@@ -223,6 +225,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 	}break;
@@ -239,6 +242,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 
@@ -254,6 +258,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 
@@ -269,6 +274,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 	}break;
@@ -285,6 +291,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 
@@ -304,6 +311,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 
@@ -319,6 +327,7 @@ HRESULT CStage_10Desper::Ready_Layer_Monster(const _wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::CH10_DESPER), strLayerTag,
 			ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Enemy"), &EnemyDesc)))
 			return E_FAIL;
+		pEnemy = m_pGameInstance->Get_LastGameObject(iDestLevel, strLayerTag);
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Set_State(STATE::POSITION, XMLoadFloat4(&vStartPos));
 		dynamic_cast<CTransform*>(pEnemy->Get_Component(L"Com_Transform"))->Rotation(XMVectorSet(0.f, 1.f, 0.f, 1.f), TO_RAD(fStartRotDeg));
 	}break;
@@ -433,26 +442,21 @@ HRESULT CStage_10Desper::Ready_Pickup_Objects(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-void CStage_10Desper::Update_TriggerOnce()
-{
-	if (m_isTriggered)
-		return;
-
-	// ==============================
-	m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10));
-	// ==============================
-
-	m_isTriggered = true;
-}
-
 void CStage_10Desper::Update_Trigger_OnTime(_float fTimeDelta)
 {
-	m_fTimeEventDeltaTime += fTimeDelta;
+	m_fTimeEventDeltaTime += m_pGameInstance->Get_RawTimeDelta();
 
-	if (IS_BETWEEN(m_fTimeEventDeltaTime, 2.0f, 7.0f) && !m_isEndLevelStandby)
-		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::TUTO_LEFTCLICK));
-	else if ((IS_BETWEEN(m_fTimeEventDeltaTime, 7.0f, 8.0f) && !m_isEndLevelStandby))
-		m_pUI_ScreenText->Hide_ScreenText();
+
+	if ((m_fTimeEventDeltaTime >= 0.8f) && (m_iStartTextIndex == 0))
+	{
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10_1));
+		m_iStartTextIndex++;
+	}
+	else if ((m_fTimeEventDeltaTime >= 1.5f) && (m_iStartTextIndex == 1))
+	{
+		m_pUI_ScreenText->Show_ScreenText(ENUM_CLASS(SCREENTEXT_INDEX::LVLSTART_10_2));
+		m_iStartTextIndex++;
+	}
 }
 
 CStage_10Desper* CStage_10Desper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
