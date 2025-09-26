@@ -40,7 +40,8 @@ public:
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
-	CPartObject* Get_WeaponPart() { return m_pPart_Weapon; };
+	CPartObject*	Get_WeaponPart() { return m_pPart_Weapon; };
+	void			Set_HotSwitchOn() { m_isHotSwitchOn = true; };
 
 private:
 	// 로컬 함수들 (기능 분리)
@@ -89,6 +90,10 @@ private:
 	CGameObject*	m_pRayObj = { nullptr };
 	_float			m_fRayDist = {};
 	const _float	m_fPickupableDist = 20.f;
+
+	_bool			m_isHotSwitchOn = false;
+	_bool			m_isHotSwitchProgressing = false;
+
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

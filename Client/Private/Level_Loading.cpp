@@ -5,9 +5,9 @@
 
 #include "Level_Logo.h"
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 #include "Level_Editor.h"
-//#endif
+#endif
 
 #include "Level_GamePlay.h"
 
@@ -16,6 +16,7 @@
 #include "Stage_01Kick.h"
 #include "Stage_09FightC.h"
 #include "Stage_10Desper.h"
+#include "Stage_ENDTower.h"
 
 
 #include "BackGround.h"
@@ -57,9 +58,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 			pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 			break;
 		case LEVEL::EDITOR:
-//#ifdef _DEBUG
+#ifdef _DEBUG
 			pNewLevel = CLevel_Editor::Create(m_pDevice, m_pContext);
-//#endif
+#endif
 			break;
 		case LEVEL::GAMEPLAY:
 			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
@@ -76,6 +77,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 			break;
 		case LEVEL::CH10_DESPER:
 			pNewLevel = CStage_10Desper::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL::TEST_EXTRA3:
+			pNewLevel = CStage_ENDTower::Create(m_pDevice, m_pContext);
 			break;
 		}
 

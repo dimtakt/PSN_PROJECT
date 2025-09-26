@@ -76,7 +76,7 @@ void CStage_10Desper::Update(_float fTimeDelta)
 		Update_Trigger_OnTime(fTimeDelta);
 
 	// 레벨 종료 조건 검사
-	Update_CheckEndLevel(fTimeDelta, LEVEL::CH09_FIGHTC);
+	Update_CheckEndLevel(fTimeDelta, LEVEL::TEST_EXTRA3);
 }
 
 HRESULT CStage_10Desper::Render()

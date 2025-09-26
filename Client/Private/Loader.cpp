@@ -110,6 +110,9 @@ HRESULT CLoader::Loading()
 		hr = Loading_For_Stage_10DesperadoBar();
 		break;
 
+	case LEVEL::TEST_EXTRA3:
+		hr = Loading_For_Stage_ENDTower();
+		break;
 
 		
 	
@@ -429,6 +432,21 @@ HRESULT CLoader::Loading_For_Stage_10DesperadoBar()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Stage_ENDTower()
+{
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	/* Prototype_Component_Navigation */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TEST_EXTRA3), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/_BinaryNavs/StageEnd_Tower.datnavmesh")))))
+		return E_FAIL;
+
+	if (FAILED(Loading_For_Stages()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_Stages()
 {
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
@@ -505,8 +523,12 @@ HRESULT CLoader::Loading_For_Stages()
 	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Hot"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/LVLEnd_HOT.png"), 1))))
 		return E_FAIL;
-
-
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_HSInto"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/HSINTO.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_BLACK"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/_SUPERHOT/Textures/ScreenText/BLACK.png"), 1))))
+		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 

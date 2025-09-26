@@ -191,6 +191,7 @@
     <ClInclude Include="..\public\Stage_01Kick.h" />
     <ClInclude Include="..\public\Stage_09FightC.h" />
     <ClInclude Include="..\public\Stage_10Desper.h" />
+    <ClInclude Include="..\public\Stage_ENDTower.h" />
     <ClInclude Include="..\public\Stage_Test1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TrailParticle.h" />
@@ -270,6 +271,7 @@
     <ClCompile Include="..\private\Stage_01Kick.cpp" />
     <ClCompile Include="..\private\Stage_09FightC.cpp" />
     <ClCompile Include="..\private\Stage_10Desper.cpp" />
+    <ClCompile Include="..\private\Stage_ENDTower.cpp" />
     <ClCompile Include="..\private\Stage_Test1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TrailParticle.cpp" />

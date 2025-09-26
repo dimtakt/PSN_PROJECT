@@ -43,7 +43,9 @@ namespace Client
 
 		LVLEND_SUPER,
 		LVLEND_HOT,
+		LVLEND_HSINTO,
 
+		BLACK,
 
 		END
 	};

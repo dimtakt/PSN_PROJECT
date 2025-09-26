@@ -60,7 +60,8 @@ void CUI_ScreenText::Priority_Update(_float fTimeDelta)
 void CUI_ScreenText::Update(_float fTimeDelta)
 {
     if (
-        m_pCurTextureCom == m_pTextureCom_TUTO_LeftClick
+        m_pCurTextureCom == m_pTextureCom_TUTO_LeftClick ||
+        m_pCurTextureCom == m_pTextureCom_LVLEnd_BLACK
         )
     {
         Update_FloatUI(fTimeDelta);
@@ -142,6 +143,10 @@ void CUI_ScreenText::Change_ScreenText(_uint iTexIndex)
 
     case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_SUPER):        m_pCurTextureCom = m_pTextureCom_LVLEnd_Super;      break;
     case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HOT):          m_pCurTextureCom = m_pTextureCom_LVLEnd_Hot;        break;
+
+    case ENUM_CLASS(SCREENTEXT_INDEX::LVLEND_HSINTO):       m_pCurTextureCom = m_pTextureCom_LVLEnd_HSInto;     break;
+    case ENUM_CLASS(SCREENTEXT_INDEX::BLACK):               m_pCurTextureCom = m_pTextureCom_LVLEnd_BLACK;      break;
+
 
     default:                                                                                                    break;
     }
@@ -226,6 +231,12 @@ HRESULT CUI_ScreenText::Ready_Components()
         return E_FAIL;
     if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_Hot"),
         TEXT("Com_Texture_LVLEnd_Hot"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_Hot), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_HSInto"),
+        TEXT("Com_Texture_LVLEnd_HSInto"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_HSInto), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(iDestLevel, TEXT("Prototype_Component_Texture_LVLEnd_BLACK"),
+        TEXT("Com_Texture_LVLEnd_BLACK"), reinterpret_cast<CComponent**>(&m_pTextureCom_LVLEnd_BLACK), nullptr)))
         return E_FAIL;
 
 
@@ -331,4 +342,7 @@ void CUI_ScreenText::Free()
     Safe_Release(m_pTextureCom_TUTO_LeftClick);
     Safe_Release(m_pTextureCom_LVLEnd_Super);
     Safe_Release(m_pTextureCom_LVLEnd_Hot);
+    Safe_Release(m_pTextureCom_LVLEnd_HSInto);
+
+    Safe_Release(m_pTextureCom_LVLEnd_BLACK);
 }

@@ -61,6 +61,9 @@ private:
 
 	CTexture*		m_pTextureCom_LVLEnd_Super	= { nullptr };
 	CTexture*		m_pTextureCom_LVLEnd_Hot	= { nullptr };
+	CTexture*		m_pTextureCom_LVLEnd_HSInto	= { nullptr };
+
+	CTexture*		m_pTextureCom_LVLEnd_BLACK	= { nullptr };
 
 
 
