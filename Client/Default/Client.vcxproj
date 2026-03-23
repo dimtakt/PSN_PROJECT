@@ -159,6 +159,9 @@
     <ClInclude Include="..\public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\public\CustomObj_Pickupable.h" />
+    <ClInclude Include="..\public\EnemyAI.h" />
+    <ClInclude Include="..\public\EnemyAnyState.h" />
+    <ClInclude Include="..\public\EnemyState.h" />
     <ClInclude Include="..\Public\HitParticle.h" />
     <ClInclude Include="..\public\Level_Stage.h" />
     <ClInclude Include="..\public\ShotParticle.h" />
@@ -193,6 +196,7 @@
     <ClInclude Include="..\public\Stage_10Desper.h" />
     <ClInclude Include="..\public\Stage_ENDTower.h" />
     <ClInclude Include="..\public\Stage_Test1.h" />
+    <ClInclude Include="..\Public\State.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TrailParticle.h" />
     <ClInclude Include="..\public\UI_Crosshair.h" />
@@ -239,6 +243,9 @@
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Player.cpp" />
     <ClCompile Include="..\private\CustomObj_Pickupable.cpp" />
+    <ClCompile Include="..\private\EnemyAI.cpp" />
+    <ClCompile Include="..\private\EnemyAnyState.cpp" />
+    <ClCompile Include="..\private\EnemyState.cpp" />
     <ClCompile Include="..\Private\HitParticle.cpp" />
     <ClCompile Include="..\private\Level_Stage.cpp" />
     <ClCompile Include="..\private\ShotParticle.cpp" />

@@ -163,6 +163,36 @@
     <Filter Include="01.Levels\Stage\Stages\Stage_ENDTower">
       <UniqueIdentifier>{d1b78bf9-4e52-4531-81a6-0298fecff9f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI">
+      <UniqueIdentifier>{652098a0-ebb6-49aa-b8cb-bc1dfda9f3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State">
+      <UniqueIdentifier>{3092ebce-2aa0-4d59-81ff-a5b48d9f5445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\_AnyState">
+      <UniqueIdentifier>{0ffcb446-35bb-4e37-bed7-ad3e9bd76fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\_Entry">
+      <UniqueIdentifier>{18ad166c-9167-4c83-a1a0-c792fa181ffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackAiming">
+      <UniqueIdentifier>{a546980e-86bd-4ea1-b439-b8f585bbc1bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackMelee">
+      <UniqueIdentifier>{9fb6fb56-98aa-4ad4-a52b-37a0af6bcd01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\GetDamaged1/2">
+      <UniqueIdentifier>{bd0ed2f3-7125-4890-9f8d-51e8270d8892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\Idle">
+      <UniqueIdentifier>{ced2fc57-a303-4219-b58e-7c1d26a6de8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackPlayer">
+      <UniqueIdentifier>{ed1be5ac-909b-48cc-9431-1d19ff4d337f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackWeapon">
+      <UniqueIdentifier>{0f0af00a-2b6c-4181-a86c-ddf74041626c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -318,6 +348,18 @@
     <ClInclude Include="..\public\Stage_ENDTower.h">
       <Filter>01.Levels\Stage\Stages\Stage_ENDTower</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\EnemyAI.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\State.h">
+      <Filter>02.GameObject\_AnimObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyAnyState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\_AnyState</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -470,6 +512,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage_ENDTower.cpp">
       <Filter>01.Levels\Stage\Stages\Stage_ENDTower</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyAI.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyAnyState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\_AnyState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

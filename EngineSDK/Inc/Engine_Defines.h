@@ -72,6 +72,7 @@ namespace Engine
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <iostream>
+#include <typeinfo>
 
 #ifndef DBG_NEW 
 

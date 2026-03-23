@@ -143,69 +143,6 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
     /* 애니메이션이 반영 및 계산된 최종 Transform 정보를, 인자로 받아온 Blend 가중치에 따라 재계산 (애니메이션 전환 시 블렌딩 효과) */
     if (fBlendRatio <= 1.f)
     {
-#pragma region 포기한흔적
-        //if (!isSameAnim)    // 다른 애니메이션일 경우.
-        //{
-        //    _float fAnimBlendRatio = fBlendRatio;               // [이쪽이 새로 반영될 Transform] 의 반영 비율
-        //    _float fExistBlendRatio = 1.f - fAnimBlendRatio;    // [이쪽이 기존의 뼈대 Transform] 의 반영 비율
-
-
-        //    // [이전 애니메이션이 적용된] 기존 뼈대의 Translation, Rotation, Scale 정보를 받아와서
-        //    // Blend 수치에 맞게 반영하여 lerp 한 뒤 재반영시킴
-        //    _vector vExistTranslation = {}, vExistRotation = {}, vExistScale = {};
-        //    XMMatrixDecompose(&vExistScale, &vExistRotation, &vExistTranslation, pTargetBone->Get_TransformationMatrix());
-
-        //    vScale = XMVectorLerp(vExistScale, vScale, fAnimBlendRatio);
-        //    vRotation = XMQuaternionSlerp(vExistRotation, vRotation, fAnimBlendRatio);
-        //    vTranslation = XMVectorSetW(XMVectorLerp(vExistTranslation, vTranslation, fAnimBlendRatio), 1.f);
-        //}
-        //else                // 같은 애니메이션일 경우
-        //{
-        //    // 1. 애니메이션 종료되기 [TransitionTime] 전부터 블렌딩 시작 필요
-        //    // 2. 블렌딩 시 선형적으로 보간되도록
-        //    //
-        //    // - 문제)
-        //    // 종료로부터 해당 시간 이전 시점의 키프레임을 어떻게 계산하는가
-        //    // - 필요한것)
-        //    // 종료로부터 해당 시간 이전 시점의 키프레임 에서 "이전 시간". Model 단계서부터 인자로 받아와야 하나?
-        //    // 애니메이션의 총 길이. 애니메이션쪽에 [m_fDuration] 으로 있음
-        //    // 현재 키프레임이 어디쯤인지 정보.  fCurrentTrackPosition 와 애니메이션의 총 길이를 이용하여 구할 수 있을듯
-        //    // 블렌딩 대상의 키프레임이 어디쯤인지 정보. 위와 동일
-        //    // - 그래서 그걸 어떻게 구함?)
-        //    // 현재 키프레임이 어디쯤인지 정보 : 102번줄과 같이 계산
-        //    // 블렌딩 대상의 키프레임 정보 : m_fDuration 에서 102번줄 계산 결과를 빼고, 보정하면 될 듯
-        //    // - 이걸로 뭘 하면 됨?)
-        //    // [isSameAnim == true] 인 동안, "이전 시간" 시점부터,
-        //    // 신규 애니메이션은 0부터, 기존 애니메이션은 "이전 시간"부터
-        //    // 시간 경과에 따라 0:1 부터 블렌딩 진행
-        //    // 
-        //
-        //    _float fAnimDuration = pDesc->fAnimDuration;      // tick 단위
-        //    _float fTransitionTimeSec = pDesc->fTransitionTime;    // 초 단위
-        //    _float fTickPerSecond = pDesc->fTickPerSecond;     // tick/s
-        //
-        //    // 애니메이션 지속 길이를 m_fDuration - fTranslationTime 로 축소함,
-        //    // 애니메이션 루프 중 loop 이후 fTransitionTimeSec 동안만 블렌딩할 것
-        //    // isSameAnim 조건이므로, 애니메이션 2회차 반복 시작 시 부터 적용됨
-        //    // isSameAnim 이 True 로 바뀌는 타이밍 문제려나.. 1->2 는 안되는데 2->3 부터는 잘됨
-
-        //    _float fTransitionTicks = fTransitionTimeSec * fTickPerSecond;  // 트랜지션이 일어날 Tick 기간
-
-        //    if (fCurrentTrackPosition <= fTransitionTicks)
-        //    {
-        //        _float fLocalBlendRatio = fCurrentTrackPosition / fTransitionTicks;
-        //        if (fLocalBlendRatio > 1.f) fLocalBlendRatio = 1.f;
-
-        //        _vector vExistScale, vExistRot, vExistTrans;
-        //        XMMatrixDecompose(&vExistScale, &vExistRot, &vExistTrans, pTargetBone->Get_TransformationMatrix());
-
-        //        vScale = XMVectorLerp(vExistScale, vScale, fLocalBlendRatio);
-        //        vRotation = XMQuaternionSlerp(vExistRot, vRotation, fLocalBlendRatio);
-        //        vTranslation = XMVectorSetW(XMVectorLerp(vExistTrans, vTranslation, fLocalBlendRatio), 1.f);
-        //    }
-        //    // 블렌딩 구간이 아니라면 그냥 현재 Transform 그대로 적용
-        //}
-#pragma endregion
         // 야매로함
         if (pArg != nullptr)    // Arg 가 존재하면..
         {
@@ -234,7 +171,6 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
         {
             _float fAnimBlendRatio = fBlendRatio;               // [이쪽이 새로 반영될 Transform] 의 반영 비율
             _float fExistBlendRatio = 1.f - fAnimBlendRatio;    // [이쪽이 기존의 뼈대 Transform] 의 반영 비율
-
 
             // [이전 애니메이션이 적용된] 기존 뼈대의 Translation, Rotation, Scale 정보를 받아와서
             // Blend 수치에 맞게 반영하여 lerp 한 뒤 재반영시킴

@@ -262,6 +262,9 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 
 
+
+
+
 	/* Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
 	//	CPlayer::Create(m_pDevice, m_pContext))))

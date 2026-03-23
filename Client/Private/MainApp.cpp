@@ -28,6 +28,9 @@
 #include "UI_Crosshair.h"
 #include "UI_ScreenText.h"
 
+// AI
+#include "EnemyAI.h"
+
 
 // Particle 
 
@@ -194,6 +197,13 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CCollider::Create(m_pDevice, m_pContext, COLLIDERTYPE::SPHERE))))
 		return E_FAIL;
 
+
+	/* AI */
+
+	/* Prototype_Component_EnemyAI */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_EnemyAI"),
+		CEnemyAI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 

@@ -7,6 +7,7 @@
 #include "Channel.h"
 
 #include <fstream>
+#include <algorithm>
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent{ pDevice ,pContext }
@@ -185,6 +186,7 @@ _bool CModel::Play_Animation_AllLayer(_float fTimeDelta)
 
 _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 {
+#pragma region Variables
 
     // model anim desc 변수 꺼내기
 
@@ -202,11 +204,14 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     _float&	fTranslationTime    = TargetAnimDesc.fTranslationTime;
     _float&	fAnimElapsedTime    = TargetAnimDesc.fAnimElapsedTime;
 
-
-
-
-
     isFinished = false;
+
+
+    CChannel::CHANNEL_UPD_DESC pDesc = {};
+    pDesc.fAnimDuration = m_Animations[iCurAnimIndex]->Get_Duration();
+    pDesc.fTransitionTime = fTranslationTime;
+    pDesc.fTickPerSecond = m_Animations[iCurAnimIndex]->Get_TickPerSecond();
+
 
     /* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
     
@@ -217,10 +222,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
 
     _bool isSameAnim = iCurAnimIndex == iPrevAnimIndex;
 
-
-    // ==============================
-    // || 블렌딩 조건이 충족되면 ratio 를 1.0 이 아닌, 시간 경과 값에 따라 변경함
-    // ==============================
+#pragma endregion
 
     // 블렌딩 트랜지션 시작 조건. 애니메이션이 바뀌었고, 블렌딩 진행중이 아닐 때 활성화
     if (isAnimChanged && !isDoingTransition)
@@ -231,16 +233,15 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     {
         fAnimElapsedTime += fTimeDelta;
         fBlendLeftTime = fTranslationTime - fAnimElapsedTime;
-
-        //fAnimBlendRatio = fTimeDelta / fBlendLeftTime;            // 이게 적용돼야 할 신규 Anim 가중치 (수정 전 백업 8/25 7:54)
-        fAnimBlendRatio = fAnimElapsedTime / fTranslationTime;      // 이게 적용돼야 할 신규 Anim 가중치
-
-
-        // clamping
-        if      (fAnimBlendRatio > 1)       fAnimBlendRatio = 1;
-        else if (fAnimBlendRatio < 0)       fAnimBlendRatio = 0;
+        fAnimBlendRatio = fAnimElapsedTime / fTranslationTime;      // 신규 Anim 가중치
         
-        // 종료 조건
+        // blend ratio clamping
+        {
+            if      (fAnimBlendRatio > 1)       fAnimBlendRatio = 1;
+            else if (fAnimBlendRatio < 0)       fAnimBlendRatio = 0;
+        }
+        
+        // 블렌딩 시간 모두 경과 시, 블렌딩 종료. 
         if (fBlendLeftTime <= 0)
         {
             isDoingTransition = false;
@@ -248,60 +249,17 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
         }
     }
 
-
-    //m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta, fAnimBlendRatio);
-
-
-
-    // ==============================
-    // || 블렌딩중이면 애니메이션 2개 동시에 돌림, 아니면 1개
-    // ==============================
-
-    CChannel::CHANNEL_UPD_DESC pDesc = {};
-    pDesc.fAnimDuration = m_Animations[iCurAnimIndex]->Get_Duration();
-    pDesc.fTransitionTime = fTranslationTime;
-    pDesc.fTickPerSecond = m_Animations[iCurAnimIndex]->Get_TickPerSecond();
-
-#pragma region Old Animation (LoopAnim Lerping Test)
-    //// 애니메이션 업데이트
-    //if (isDoingTransition)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
-    //{
-    //    if (!isSameAnim)        // 전환 간 애니메이션이 다를 때
-    //    {
-    //        if (iPrevAnimIndex != UINT_MAX)
-    //            m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
-
-    //        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
-    //    }
-    //    else                    // 전환 간 애니메이션이 같을 때
-    //    {
-    //        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
-    //    }
-    //    //std::cout << "[CModel::Play_Animation] Playing Blend Anim.. (NewAnim BlendRatio : " << fAnimBlendRatio << ")" << std::endl;
-    //}
-    //else                        // 전환 중이 아니면 현재 애니메이션만
-    //{
-    //    m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio, isSameAnim, &pDesc);
-    //    //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
-    //}
-#pragma endregion
-
     // 애니메이션 업데이트
-    if (isDoingTransition && !isSameAnim)    // 전환 중이면 두 개 애니메이션을 모두 업데이트. 다만 같은 애니메이션 반복 시 문제 발생
+    if (isDoingTransition && !isSameAnim)   // 전환 중이면 두 개 애니메이션을 모두 업데이트.
     {
-
-        if (iPrevAnimIndex != UINT_MAX)
-            m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);              // 이전 애니메이션은 full weight로
-
-        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);   // 새 애니메이션은 fAnimBlendRatio만큼
+        if (iPrevAnimIndex != UINT_MAX)     // 이전 애니메이션이 있다면
+            m_Animations[iPrevAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, 1.f);         // 이전 애니메이션은 full weight로
+        m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);  // 새 애니메이션은 fAnimBlendRatio만큼
     }
-    else                        // 전환 중이 아니면 현재 애니메이션만
-    {
+    else                                    // 전환 중이 아니면 현재 애니메이션만
         m_Animations[iCurAnimIndex]->Update_TransformationMatrices(m_Bones, isLoop, &isFinished, fTimeDelta, fAnimBlendRatio);
-        //std::cout << "[CModel::Play_Animation] Playing Cur Anim.." << std::endl;
-    }
 
-
+#pragma region Update CombinedTransformationMatrix / if Finished Animation Already, Clear it.
 
     /* 바꿔야할 뼈들의 Transformation행렬이 갱신되었다면, 정점들에게 직접 전달돼야할 CombindTransformationMatrix를 만들어준다. */
     for (auto& pBone : m_Bones)
@@ -314,7 +272,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _uint iTargetCurAnimIndex)
     if (m_Animations[iCurAnimIndex]->Get_isFinishedLoop())
         iPrevAnimIndex = iCurAnimIndex;
 
-
+#pragma endregion
     return isFinished;
 }
 

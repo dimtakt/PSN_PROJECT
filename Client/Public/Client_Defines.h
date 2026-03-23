@@ -78,6 +78,19 @@ namespace Client
 		ENEMY_STATE_END = (1 << 12)
 	};
 
+	enum class ENEMY_NEWSTATE {
+		IDLE			,
+		MOVE			,
+		
+		TRACK_PLAYER	,
+		TRACK_WEAPON	,
+		
+		ATK_MELEE		,
+		ATK_WEAPON_GUN	,
+
+		DMGD			
+	};
+
 	enum class PLAYER_STATE {
 		IDLE				= (1 << 0),		// °¡¸¸È÷
 

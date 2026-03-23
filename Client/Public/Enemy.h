@@ -6,14 +6,14 @@
 
 NS_BEGIN(Engine)
 
-//class CShader;
-//class CModel;
 class CNavigation;
 class CCollider;
 
 NS_END
 
 NS_BEGIN(Client)
+
+class CEnemyAI;
 
 class CEnemy final : public CContainerObject
 {
@@ -53,6 +53,8 @@ private:
 
 	void		Update_Transform(_float fTimeDelta);		// AI 행동에 의한 "Transform" 제어
 	void		Update_Transform_PreMove(_float fTimeDelta);			// 미리 지정된 위치로 이동시킬 때 필요
+
+	void		Update_StateMachine(_float fTimeDelta);
 	void		Update_AnimationState(_float fTimeDelta);	// AI 행동에 의한 "상태" 제어 (이를 기반으로 이벤트 등..)
 	void		Update_AnimationIndex(_float fTimeDelta);	// AI 행동에 의한 "애니메이션" 제어
 
@@ -78,6 +80,8 @@ private:
 
 	CPartObject*		m_pPart_Weapon		= { nullptr };
 
+	CEnemyAI*			m_pEnemyAI			= { nullptr };
+
 	ANIMARG_DESC		m_tAnimDesc[PART_END] = {};
 
 
@@ -91,6 +95,7 @@ private:
 
 private:
 	_uint				m_iState			= { };
+	_uint				m_iNewState			= { };
 
 	_vector				m_vLoadShotDir		= {};
 

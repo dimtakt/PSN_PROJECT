@@ -8,6 +8,8 @@
 
 #include "Camera_Player.h"
 
+#include "EnemyAI.h"
+
 
 
 CEnemy::CEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -84,6 +86,8 @@ void CEnemy::Update(_float fTimeDelta)
 
 	Update_NearestWeapons();
 	Update_Transform(fTimeDelta);
+
+	Update_StateMachine(fTimeDelta);
 
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
@@ -359,6 +363,11 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 	if (FAILED(Ready_Colliders(pArg)))
 		return E_FAIL;
 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_EnemyAI"),
+		TEXT("Com_EnemyAI"), reinterpret_cast<CComponent**>(&m_pEnemyAI), nullptr)))
+		return E_FAIL;
+	
+
 
 	return S_OK;
 }
@@ -509,6 +518,11 @@ void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
 	{
 		m_listPreMovePoses.pop_front();
 	}
+}
+
+void CEnemy::Update_StateMachine(_float fTimeDelta)
+{
+	m_pEnemyAI->Update(fTimeDelta);
 }
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
@@ -733,6 +747,7 @@ void CEnemy::Update_LogicInterval(_float fTimeDelta)
 	}
 }
 
+// m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON)
 void CEnemy::Update_Interact(_float fTimeDelta)
 {
 	// 무기 가까이에 있으면 줍도록
@@ -866,7 +881,6 @@ HRESULT CEnemy::Ready_Colliders(void* pArg)
 	return S_OK;
 }
 
-
 void CEnemy::Update_ToggleColliders()
 {
 	_bool isFistPlaying = false;
@@ -913,10 +927,6 @@ void CEnemy::Update_NearestWeapons()
 		CGameObject* pWeapon = m_pGameInstance->Find_GameObject(iDestLevel, strWeaponLayerTag, iIndex++);
 		if (pWeapon == nullptr) break;
 
-
-		// 콜라이더 있는지 검사. 없으면 throw 된 것으로 간주하고 포함 X
-		// !! 이렇게 하면 안되고, 콜라이더의 인덱스 타입이 THROW인지로 확인해야 할 것 같음
-		// !! 또한 pickingup중인 것도 제외해야 함
 		_bool isNotPickupable = false;
 
 		vector<CCollider*>* vecColliders = pWeapon->Get_Colliders();
@@ -1001,4 +1011,5 @@ void CEnemy::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pEnemyAI);
 }

@@ -105,7 +105,6 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 
     }
 
-
     for (_uint i = 0; i < m_iNumChannels; ++i)
     {
         m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i], fBlendRatio, isSameAnim, pArg);
