@@ -43,7 +43,21 @@ public:
 public:
 	// 퍼블릭 함수들 (Get/Set 등..)
 	// ..
-	CPartObject* Get_WeaponPart() { return m_pPart_Weapon; };
+	CPartObject* Get_WeaponPart()		{ return m_pPart_Weapon; };
+	_uint Get_StateFlags()	const		{ return m_iState; }
+	void Set_StateFlags(_uint iState)	{ m_iState = iState; }
+	_bool Has_PreMovePath() const		{ return !m_listPreMovePoses.empty(); }
+	_bool Has_NearestWeapon() const		{ return m_pNearestWeapon != nullptr; }
+	_bool Has_Weapon()		const		{ return m_pPart_Weapon != nullptr; }
+	_bool Has_GunWeapon()	const;
+	_bool Is_Groggy()		const		{ return m_isGroggy; }
+	_float Get_DistanceToPlayer() const;
+
+	void Face_Player();
+	void Face_NearestWeapon();
+	void Chase_Player(_float fTimeDelta);
+	void Chase_NearestWeapon(_float fTimeDelta);
+	void Try_PickupNearestWeapon() { Update_Interact(0.f); }
 
 private:
 	// 로컬 함수들 (기능 분리)

@@ -8,22 +8,20 @@ NS_END
 
 NS_BEGIN(Client)
 class CEnemyState;
+class CEnemyAnyState;
 
 class CEnemyAI final : public CComponent
 {
 public:
     typedef struct tagEnemyAIParam {
-        // 여기에 전용 파라미터 정의,
-        // Enemy 에서는 이걸 Getter 통해 조작하는 식으로.
-        // 이게 블랙보드 방식.
 
         _trigger    isGetDamaged_Upper      = false;
         _trigger    isGetDamaged_Lower      = false;
-        
-        _trigger    isGainWeapon            = false;
 
         _bool       isHaveWeapon            = false;
+        _bool       isHaveGunWeapon         = false;
         _bool       isNearExistWeapon       = false;
+        _bool       isGroggy                = false;
 
         _float      fDistToPlayer           = 0.f;
 
@@ -32,18 +30,16 @@ public:
         {
             isGetDamaged_Upper          = false;
             isGetDamaged_Lower          = false;
-
-            isGainWeapon                = false;
         }
 
     } ENEMY_AI_PARAM;
 
-    typedef struct tagEnemyAI {
+    typedef struct tagEnemyAIDesc {
         // Initialize 시 필요한 정보.
 
         CGameObject*        pOwner;
 
-    } ENEMY_AI;
+    } ENEMY_AI_DESC;
 
 private:
     CEnemyAI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -58,6 +54,7 @@ public:
 
     CGameObject*        Get_Owner()     { return m_pOwner; }
     ENEMY_AI_PARAM&     Get_AIParam()   { return m_tAIParam; }
+    const _wstring&     Get_CurrentStateTag() const { return m_strCurrentStateTag; }
 
 private:
     _bool               Insert_State(const _wstring& strStateTag, CEnemyState* state);
@@ -71,6 +68,7 @@ private:
     CEnemyAnyState*     m_pAnyState         = nullptr;
     CEnemyState*        m_pCurrentState     = nullptr;
     CGameObject*        m_pOwner            = nullptr;
+    _wstring            m_strCurrentStateTag = L"";
 
     //CEnemyState*        m_pEntryState       = nullptr;
     //CEnemyAnyState*     m_pAnyState         = nullptr;

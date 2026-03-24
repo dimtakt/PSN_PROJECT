@@ -181,9 +181,6 @@
     <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackMelee">
       <UniqueIdentifier>{9fb6fb56-98aa-4ad4-a52b-37a0af6bcd01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\GetDamaged1/2">
-      <UniqueIdentifier>{bd0ed2f3-7125-4890-9f8d-51e8270d8892}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\Idle">
       <UniqueIdentifier>{ced2fc57-a303-4219-b58e-7c1d26a6de8b}</UniqueIdentifier>
     </Filter>
@@ -192,6 +189,9 @@
     </Filter>
     <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackWeapon">
       <UniqueIdentifier>{0f0af00a-2b6c-4181-a86c-ddf74041626c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\_AnimObject\Enemy\EnemyAI_State\Damaged">
+      <UniqueIdentifier>{bd0ed2f3-7125-4890-9f8d-51e8270d8892}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -351,14 +351,32 @@
     <ClInclude Include="..\public\EnemyAI.h">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\EnemyAttackMeleeState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackMelee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyAttackWeaponGunState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackAiming</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\State.h">
       <Filter>02.GameObject\_AnimObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyDamagedState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\Damaged</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyIdleState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\Idle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\EnemyState.h">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State</Filter>
     </ClInclude>
     <ClInclude Include="..\public\EnemyAnyState.h">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\_AnyState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyTrackPlayerState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnemyTrackWeaponState.h">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackWeapon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -516,11 +534,29 @@
     <ClCompile Include="..\private\EnemyAI.cpp">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\EnemyAttackMeleeState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackMelee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyAttackWeaponGunState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\AttackAiming</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\EnemyState.cpp">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State</Filter>
     </ClCompile>
     <ClCompile Include="..\private\EnemyAnyState.cpp">
       <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\_AnyState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyDamagedState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\Damaged</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyIdleState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyTrackPlayerState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnemyTrackWeaponState.cpp">
+      <Filter>02.GameObject\_AnimObject\Enemy\EnemyAI_State\TrackWeapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -160,8 +160,14 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\public\CustomObj_Pickupable.h" />
     <ClInclude Include="..\public\EnemyAI.h" />
+    <ClInclude Include="..\public\EnemyAttackMeleeState.h" />
+    <ClInclude Include="..\public\EnemyAttackWeaponGunState.h" />
     <ClInclude Include="..\public\EnemyAnyState.h" />
+    <ClInclude Include="..\public\EnemyDamagedState.h" />
+    <ClInclude Include="..\public\EnemyIdleState.h" />
     <ClInclude Include="..\public\EnemyState.h" />
+    <ClInclude Include="..\public\EnemyTrackPlayerState.h" />
+    <ClInclude Include="..\public\EnemyTrackWeaponState.h" />
     <ClInclude Include="..\Public\HitParticle.h" />
     <ClInclude Include="..\public\Level_Stage.h" />
     <ClInclude Include="..\public\ShotParticle.h" />
@@ -244,8 +250,14 @@
     <ClCompile Include="..\private\Camera_Player.cpp" />
     <ClCompile Include="..\private\CustomObj_Pickupable.cpp" />
     <ClCompile Include="..\private\EnemyAI.cpp" />
+    <ClCompile Include="..\private\EnemyAttackMeleeState.cpp" />
+    <ClCompile Include="..\private\EnemyAttackWeaponGunState.cpp" />
     <ClCompile Include="..\private\EnemyAnyState.cpp" />
+    <ClCompile Include="..\private\EnemyDamagedState.cpp" />
+    <ClCompile Include="..\private\EnemyIdleState.cpp" />
     <ClCompile Include="..\private\EnemyState.cpp" />
+    <ClCompile Include="..\private\EnemyTrackPlayerState.cpp" />
+    <ClCompile Include="..\private\EnemyTrackWeaponState.cpp" />
     <ClCompile Include="..\Private\HitParticle.cpp" />
     <ClCompile Include="..\private\Level_Stage.cpp" />
     <ClCompile Include="..\private\ShotParticle.cpp" />
@@ -337,3 +349,4 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+

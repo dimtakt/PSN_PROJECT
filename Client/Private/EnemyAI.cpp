@@ -4,6 +4,12 @@
 #include "EnemyState.h"
 #include "EnemyAnyState.h"
 #include "Enemy.h"
+#include "EnemyIdleState.h"
+#include "EnemyTrackPlayerState.h"
+#include "EnemyTrackWeaponState.h"
+#include "EnemyAttackMeleeState.h"
+#include "EnemyAttackWeaponGunState.h"
+#include "EnemyDamagedState.h"
 
 CEnemyAI::CEnemyAI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -15,30 +21,28 @@ HRESULT CEnemyAI::Initialize(void* pArg)
 	if (pArg == nullptr)
 		return E_FAIL;
 
-	ENEMY_AI* pEnemyAI = static_cast<ENEMY_AI*>(pArg);
+	ENEMY_AI_DESC* pEnemyAI = static_cast<ENEMY_AI_DESC*>(pArg);
 	m_pOwner = pEnemyAI->pOwner;
 
-	// ==============================
-	// 여기에서 State들 new 한 뒤 삽입.
-	// 이후 Safe_Delete 필수!!!
-
-
-
-
-
-
-
-
-	// ==============================
+	Insert_State(L"AnyState", CEnemyAnyState::Create());
+	Insert_State(L"Idle", CEnemyIdleState::Create());
+	Insert_State(L"TrackPlayer", CEnemyTrackPlayerState::Create());
+	Insert_State(L"TrackWeapon", CEnemyTrackWeaponState::Create());
+	Insert_State(L"AttackMelee", CEnemyAttackMeleeState::Create());
+	Insert_State(L"AttackWeaponGun", CEnemyAttackWeaponGunState::Create());
+	Insert_State(L"Damaged", CEnemyDamagedState::Create());
 
 	CEnemyState* pEnemyAnyState = Find_State(L"AnyState");
 	m_pAnyState = static_cast<CEnemyAnyState*>(pEnemyAnyState);
+
+	// Entry
+	Change_State(L"Idle");
 
 	return S_OK;
 }
 
 void CEnemyAI::Update(_float fTimeDelta)
-{				
+{
 	_bool isStateInterruped = Check_AnyState();
 
 	if (!isStateInterruped)
@@ -72,28 +76,36 @@ void CEnemyAI::Change_State(const _wstring& strStateTag)
 #endif // _DEBUG
 		return;
 	}
-	
+
+	m_strCurrentStateTag = strStateTag;
 	Change_State(state);
 }
 
 _bool CEnemyAI::Insert_State(const _wstring& strStateTag, CEnemyState* state)
 {
-	_bool isAlreadyExists = (Find_State(strStateTag) == nullptr);
+	if (state == nullptr)
+		return false;
 
-	if (!isAlreadyExists)
-		m_umapStates.insert({strStateTag, state});
+	_bool isAlreadyExists = (Find_State(strStateTag) != nullptr);
 
+	if (isAlreadyExists)
+	{
 #ifdef _DEBUG
-	std::cout << "[WRN][EnemyAI::InsertState] State Already Exists." << std::endl;
+		std::cout << "[WRN][EnemyAI::InsertState] State Already Exists." << std::endl;
 #endif // _DEBUG
+		Safe_Release(state);
+		return false;
+	}
 
-	return !isAlreadyExists;
+	m_umapStates.insert({strStateTag, state});
+
+	return true;
 }
 
 CEnemyState* CEnemyAI::Find_State(const _wstring& strStateTag)
 {
 	auto it = m_umapStates.find(strStateTag);
-	
+
 	if (it != m_umapStates.end())
 		return it->second;
 
@@ -102,14 +114,8 @@ CEnemyState* CEnemyAI::Find_State(const _wstring& strStateTag)
 
 _bool CEnemyAI::Check_AnyState()
 {
-	// 조건들 정의
-
-	// - 1번 조건?
-	// 상세조건 : 보유중인 무기 없음, 주변에 주인없는 무기 감지
-	// 목표상태 : 무기추적
-	// - 2번 조건? : 
-	// 상세조건 : 상체 또는 하체 공격받음
-	// 목표상태 : 피격중
+	if (m_pAnyState == nullptr)
+		return false;
 
 	return m_pAnyState->Check_Transition(this);
 }

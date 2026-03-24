@@ -86,12 +86,10 @@ void CEnemy::Update(_float fTimeDelta)
 
 	Update_NearestWeapons();
 	Update_Transform(fTimeDelta);
-
 	Update_StateMachine(fTimeDelta);
 
 	Update_AnimationState(fTimeDelta);
 	Update_AnimationIndex(fTimeDelta);
-	Update_Interact(fTimeDelta);
 
 	m_pModelCom->Play_Animation_AllLayer(fTimeDelta);
 
@@ -269,6 +267,8 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 #ifdef _DEBUG
 		std::cout << "[CEnemy::OnCollision] Body Collision Detected." << std::endl;
 #endif
+		if (m_pEnemyAI)
+			m_pEnemyAI->Get_AIParam().isGetDamaged_Lower = true;
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
 			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
 		{
@@ -287,6 +287,8 @@ _bool CEnemy::OnCollision(COLLISION_DESC* pColDescFrom, COLLISION_DESC* pColDesc
 #ifdef _DEBUG
 		std::cout << "[CEnemy::OnCollision] Head Collision Detected." << std::endl;
 #endif
+		if (m_pEnemyAI)
+			m_pEnemyAI->Get_AIParam().isGetDamaged_Upper = true;
 		if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
 			m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))		// 이미 데미지 받은 상태라면..
 		{
@@ -363,8 +365,10 @@ HRESULT CEnemy::Ready_Components(void* pArg)
 	if (FAILED(Ready_Colliders(pArg)))
 		return E_FAIL;
 
+	CEnemyAI::ENEMY_AI_DESC tEnemyAIDesc{};
+	tEnemyAIDesc.pOwner = this;
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_EnemyAI"),
-		TEXT("Com_EnemyAI"), reinterpret_cast<CComponent**>(&m_pEnemyAI), nullptr)))
+		TEXT("Com_EnemyAI"), reinterpret_cast<CComponent**>(&m_pEnemyAI), &tEnemyAIDesc)))
 		return E_FAIL;
 	
 
@@ -434,68 +438,96 @@ HRESULT CEnemy::Ready_PartObject(_uint iObjType, void* pArg)
 void CEnemy::Update_Transform(_float fTimeDelta)
 {
 	if (!m_listPreMovePoses.empty())
-	{
 		Update_Transform_PreMove(fTimeDelta);
+}
+
+void CEnemy::Face_Player()
+{
+	if (m_isDeadStandby || !m_listPreMovePoses.empty())
 		return;
-	}
 
 	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
 	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
-	CTransform* pNearestWeaponTransformCom = (m_pNearestWeapon)? dynamic_cast<CTransform*>(m_pNearestWeapon->Get_Component(L"Com_Transform")) : nullptr;
-	
-	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
+	if (pPlayerTransformCom == nullptr)
+		return;
 
-	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
+	m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
+}
 
-	_bool isNearExistWeapon = false;
+void CEnemy::Face_NearestWeapon()
+{
+	if (m_isDeadStandby || !m_listPreMovePoses.empty() || m_pNearestWeapon == nullptr)
+		return;
 
-	if (!(m_iState & ENUM_CLASS(ENEMY_STATE::IDLE) &&
-		(m_iState & ENUM_CLASS(ENEMY_STATE::MOVE))))
+	CTransform* pNearestWeaponTransformCom = dynamic_cast<CTransform*>(m_pNearestWeapon->Get_Component(L"Com_Transform"));
+	if (pNearestWeaponTransformCom == nullptr)
+		return;
+
+	_vector vWeaponPos = pNearestWeaponTransformCom->Get_Position();
+	m_pTransformCom->LookAt(XMVectorSetY(vWeaponPos, m_pTransformCom->Get_Position_Store().y));
+}
+
+void CEnemy::Chase_Player(_float fTimeDelta)
+{
+	if (m_isDeadStandby || !m_listPreMovePoses.empty())
+		return;
+
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
+	if (pPlayerTransformCom == nullptr)
+		return;
+
+	_vector vTargetPos = pPlayerTransformCom->Get_Position();
+	_vector vTargetDir = vTargetPos - m_pTransformCom->Get_Position();
+	_float fTargetDirLength = XMVectorGetX(XMVector3Length(vTargetDir));
+
+	if (fTargetDirLength > 0.0001f)
 	{
-		// 타겟을 바라보고 다가오도록
-		_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK); // 현재 바라보는 방향
-		_vector vTargetDir = {};
-
-		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
-			vTargetDir = XMVector3Normalize(pPlayerTransformCom->Get_Position() - m_pTransformCom->Get_Position()); // 목표 위치 방향
-		else if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-			if (m_pNearestWeapon)
-				vTargetDir = XMVector3Normalize(pNearestWeaponTransformCom->Get_Position() - m_pTransformCom->Get_Position());
-
-		_float vDeg = TO_DEG(acosf(XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir))));	// 바라보는 방향과 목표물의 각도 차이
-
+		vTargetDir = XMVector3Normalize(vTargetDir);
+		_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
+		_float fDot = XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir));
+		fDot = max(-1.f, min(1.f, fDot));
+		_float fDeg = TO_DEG(acosf(fDot));
 		_vector vCross = XMVector3Cross(vCurrentLook, vTargetDir);
 		_float fDir = (XMVectorGetY(vCross) >= 0.f) ? +1.f : -1.f;
 
-		if (vDeg > 20)
+		if (fDeg > 20.f)
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDir * fTimeDelta);
-
-
-
-
-
-		if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER))
-			m_pTransformCom->Chase(pPlayerTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
-		else if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
-			if (m_pNearestWeapon)
-				m_pTransformCom->Chase(pNearestWeaponTransformCom->Get_Position(), fTimeDelta, 0.5f, m_pNavigationCom);
-
-
-
 	}
 
-	if (m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON))
+	m_pTransformCom->Chase(vTargetPos, fTimeDelta, 0.5f, m_pNavigationCom);
+	Face_Player();
+}
+
+void CEnemy::Chase_NearestWeapon(_float fTimeDelta)
+{
+	if (m_isDeadStandby || !m_listPreMovePoses.empty() || m_pNearestWeapon == nullptr)
+		return;
+
+	CTransform* pNearestWeaponTransformCom = dynamic_cast<CTransform*>(m_pNearestWeapon->Get_Component(L"Com_Transform"));
+	if (pNearestWeaponTransformCom == nullptr)
+		return;
+
+	_vector vTargetPos = pNearestWeaponTransformCom->Get_Position();
+	_vector vTargetDir = vTargetPos - m_pTransformCom->Get_Position();
+	_float fTargetDirLength = XMVectorGetX(XMVector3Length(vTargetDir));
+
+	if (fTargetDirLength > 0.0001f)
 	{
-		if (m_pNearestWeapon)
-		{
-			_vector vWeaponPos = pNearestWeaponTransformCom->Get_Position();
-			m_pTransformCom->LookAt(XMVectorSetY(vWeaponPos, m_pTransformCom->Get_Position_Store().y));
-		}
-	}
-	else 
-		m_pTransformCom->LookAt(pPlayerTransformCom->Get_Position());
+		vTargetDir = XMVector3Normalize(vTargetDir);
+		_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
+		_float fDot = XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir));
+		fDot = max(-1.f, min(1.f, fDot));
+		_float fDeg = TO_DEG(acosf(fDot));
+		_vector vCross = XMVector3Cross(vCurrentLook, vTargetDir);
+		_float fDir = (XMVectorGetY(vCross) >= 0.f) ? +1.f : -1.f;
 
+		if (fDeg > 20.f)
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDir * fTimeDelta);
+	}
+
+	m_pTransformCom->Chase(vTargetPos, fTimeDelta, 0.5f, m_pNavigationCom);
+	Face_NearestWeapon();
 }
 
 void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
@@ -522,130 +554,59 @@ void CEnemy::Update_Transform_PreMove(_float fTimeDelta)
 
 void CEnemy::Update_StateMachine(_float fTimeDelta)
 {
+	if (m_pEnemyAI == nullptr)
+		return;
+
+	CEnemyAI::ENEMY_AI_PARAM& tAIParam = m_pEnemyAI->Get_AIParam();
+	tAIParam.isHaveWeapon = (m_pPart_Weapon != nullptr);
+	tAIParam.isHaveGunWeapon = Has_GunWeapon();
+	tAIParam.isGroggy = m_isGroggy;
+	tAIParam.isNearExistWeapon = (m_pNearestWeapon != nullptr);
+	tAIParam.fDistToPlayer = Get_DistanceToPlayer();
+
 	m_pEnemyAI->Update(fTimeDelta);
 }
 
 void CEnemy::Update_AnimationState(_float fTimeDelta)
 {
-	// 상태 추가 (켜기) → |=
-	// 상태 제거 (끄기) → &= ~
-	// 
-	// 상태 토글 (반전) → ^=
-	// 상태 확인 (켜져 있는지 검사) → &
-
 	if (!m_listPreMovePoses.empty())
 	{
 		m_iState = ENUM_CLASS(ENEMY_STATE::MOVE);
 		return;
 	}
 
-
-
 	_float fShotInterval = 3.5f;
-
-	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Find_GameObject(iDestLevel, L"Layer_Player"));
-	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
-
-	_float fDist = XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
 	CWeapon_Gun* pWeaponGun = dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon);
 
-
-	// 근접 공격을 받는 경우도..
-
-	if (/*m_isLogicTriggered &&*/ 
-		!(m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
-		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U)))
+	if (!(m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
+		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U)) &&
+		(m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN)))
 	{
-
-
-		if (pWeaponGun)		// [총]		무기 들고 있음
+		if (pWeaponGun != nullptr && m_fElapsedShot > fShotInterval)
 		{
-			if (IS_BETWEEN(fDist, 60.f, 80.f))				// [Track]	적당히 가까이 있음
-			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
-				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
-			}
-			else if (IS_BETWEEN(fDist, 0.f, 60.f))			// [Aiming]	가까이 있음
-			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN);
-				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-			}
-			else if (fDist >= 70.f)							// [Idle]	멀리 있음 
-			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
-				m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-			}
+			_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
+			_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);
+
+			m_vLoadShotDir = vDir;
+
+			pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
+			m_fElapsedShot = 0.f;
 		}
-		else if (false)		// [근접]	무기 들고 있음
+		else
 		{
-
-		}
-		else				// [ X ]	든 무기 없음
-		{
-			if (m_pNearestWeapon)	//	근처에 무기 감지
-			{
-				m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON);
-				m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
-			}
-			else					//	근처에 무기가 없다면
-			{
-				if (fDist >= 20.f)
-				{
-					m_iState = ENUM_CLASS(ENEMY_STATE::IDLE);
-					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-				}
-				else if (IS_BETWEEN(fDist, 6.f, 20.f))
-				{
-					m_iState = ENUM_CLASS(ENEMY_STATE::TRACK_PLAYER);
-					m_iState |= ENUM_CLASS(ENEMY_STATE::MOVE);
-				}
-				else if (IS_BETWEEN(fDist, 0.0f, 6.f))
-				{
-					m_iState = ENUM_CLASS(ENEMY_STATE::ATK_MELEE);
-					m_iState &= ~ENUM_CLASS(ENEMY_STATE::MOVE);
-				}
-			}
-		}
-
-
-		if (m_iState & ENUM_CLASS(ENEMY_STATE::ATK_WEAPON_GUN))
-		{
-			if (pWeaponGun != nullptr && m_fElapsedShot > fShotInterval)
-			{
-				// 날아갈 방향 계산
-				_vector vGunPos = XMVectorSet(pWeaponGun->Get_CombinedMatrix()._41, pWeaponGun->Get_CombinedMatrix()._42, pWeaponGun->Get_CombinedMatrix()._43, 1.f);
-
-				_vector vDir = XMVector3Normalize(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vGunPos);	// 방향은, 목적지(에이밍중인 방향) - 출발지(플레이어 카메라 위치) 의 정규화 값.
-	
-				m_vLoadShotDir = vDir;
-
-				pWeaponGun->Shot(&m_vLoadShotDir, ENUM_CLASS(GAMEOBJ_TYPE::ENEMYBULLET));
-				m_fElapsedShot = 0.f;
-			}
-			else
-				m_fElapsedShot += fTimeDelta;
+			m_fElapsedShot += fTimeDelta;
 		}
 	}
-	
 
-	// 공격받은 상태라면
 	if (m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_L) ||
 		m_iState & ENUM_CLASS(ENEMY_STATE::DMGD_U))
 	{
-		// ksta : 피격 애니메이션 종료 시 공격받음 상태 제거..?
-		//CModel::MODEL_ANIM_DESC tUpperDesc = m_pModelCom->Get_PlayingAnimDesc(PART_UPPER);
-		//CModel::MODEL_ANIM_DESC tLowerDesc = m_pModelCom->Get_PlayingAnimDesc(PART_LOWER);
-
-		// 그냥 자체 그로기 쿨타임 적용..
 		if (!m_isGroggy)
 		{
 			m_iState &= ~ENUM_CLASS(ENEMY_STATE::DMGD_L);
 			m_iState &= ~ENUM_CLASS(ENEMY_STATE::DMGD_U);
 		}
 	}
-
-
 }
 
 void CEnemy::Update_AnimationIndex(_float fTimeDelta)
@@ -754,7 +715,8 @@ void CEnemy::Update_Interact(_float fTimeDelta)
 
 	if (!(
 		m_pPart_Weapon == nullptr &&
-		(m_iState & ENUM_CLASS(ENEMY_STATE::TRACK_WEAPON)) &&
+		m_pEnemyAI != nullptr &&
+		m_pEnemyAI->Get_CurrentStateTag() == L"TrackWeapon" &&
 		m_pNearestWeapon != nullptr &&
 		!m_isDeadStandby
 		))
@@ -976,6 +938,21 @@ void CEnemy::Update_NearestWeapons()
 	}
 	
 	m_pNearestWeapon = pNearestWeapon;
+}
+
+_bool CEnemy::Has_GunWeapon() const
+{
+	return dynamic_cast<CWeapon_Gun*>(m_pPart_Weapon) != nullptr;
+}
+
+_float CEnemy::Get_DistanceToPlayer() const
+{
+	_uint iDestLevel = m_pGameInstance->Get_DestLevel();
+	CTransform* pPlayerTransformCom = dynamic_cast<CTransform*>(m_pGameInstance->Find_Component(iDestLevel, L"Layer_Player", L"Com_Transform"));
+	if (pPlayerTransformCom == nullptr)
+		return FLT_MAX;
+
+	return XMVectorGetX(XMVector3Length(m_pTransformCom->Get_Position() - pPlayerTransformCom->Get_Position()));
 }
 
 CEnemy* CEnemy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
